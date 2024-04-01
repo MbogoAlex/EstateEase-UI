@@ -37,8 +37,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenant_care.R
+import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
+object PManagerLoginScreen: AppNavigation {
+    override val title: String = "PManager login screen"
+    override val route: String = "pManager-login"
+}
 @Composable
 fun PManagerLoginScreen(
     modifier: Modifier = Modifier

@@ -28,8 +28,8 @@ class MainActivity : ComponentActivity() {
                 ) {
 //                    TenantHomeScreen()
 //                    PManagerLoginScreen()
-//                    PManagerHomeScreen()
-                    PManagerAddUnitScreen()
+                    EstateEaseApp()
+//                    PManagerAddUnitScreen()
                 }
             }
         }
