@@ -15,7 +15,7 @@ data class PManagerLoginScreenUiState(
 )
 
 data class PManagerLoginDetails(
-    val phoneNumber: String = "",
+    val email: String = "",
     val password: String = "",
 )
 
@@ -27,7 +27,7 @@ class PManagerLoginScreenViewModel:ViewModel() {
 
     fun updatePhoneNumber(phoneNumber: String) {
         pManagerLoginDetails = pManagerLoginDetails.copy(
-            phoneNumber = phoneNumber
+            email = phoneNumber
         )
         _uiState.update {
             it.copy(
@@ -50,6 +50,6 @@ class PManagerLoginScreenViewModel:ViewModel() {
     }
 
     fun checkIfFieldsAreEmpty(): Boolean {
-        return pManagerLoginDetails.phoneNumber.isNotEmpty() && pManagerLoginDetails.password.isNotEmpty()
+        return pManagerLoginDetails.email.isNotEmpty() && pManagerLoginDetails.password.isNotEmpty()
     }
 }

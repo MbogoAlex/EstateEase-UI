@@ -83,11 +83,11 @@ fun PManagerLoginScreen(
         )
         Spacer(modifier = Modifier.height(20.dp))
         PManagerLoginInputField(
-            label = "Phone number",
-            value = uiState.pManagerLoginDetails.phoneNumber,
+            label = "Email",
+            value = uiState.pManagerLoginDetails.email,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Number
+                keyboardType = KeyboardType.Email
             ),
             onValueChange = {
                 viewModel.updatePhoneNumber(it)

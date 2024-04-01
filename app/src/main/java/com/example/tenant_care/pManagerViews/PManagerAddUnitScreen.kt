@@ -144,6 +144,19 @@ fun PManagerAddUnitForm(
                         keyboardType = KeyboardType.Text
                     )
                 )
+                Spacer(modifier = Modifier.height(10.dp))
+                PManagerAddUnitInputField(
+                    label = "Monthly rent",
+                    value = uiState.unitDetails.monthlyRent.toString(),
+                    maxLines = 1,
+                    onValueChange = {
+                        viewModel.updateUnitRent(it.toDouble())
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Number
+                    )
+                )
                 Spacer(modifier = Modifier.height(20.dp))
 
             }

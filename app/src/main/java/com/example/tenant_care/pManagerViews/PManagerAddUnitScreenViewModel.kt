@@ -1,6 +1,5 @@
 package com.example.tenant_care.pManagerViews
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,6 +18,7 @@ data class UnitDetails(
     val numOfRooms: Int = 0,
     val unitNameOrNumber: String = "",
     val unitDescription: String = "",
+    val monthlyRent: Double = 0.0
 )
 
 class PManagerAddUnitScreenViewModel: ViewModel() {
@@ -63,7 +63,20 @@ class PManagerAddUnitScreenViewModel: ViewModel() {
         }
     }
 
+    fun updateUnitRent(monthlyRent: Double) {
+        unitDetails = unitDetails.copy(
+            monthlyRent = monthlyRent
+        )
+        _uiState.update {
+            it.copy(
+                unitDetails = unitDetails,
+                showSaveButton = checkIfAddUnitFieldsAreEmpty()
+            )
+        }
+    }
+
     fun checkIfAddUnitFieldsAreEmpty(): Boolean {
         return unitDetails.numOfRooms != 0 && unitDetails.unitNameOrNumber.isNotEmpty() && unitDetails.unitDescription.isNotEmpty()
+                && unitDetails.monthlyRent != 0.0
     }
 }
