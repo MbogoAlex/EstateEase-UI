@@ -15,6 +15,11 @@ data class PManagerResponseBody(
 )
 @Serializable
 data class PManagerData(
+    val pmanager: PManagerDataBody,
+)
+
+@Serializable
+data class PManagerDataBody(
     val fullName: String,
     val phoneNumber: String,
     val email: String,

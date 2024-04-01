@@ -19,10 +19,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
+object HomeScreenDestination: AppNavigation {
+    override val title: String = "Home Screen"
+    override val route: String = "home-screen"
+
+}
 @Composable
 fun HomeScreen(
+    navigateToPManagerLoginScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -34,7 +41,7 @@ fun HomeScreen(
     ) {
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            text = "PropEase",
+            text = "EstateEase",
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold
         )
@@ -45,12 +52,15 @@ fun HomeScreen(
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(100.dp))
-        LoginButtonsDisplay()
+        LoginButtonsDisplay(
+            navigateToPManagerLoginScreen = navigateToPManagerLoginScreen
+        )
     }
 }
 
 @Composable
 fun LoginButtonsDisplay(
+    navigateToPManagerLoginScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -71,7 +81,7 @@ fun LoginButtonsDisplay(
         Spacer(modifier = Modifier.height(50.dp))
         LoginButton(
             buttonText = "PROPERTY MANAGER",
-            onClickButton = { /*TODO*/ }
+            onClickButton = { navigateToPManagerLoginScreen() }
         )
     }
 }
@@ -117,6 +127,8 @@ fun HomeScreenPreview(
     modifier: Modifier = Modifier
 ) {
     Tenant_careTheme {
-        HomeScreen()
+        HomeScreen(
+            navigateToPManagerLoginScreen = {}
+        )
     }
 }

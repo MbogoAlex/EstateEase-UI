@@ -37,8 +37,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tenant_care.R
+import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
+object PManagerHomeScreenDestination: AppNavigation {
+    override val title: String = "PManager Home Screen"
+    override val route: String = "pmanager-home-screen"
+
+}
 @Composable
 fun PManagerHomeScreen(
     modifier: Modifier = Modifier

@@ -22,8 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
+object TenantLoginScreenDestination: AppNavigation {
+    override val title: String = "Tenant Login Screen"
+    override val route: String = "tenant-login-screen"
+
+}
 @Composable
 fun TenantLoginScreen(
     modifier: Modifier = Modifier
@@ -36,7 +42,7 @@ fun TenantLoginScreen(
     ) {
         Spacer(modifier = Modifier.height(50.dp))
         Text(
-            text = "PropEase",
+            text = "EstateEase",
             fontWeight = FontWeight.Bold,
             fontSize = 25.sp
         )

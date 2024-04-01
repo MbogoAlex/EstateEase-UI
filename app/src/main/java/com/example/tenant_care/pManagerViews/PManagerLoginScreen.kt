@@ -1,5 +1,7 @@
 package com.example.tenant_care.pManagerViews
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +17,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -36,20 +40,37 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
-object PManagerLoginScreen: AppNavigation {
+object PManagerLoginScreenDestination: AppNavigation {
     override val title: String = "PManager login screen"
     override val route: String = "pManager-login"
 }
 @Composable
 fun PManagerLoginScreen(
+    navigateBackToHomeScreen: () -> Unit,
+    navigateToPManagerHomeScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val viewModel: PManagerLoginScreenViewModel = viewModel()
+    BackHandler (onBack = navigateBackToHomeScreen)
+    val context = LocalContext.current
+    val viewModel: PManagerLoginScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
+    when(uiState.loginStatus) {
+        LOGIN_STATUS.INITIAL -> {}
+        LOGIN_STATUS.LOADING -> {}
+        LOGIN_STATUS.SUCCESS -> {
+            navigateToPManagerHomeScreen()
+            viewModel.resetLoginStatus()
+        }
+        LOGIN_STATUS.FAIL -> {
+            Toast.makeText(context, uiState.loginResponseMessage, Toast.LENGTH_LONG).show()
+            viewModel.resetLoginStatus()
+        }
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -61,14 +82,14 @@ fun PManagerLoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { navigateBackToHomeScreen() }) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "BAck button"
+                    contentDescription = "Back button"
                 )
             }
             Text(
-                text = "PropEase",
+                text = "EstateEase",
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -95,7 +116,7 @@ fun PManagerLoginScreen(
                 keyboardType = KeyboardType.Email
             ),
             onValueChange = {
-                viewModel.updatePhoneNumber(it)
+                viewModel.updateEmail(it)
             }
         )
         Spacer(modifier = Modifier.height(20.dp))
@@ -120,11 +141,17 @@ fun PManagerLoginScreen(
         }
         Spacer(modifier = Modifier.height(30.dp))
         PManagerLoginButton(
-            onLoginButtonClicked = { /*TODO*/ },
+            onLoginButtonClicked = {
+                                   viewModel.loginPManager()
+            },
             buttonEnabled = uiState.showLoginButton,
             modifier = Modifier
                 .widthIn(250.dp)
         )
+        if(uiState.loginStatus == LOGIN_STATUS.LOADING) {
+            Spacer(modifier = Modifier.height(10.dp))
+            CircularProgressIndicator()
+        }
     }
 }
 
@@ -169,6 +196,8 @@ fun PManagerLoginButton(
     }
 }
 
+
+
 @Preview(showBackground = true)
 @Composable
 fun PManagerLoginInputFieldPreview() {
@@ -189,6 +218,9 @@ fun PManagerLoginInputFieldPreview() {
 @Composable
 fun PManagerLoginScreenPreview() {
     Tenant_careTheme {
-        PManagerLoginScreen()
+        PManagerLoginScreen(
+            navigateBackToHomeScreen = {},
+            navigateToPManagerHomeScreen = {}
+        )
     }
 }
