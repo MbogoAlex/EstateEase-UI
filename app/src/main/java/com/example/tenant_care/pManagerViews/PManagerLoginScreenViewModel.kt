@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.container.ApiRepository
+import com.example.tenant_care.datastore.DSRepository
+import com.example.tenant_care.datastore.UserDSDetails
 import com.example.tenant_care.model.PManagerRequestBody
 import com.example.tenant_care.util.ReusableFunctions
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +37,7 @@ data class PManagerLoginDetails(
 
 class PManagerLoginScreenViewModel(
     private val apiRepository: ApiRepository,
+    private val dsRepository: DSRepository
 ):ViewModel() {
     private val _uiState = MutableStateFlow(value = PManagerLoginScreenUiState())
     val uiState: StateFlow<PManagerLoginScreenUiState> = _uiState.asStateFlow()
@@ -89,6 +92,22 @@ class PManagerLoginScreenViewModel(
                 try {
                     val response = apiRepository.loginPManager(pManagerRequestBody)
                     if(response.isSuccessful) {
+
+                        // save to datastore
+
+                        val userDSDetails = UserDSDetails(
+                            roleId = 1,
+                            userId = response.body()?.data?.pmanager?.pmanagerId!!,
+                            fullName = response.body()?.data?.pmanager?.fullName!!,
+                            email = response.body()?.data?.pmanager?.email!!,
+                            phoneNumber = response.body()?.data?.pmanager?.phoneNumber!!,
+                            userAddedAt = response.body()?.data?.pmanager?.propertyManagerAddedAt!!
+
+                        )
+                        dsRepository.saveUserDetails(userDSDetails)
+
+                        // update UI
+
                         _uiState.update {
                             it.copy(
                                 loginStatus = LOGIN_STATUS.SUCCESS,

@@ -12,8 +12,19 @@ object EstateEaseViewModelFactory {
 
         initializer {
             val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
             PManagerLoginScreenViewModel(
-                apiRepository = apiRepository
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        // initialize SplashScreen ViewModel
+
+        initializer {
+            val dsRepository = estateEaseApplication().dsRepository
+            SplashScreenViewModel(
+                dsRepository = dsRepository
             )
         }
     }

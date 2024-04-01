@@ -30,6 +30,10 @@ fun NavigationGraph(
                 navigateToHomeScreen = {
                     navController.popBackStack(SplashScreenDestination.route, true)
                     navController.navigate(HomeScreenDestination.route)
+                },
+                navigateToPManagerHomeScreen = {
+                    navController.popBackStack(SplashScreenDestination.route, true)
+                    navController.navigate(PManagerHomeScreenDestination.route)
                 }
             )
         }

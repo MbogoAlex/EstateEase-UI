@@ -20,6 +20,7 @@ data class PManagerData(
 
 @Serializable
 data class PManagerDataBody(
+    val pmanagerId: Int,
     val fullName: String,
     val phoneNumber: String,
     val email: String,
