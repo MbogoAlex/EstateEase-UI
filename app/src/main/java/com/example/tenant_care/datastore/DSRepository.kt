@@ -73,4 +73,10 @@ class DSRepository(
 
     )
 
+    suspend fun deleteAllPreferences() {
+        datastore.edit {
+            it.clear()
+        }
+    }
+
 }
