@@ -1,6 +1,5 @@
 package com.example.tenant_care.pManagerViews
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,12 +19,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,9 +36,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.ReusableFunctions
 
 object PManagerHomeScreenDestination: AppNavigation {
     override val title: String = "PManager Home Screen"
@@ -49,9 +52,13 @@ object PManagerHomeScreenDestination: AppNavigation {
 fun PManagerHomeScreen(
     modifier: Modifier = Modifier
 ) {
+    val viewModel: PManagerHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
+    val uiState by viewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
-            PManagerHomeTopBar()
+            PManagerHomeTopBar(
+                uiState = uiState
+            )
         }
     ) {
         Column(
@@ -65,7 +72,9 @@ fun PManagerHomeScreen(
                     .verticalScroll(rememberScrollState())
                     .fillMaxSize()
             ) {
-                RentPaymentCard()
+                RentPaymentCard(
+                    uiState = uiState
+                )
                 Spacer(modifier = Modifier.height(20.dp))
                 PManagerUnitsHomeScreenBody()
             }
@@ -75,6 +84,7 @@ fun PManagerHomeScreen(
 
 @Composable
 fun RentPaymentCard(
+    uiState: PManagerHomeScreenUiState,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -99,7 +109,7 @@ fun RentPaymentCard(
                 }
             }
             Row {
-                Text(text = "Occupied units: 50")
+                Text(text = "Occupied units: ${uiState.estateEaseRentOverview.totalUnits}")
             }
             Spacer(modifier = Modifier.height(20.dp))
             Row {
@@ -125,13 +135,13 @@ fun RentPaymentCard(
             ) {
 
                 Text(
-                    text = "Ksh, 50,000,000.00",
+                    text = ReusableFunctions.formatMoneyValue(uiState.estateEaseRentOverview.totalExpectedRent),
                     style = TextStyle(
                         color = Color.Green
                     )
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Text(text = "50 units")
+                Text(text = "${uiState.estateEaseRentOverview.totalUnits} units")
                 Icon(
                     painter = painterResource(id = R.drawable.navigate_next),
                     contentDescription = null
@@ -147,13 +157,13 @@ fun RentPaymentCard(
                     .clickable {  }
             ) {
                 Text(
-                    text = "Ksh, 30,000",
+                    text = ReusableFunctions.formatMoneyValue(uiState.estateEaseRentOverview.paidAmount),
                     style = TextStyle(
                         color = Color.Blue
                     )
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Text(text = "30 units")
+                Text(text = "${uiState.estateEaseRentOverview.clearedUnits} units")
                 Icon(
                     painter = painterResource(id = R.drawable.navigate_next),
                     contentDescription = null
@@ -169,13 +179,13 @@ fun RentPaymentCard(
                     .clickable {  }
             ) {
                 Text(
-                    text = "Ksh, 20,000",
+                    text = ReusableFunctions.formatMoneyValue(uiState.estateEaseRentOverview.deficit),
                     style = TextStyle(
                         color = Color.Red
                     )
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Text(text = "20 units")
+                Text(text = "${uiState.estateEaseRentOverview.unclearedUnits} units")
                 Icon(
                     painter = painterResource(id = R.drawable.navigate_next),
                     contentDescription = null
@@ -287,6 +297,7 @@ fun PManagerUnitsHomeScreenBody(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PManagerHomeTopBar(
+    uiState: PManagerHomeScreenUiState,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -303,7 +314,7 @@ fun PManagerHomeTopBar(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = "PManager: Samuel Kairu",
+                    text = "PManager: ${uiState.userDSDetails.fullName}",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
@@ -317,7 +328,9 @@ fun PManagerHomeTopBar(
 @Composable
 fun RentPaymentCardPreview() {
     Tenant_careTheme {
-        RentPaymentCard()
+        RentPaymentCard(
+            uiState = PManagerHomeScreenUiState()
+        )
     }
 }
 

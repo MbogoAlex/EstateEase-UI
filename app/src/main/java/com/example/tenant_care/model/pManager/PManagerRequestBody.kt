@@ -1,4 +1,4 @@
-package com.example.tenant_care.model
+package com.example.tenant_care.model.pManager
 
 import kotlinx.serialization.Serializable
 

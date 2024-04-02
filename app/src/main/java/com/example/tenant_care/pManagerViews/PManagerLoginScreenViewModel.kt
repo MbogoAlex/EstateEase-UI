@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.container.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
 import com.example.tenant_care.datastore.UserDSDetails
-import com.example.tenant_care.model.PManagerRequestBody
+import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.util.ReusableFunctions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
