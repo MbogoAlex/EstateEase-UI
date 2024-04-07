@@ -5,6 +5,8 @@ import com.example.tenant_care.model.pManager.PManagerResponseBody
 import com.example.tenant_care.model.PropertyUnitResponseBody
 import com.example.tenant_care.model.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
+import com.example.tenant_care.model.property.NewPropertyRequestBody
+import com.example.tenant_care.model.property.NewPropertyResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -36,4 +38,10 @@ interface ApiService {
         @Path("month") month: String,
         @Path("year") year: String
     ): Response<RentPaymentOverView>
+
+    // Add a new unit
+    @POST("propertyunit")
+    suspend fun addNewUnit(
+        @Body propertyRequestBody: NewPropertyRequestBody
+    ): Response<NewPropertyResponseBody>
 }

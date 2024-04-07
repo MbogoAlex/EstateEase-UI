@@ -50,6 +50,7 @@ object PManagerHomeScreenDestination: AppNavigation {
 }
 @Composable
 fun PManagerHomeScreen(
+    navigateToAddUnitScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: PManagerHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -76,7 +77,9 @@ fun PManagerHomeScreen(
                     uiState = uiState
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                PManagerUnitsHomeScreenBody()
+                PManagerUnitsHomeScreenBody(
+                    navigateToAddUnitScreen = navigateToAddUnitScreen
+                )
             }
         }
     }
@@ -206,6 +209,7 @@ fun RentPaymentCard(
 
 @Composable
 fun PManagerUnitsHomeScreenBody(
+    navigateToAddUnitScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column {
@@ -213,6 +217,7 @@ fun PManagerUnitsHomeScreenBody(
             ElevatedCard(
                 modifier = Modifier
                     .weight(1f)
+                    .clickable { navigateToAddUnitScreen() }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -338,6 +343,8 @@ fun RentPaymentCardPreview() {
 @Composable
 fun PManagerHomeScreenPreview() {
     Tenant_careTheme {
-        PManagerHomeScreen()
+        PManagerHomeScreen(
+            navigateToAddUnitScreen = {}
+        )
     }
 }

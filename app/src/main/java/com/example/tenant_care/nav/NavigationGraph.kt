@@ -10,6 +10,8 @@ import com.example.tenant_care.HomeScreen
 import com.example.tenant_care.HomeScreenDestination
 import com.example.tenant_care.SplashScreen
 import com.example.tenant_care.SplashScreenDestination
+import com.example.tenant_care.pManagerViews.PManagerAddUnitScreen
+import com.example.tenant_care.pManagerViews.PManagerAddUnitScreenDestination
 import com.example.tenant_care.pManagerViews.PManagerHomeScreen
 import com.example.tenant_care.pManagerViews.PManagerHomeScreenDestination
 import com.example.tenant_care.pManagerViews.PManagerLoginScreen
@@ -58,7 +60,18 @@ fun NavigationGraph(
             )
         }
         composable(PManagerHomeScreenDestination.route) {
-            PManagerHomeScreen()
+            PManagerHomeScreen(
+                navigateToAddUnitScreen = {
+                    navController.navigate(PManagerAddUnitScreenDestination.route)
+                }
+            )
+        }
+        composable(PManagerAddUnitScreenDestination.route) {
+            PManagerAddUnitScreen(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                }
+            )
         }
     }
 }
