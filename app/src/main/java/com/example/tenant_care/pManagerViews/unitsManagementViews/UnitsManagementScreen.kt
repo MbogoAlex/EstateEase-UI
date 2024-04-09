@@ -15,6 +15,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,15 +27,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
-enum class Screen {
-    OCCUPIED_UNITS,
-    UNOCCUPIED_UNITS,
-    ADD_UNIT
-}
+
 
 data class NavigationItem (
     val title: String,
@@ -54,8 +53,11 @@ object UnitsManagementComposable: AppNavigation {
 @Composable
 fun UnitsManagementComposable(
     navigateToPreviousScreen: () -> Unit,
+    navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val viewModel: UnitsManagementScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
+    val uiState by viewModel.uiState.collectAsState()
     val navigationItems = listOf<NavigationItem>(
         NavigationItem(
             title = "Occupied",
@@ -77,14 +79,13 @@ fun UnitsManagementComposable(
             color = Color.Black
         ),
     )
-    var currentScreen by remember {
-        mutableStateOf(Screen.OCCUPIED_UNITS)
-    }
+
     UnitsManagementScreen(
-        currentScreen = currentScreen,
+        currentScreen = uiState.currentScreen,
         navigationItems = navigationItems,
+        navigateToUnoccupiedPropertyDetailsScreen = navigateToUnoccupiedPropertyDetailsScreen,
         onChangeTab = {
-            currentScreen = it
+            viewModel.changeScreen(it)
         }
     )
 }
@@ -95,6 +96,7 @@ fun UnitsManagementScreen(
     currentScreen: Screen,
     navigationItems: List<NavigationItem>,
     onChangeTab: (newScreen: Screen) -> Unit,
+    navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -110,6 +112,7 @@ fun UnitsManagementScreen(
             }
             Screen.UNOCCUPIED_UNITS -> {
                 UnoccupiedUnitsComposable(
+                    navigateToUnoccupiedPropertyDetailsScreen = navigateToUnoccupiedPropertyDetailsScreen,
                     modifier = Modifier
                         .weight(1f)
                 )
@@ -162,12 +165,14 @@ fun BottomNavigationBar(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun UnitsManagementComposablePreview() {
     Tenant_careTheme {
         UnitsManagementComposable(
-            navigateToPreviousScreen = {}
+            navigateToPreviousScreen = {},
+            navigateToUnoccupiedPropertyDetailsScreen = {}
         )
     }
 }

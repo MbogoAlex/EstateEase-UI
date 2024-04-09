@@ -13,28 +13,26 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class FetchingOccupiedUnitsStatus {
+enum class FetchingUnOccupiedUnitsStatus {
     INITIAL,
     FETCHING,
     SUCCESS,
     FAIL
 }
-data class OccupiedUnitsScreenUiState(
+data class UnOccupiedUnitsScreenUiState(
     val properties: List<PropertyUnit> = emptyList(),
-    val fetchingOccupiedUnitsStatus: FetchingOccupiedUnitsStatus = FetchingOccupiedUnitsStatus.INITIAL,
+    val fetchingUnOccupiedUnitsStatus: FetchingUnOccupiedUnitsStatus = FetchingUnOccupiedUnitsStatus.INITIAL,
     val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
     val numOfRoomsSelected: String? = null,
     val unitName: String? = null,
-    val tenant: String? = null,
     val roomNames: List<String> = emptyList()
 )
-class OccupiedUnitsScreenViewModel(
+class UnoccupiedUnitsScreenViewModel(
     private val apiRepository: ApiRepository,
-    private val dsRepository: DSRepository,
-) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(value = OccupiedUnitsScreenUiState())
-    val uiState: StateFlow<OccupiedUnitsScreenUiState> = _uiState.asStateFlow()
+    private val dsRepository: DSRepository
+): ViewModel() {
+    private val _uiState = MutableStateFlow(value = UnOccupiedUnitsScreenUiState())
+    val uiState: StateFlow<UnOccupiedUnitsScreenUiState> = _uiState.asStateFlow()
 
     fun loadUserDetails() {
         viewModelScope.launch {
@@ -48,44 +46,46 @@ class OccupiedUnitsScreenViewModel(
         }
     }
 
-    fun fetchOccupiedProperties() {
+    fun fetchUnOccupiedProperties() {
         _uiState.update {
             it.copy(
-                fetchingOccupiedUnitsStatus = FetchingOccupiedUnitsStatus.FETCHING
+
+                fetchingUnOccupiedUnitsStatus = FetchingUnOccupiedUnitsStatus.FETCHING
             )
         }
         viewModelScope.launch {
             try {
                 val response = apiRepository.fetchFilteredProperties(
-                    tenantName = _uiState.value.tenant,
+                    tenantName = null,
                     rooms = _uiState.value.numOfRoomsSelected,
                     roomName = _uiState.value.unitName,
-                    occupied = true
+                    occupied = false
                 )
                 if(response.isSuccessful) {
                     _uiState.update {
                         it.copy(
                             properties = response.body()?.data?.property!!.reversed(),
-                            fetchingOccupiedUnitsStatus = FetchingOccupiedUnitsStatus.SUCCESS
+                            fetchingUnOccupiedUnitsStatus = FetchingUnOccupiedUnitsStatus.SUCCESS
                         )
                     }
                     fillRoomsList()
                 } else {
                     _uiState.update {
                         it.copy(
-                            fetchingOccupiedUnitsStatus = FetchingOccupiedUnitsStatus.FAIL
+                            fetchingUnOccupiedUnitsStatus = FetchingUnOccupiedUnitsStatus.FAIL
                         )
                     }
                 }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
-                        fetchingOccupiedUnitsStatus = FetchingOccupiedUnitsStatus.FAIL
+                        fetchingUnOccupiedUnitsStatus = FetchingUnOccupiedUnitsStatus.FAIL
                     )
                 }
             }
         }
     }
+
 
 
     fun filterByNumberOfRooms(rooms: Int) {
@@ -94,17 +94,9 @@ class OccupiedUnitsScreenViewModel(
                 numOfRoomsSelected = rooms.toString()
             )
         }
-        fetchOccupiedProperties()
+        fetchUnOccupiedProperties()
     }
 
-    fun filterByTenantName(tenant: String?) {
-        _uiState.update {
-            it.copy(
-                tenant = tenant
-            )
-        }
-        fetchOccupiedProperties()
-    }
 
     fun filterByRoomName(unitName: String) {
         _uiState.update {
@@ -112,7 +104,7 @@ class OccupiedUnitsScreenViewModel(
                 unitName = unitName
             )
         }
-        fetchOccupiedProperties()
+        fetchUnOccupiedProperties()
     }
 
     fun fillRoomsList() {
@@ -131,17 +123,16 @@ class OccupiedUnitsScreenViewModel(
         _uiState.update {
             it.copy(
                 numOfRoomsSelected = null,
-                tenant = null,
                 unitName = null
             )
         }
-        fetchOccupiedProperties()
+        fetchUnOccupiedProperties()
     }
+
 
     init {
         loadUserDetails()
-        fetchOccupiedProperties()
+        fetchUnOccupiedProperties()
 
     }
-
 }

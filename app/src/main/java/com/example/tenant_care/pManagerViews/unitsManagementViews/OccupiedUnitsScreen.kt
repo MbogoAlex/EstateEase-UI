@@ -67,29 +67,48 @@ fun OccupiedUnitsComposable(
     val viewModel: OccupiedUnitsScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
     val rooms = uiState.roomNames
-    Box(
-        modifier = modifier
-    ) {
-        OccupiedUnitsScreen(
-            rooms = rooms,
-            numberOfRoomsSelected = uiState.numOfRoomsSelected,
-            properties = uiState.properties,
-            onSelectNumOfRooms = {
-                viewModel.filterByNumberOfRooms(it)
-            },
-            searchText = uiState.tenant,
-            onSearchTextChanged = {
-                viewModel.filterByTenantName(it)
-            },
-            selectedUnitName = uiState.unitName,
-            onChangeSelectedUnitName = {
-                viewModel.filterByRoomName(it)
-            },
-            unfilterUnits = {
-                viewModel.unfilterProperties()
-            }
-        )
+    var selectedPropertyIndex by remember {
+        mutableIntStateOf(0)
     }
+    var showUnitDetails by remember {
+        mutableStateOf(false)
+    }
+    if (showUnitDetails) {
+        OccupiedUnitDetails(
+            propertyUnit = uiState.properties[selectedPropertyIndex],
+            onBackButtonClicked = { showUnitDetails = !showUnitDetails }
+        )
+    } else {
+        Box(
+            modifier = modifier
+        ) {
+            OccupiedUnitsScreen(
+                rooms = rooms,
+                numberOfRoomsSelected = uiState.numOfRoomsSelected,
+                properties = uiState.properties,
+                onSelectNumOfRooms = {
+                    viewModel.filterByNumberOfRooms(it)
+                },
+                searchText = uiState.tenant,
+                onSearchTextChanged = {
+                    viewModel.filterByTenantName(it)
+                },
+                selectedUnitName = uiState.unitName,
+                onChangeSelectedUnitName = {
+                    viewModel.filterByRoomName(it)
+                },
+                unfilterUnits = {
+                    viewModel.unfilterProperties()
+                },
+                numberOfUnits = uiState.properties.size,
+                onChangeSelectedIndex = {
+                    selectedPropertyIndex = it
+                    showUnitDetails = !showUnitDetails
+                }
+            )
+        }
+    }
+
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -103,6 +122,8 @@ fun OccupiedUnitsScreen(
     selectedUnitName: String?,
     onChangeSelectedUnitName: (name: String) -> Unit,
     unfilterUnits: () -> Unit,
+    numberOfUnits: Int,
+    onChangeSelectedIndex: (index: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -135,10 +156,17 @@ fun OccupiedUnitsScreen(
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = "$numberOfUnits units",
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(10.dp))
         LazyColumn() {
             items(properties.size) {
                 OccupiedUnitItem(
+                    onChangeSelectedIndex = onChangeSelectedIndex,
                     propertyUnit = properties[it],
+                    propertyIndex = it,
                     modifier = Modifier
                         .padding(
                             top = 10.dp
@@ -152,17 +180,22 @@ fun OccupiedUnitsScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OccupiedUnitItem(
+    onChangeSelectedIndex: (index: Int) -> Unit,
     propertyUnit: PropertyUnit,
+    propertyIndex: Int,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
+            .clickable {
+                onChangeSelectedIndex(propertyIndex)
+            }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(10.dp)
+                .padding(20.dp)
         ) {
             Column(
 
@@ -376,8 +409,11 @@ fun SearchFieldForOccupiedUnits(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OccupiedUnitDetails(
+    propertyUnit: PropertyUnit,
+    onBackButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -386,7 +422,7 @@ fun OccupiedUnitDetails(
             .padding(16.dp)
     ) {
         Row {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { onBackButtonClicked() }) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Previous screen"
@@ -403,7 +439,7 @@ fun OccupiedUnitDetails(
             ) {
 
                 Text(
-                    text = "Col C2",
+                    text = propertyUnit.propertyNumberOrName,
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
                     modifier = Modifier
@@ -415,7 +451,7 @@ fun OccupiedUnitDetails(
                         text = "Uploaded on: ",
                         fontWeight = FontWeight.Bold
                     )
-                    Text(text = "2024/05/08 12:08")
+                    Text(text = propertyUnit.propertyAddedAt)
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Row {
@@ -423,7 +459,7 @@ fun OccupiedUnitDetails(
                         text = "No. Rooms: ",
                         fontWeight = FontWeight.Bold
                     )
-                    Text(text = "4")
+                    Text(text = propertyUnit.numberOfRooms.toString())
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Row {
@@ -431,7 +467,7 @@ fun OccupiedUnitDetails(
                         text = "Monthly rent: ",
                         fontWeight = FontWeight.Bold
                     )
-                    Text(text = "Ksh25,000")
+                    Text(text = ReusableFunctions.formatMoneyValue(propertyUnit.monthlyRent))
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Row {
@@ -439,7 +475,7 @@ fun OccupiedUnitDetails(
                         text = "Current tenant: ",
                         fontWeight = FontWeight.Bold
                     )
-                    Text(text = "Agnes Njoki")
+                    Text(text = propertyUnit.tenants[0].fullName)
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Row {
@@ -447,7 +483,7 @@ fun OccupiedUnitDetails(
                         text = "Tenant since: ",
                         fontWeight = FontWeight.Bold
                     )
-                    Text(text = "2024/05/08 12:08")
+                    Text(text = ReusableFunctions.formatDateTimeValue(propertyUnit.tenants[0].tenantAddedAt))
                 }
 
             }
@@ -467,13 +503,13 @@ fun OccupiedUnitDetails(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun OccupiedUnitDetailsPreview() {
-    Tenant_careTheme {
-        OccupiedUnitDetails()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun OccupiedUnitDetailsPreview() {
+//    Tenant_careTheme {
+//        OccupiedUnitDetails()
+//    }
+//}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
@@ -491,7 +527,9 @@ fun OccupiedUnitItemPreview() {
     )
     Tenant_careTheme {
         OccupiedUnitItem(
-            propertyUnit = property
+            propertyUnit = property,
+            propertyIndex = 1,
+            onChangeSelectedIndex = {}
         )
     }
 }
@@ -510,7 +548,9 @@ fun ActiveUnitsComposablePreview() {
             selectedUnitName = null,
             onChangeSelectedUnitName = {},
             onSearchTextChanged = {},
-            unfilterUnits = {}
+            unfilterUnits = {},
+            numberOfUnits = 5,
+            onChangeSelectedIndex = {}
         )
     }
 }

@@ -7,6 +7,9 @@ import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
 import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
+import com.example.tenant_care.model.tenant.AssignmentResponseData
+import com.example.tenant_care.model.tenant.UnitAssignmentRequestBody
+import com.example.tenant_care.model.tenant.UnitAssignmentResponseBody
 import com.example.tenant_care.network.ApiService
 import retrofit2.Response
 
@@ -14,17 +17,18 @@ interface ApiRepository {
     suspend fun loginPManager(pManagerLoginDetails: PManagerRequestBody) : Response<PManagerResponseBody>
     suspend fun fetchAllProperties(): Response<PropertyUnitResponseBody>
     suspend fun fetchPropertyByPropertyId(propertyId: Int): Response<SinglePropertyUnitResponseBody>
-    suspend fun fetchAllOccupiedProperties(
+    suspend fun fetchFilteredProperties(
         tenantName: String?,
         rooms: String?,
-        roomName: String?
+        roomName: String?,
+        occupied: Boolean,
     ): Response<PropertyUnitResponseBody>
 
     suspend fun fetchRentPaymentOverview(month: String, year: String): Response<RentPaymentOverView>
 
     suspend fun addNewUnit(propertyRequestBody: NewPropertyRequestBody): Response<NewPropertyResponseBody>
+    suspend fun assignPropertyUnit(assignmentDetails: UnitAssignmentRequestBody): Response<UnitAssignmentResponseBody>
 
-    suspend fun fetchUnoccupiedUnits(): Response<PropertyUnitResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -33,14 +37,16 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
 
     override suspend fun fetchPropertyByPropertyId(propertyId: Int): Response<SinglePropertyUnitResponseBody> = apiService.fetchPropertyByPropertyId(propertyId)
 
-    override suspend fun fetchAllOccupiedProperties(
+    override suspend fun fetchFilteredProperties(
         tenantName: String?,
         rooms: String?,
-        roomName: String?
-    ): Response<PropertyUnitResponseBody> = apiService.fetchAllOccupiedProperties(
+        roomName: String?,
+        occupied: Boolean,
+    ): Response<PropertyUnitResponseBody> = apiService.fetchFilteredProperties(
         tenantName = tenantName,
         rooms = rooms,
-        roomName = roomName
+        roomName = roomName,
+        occupied = occupied
     )
     override suspend fun fetchRentPaymentOverview(month: String, year: String): Response<RentPaymentOverView> = apiService.fetchRentPaymentOverview(
         month = month,
@@ -51,6 +57,7 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         propertyRequestBody = propertyRequestBody
     )
 
-    override suspend fun fetchUnoccupiedUnits(): Response<PropertyUnitResponseBody> = apiService.fetchUnoccupiedUnits()
+    override suspend fun assignPropertyUnit(assignmentDetails: UnitAssignmentRequestBody): Response<UnitAssignmentResponseBody> = apiService.assignPropertyUnit(assignmentDetails)
+
 
 }

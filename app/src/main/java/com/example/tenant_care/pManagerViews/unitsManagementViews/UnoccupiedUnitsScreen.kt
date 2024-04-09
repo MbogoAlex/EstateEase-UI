@@ -1,5 +1,7 @@
 package com.example.tenant_care.pManagerViews.unitsManagementViews
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,11 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -25,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,28 +40,65 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
+import com.example.tenant_care.model.property.PropertyUnit
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.ReusableFunctions
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UnoccupiedUnitsComposable(
+    navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val viewModel: UnoccupiedUnitsScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
+    val uiState by viewModel.uiState.collectAsState()
     Box(
         modifier = modifier
     ) {
-        UnoccupiedUnitsScreen()
+        UnoccupiedUnitsScreen(
+            selectedNumOfRooms = uiState.numOfRoomsSelected,
+            onSelectNumOfRooms = {
+                viewModel.filterByNumberOfRooms(it)
+            },
+            rooms = uiState.roomNames,
+            selectedUnit = uiState.unitName,
+            onChangeSelectedUnitName = {
+                viewModel.filterByRoomName(it)
+            },
+            undoFilter = {
+                viewModel.unfilterProperties()
+            },
+            properties = uiState.properties,
+            numberOfUnits = uiState.properties.size,
+            navigateToUnoccupiedPropertyDetailsScreen = navigateToUnoccupiedPropertyDetailsScreen
+        )
     }
+
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UnoccupiedUnitsScreen(
+    selectedNumOfRooms: String?,
+    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    rooms: List<String>,
+    selectedUnit: String?,
+    onChangeSelectedUnitName: (name: String) -> Unit,
+    undoFilter: () -> Unit,
+    properties: List<PropertyUnit>,
+    numberOfUnits: Int,
+    navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -62,25 +106,35 @@ fun UnoccupiedUnitsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        SearchFieldForUnoccupiedUnits(
-            labelText = "Search room name",
-            value = "",
-            onValueChange = {},
-            modifier = Modifier
-                .fillMaxWidth()
-        )
         Spacer(modifier = Modifier.height(10.dp))
         Row {
-            FilterUnoccupiedUnitsByNumOfRoomsBox()
+            FilterUnOccupiedUnitsByNumOfRoomsBox(
+                selectedNumOfRooms = selectedNumOfRooms,
+                onSelectNumOfRooms = onSelectNumOfRooms,
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            FilterUnoccupiedUnitsByNameBox(
+                rooms = rooms,
+                selectedUnit = selectedUnit,
+                onChangeSelectedUnitName = onChangeSelectedUnitName
+            )
             Spacer(modifier = Modifier.weight(1f))
-            FilterUnoccupiedUnitsByNameBox()
-            Spacer(modifier = Modifier.weight(1f))
-            UndoFilteringForUnoccupiedUnitsBox()
+            UndoFilteringForUnoccupiedUnitsBox(
+                undoFilter = undoFilter
+            )
         }
         Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = "$numberOfUnits units",
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(10.dp))
         LazyColumn() {
-            items(10) {
+            items(properties.size) {
                 UnoccupiedUnitItem(
+                    propertyUnit = properties[it],
+                    propertyIndex = it,
+                    navigateToUnoccupiedPropertyDetailsScreen = navigateToUnoccupiedPropertyDetailsScreen,
                     modifier = Modifier
                         .padding(
                             top = 10.dp
@@ -92,13 +146,20 @@ fun UnoccupiedUnitsScreen(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UnoccupiedUnitItem(
+    propertyUnit: PropertyUnit,
+    propertyIndex: Int,
+    navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
+            .clickable {
+                navigateToUnoccupiedPropertyDetailsScreen(propertyUnit.propertyUnitId.toString())
+            }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -111,20 +172,18 @@ fun UnoccupiedUnitItem(
                 Row {
                     Text(text = "Room No: ")
                     Text(
-                        text = "Col C2",
+                        text = propertyUnit.propertyNumberOrName,
                         fontWeight = FontWeight.Bold
                     )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Row {
-                    Text(text = "Uploaded on: ")
-                    Text(
-                        text = "2023/04/05 10:44AM",
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Light
-                    )
-                }
+                Text(text = "Uploaded on: ")
+                Text(
+                    text = ReusableFunctions.formatDateTimeValue(propertyUnit.propertyAddedAt),
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Light
+                )
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = { /*TODO*/ }) {
@@ -138,28 +197,44 @@ fun UnoccupiedUnitItem(
 }
 
 @Composable
-fun FilterUnoccupiedUnitsByNumOfRoomsBox(
+fun FilterUnOccupiedUnitsByNumOfRoomsBox(
+    selectedNumOfRooms: String?,
+    onSelectNumOfRooms: (rooms: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var rooms = listOf<Int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     var expanded by remember {
         mutableStateOf(false)
     }
-    var selectedNumOfRooms by remember {
-        mutableIntStateOf(0)
+
+    var icon: ImageVector
+    if(expanded) {
+        icon = Icons.Default.KeyboardArrowUp
+    } else {
+        icon = Icons.Default.KeyboardArrowDown
     }
+
     Card(
         modifier = Modifier
             .clickable {
                 expanded = !expanded
             }
+            .widthIn(min = 100.dp)
     ) {
         Column {
-            Text(
-                text = "No. Rooms".takeIf { selectedNumOfRooms == 0 } ?: "$selectedNumOfRooms room".takeIf { selectedNumOfRooms == 1 } ?: "$selectedNumOfRooms rooms",
-                modifier = Modifier
-                    .padding(10.dp)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "No. Rooms".takeIf { selectedNumOfRooms == null } ?: "$selectedNumOfRooms room".takeIf { selectedNumOfRooms?.toInt() == 1 } ?: "$selectedNumOfRooms rooms",
+                    modifier = Modifier
+                        .padding(10.dp)
+                )
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null
+                )
+            }
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = !expanded }
@@ -172,7 +247,7 @@ fun FilterUnoccupiedUnitsByNumOfRoomsBox(
                             )
                         },
                         onClick = {
-                            selectedNumOfRooms = i
+                            onSelectNumOfRooms(i)
                             expanded = false
                         }
                     )
@@ -184,27 +259,41 @@ fun FilterUnoccupiedUnitsByNumOfRoomsBox(
 
 @Composable
 fun FilterUnoccupiedUnitsByNameBox(
+    rooms: List<String>,
+    selectedUnit: String?,
+    onChangeSelectedUnitName: (name: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var rooms = listOf<String>("A1", "A2", "A3", "A4", "A5")
     var expanded by remember {
         mutableStateOf(false)
     }
-    var selectedUnit by remember {
-        mutableStateOf("")
+    var icon: ImageVector
+    if(expanded) {
+        icon = Icons.Default.KeyboardArrowUp
+    } else {
+        icon = Icons.Default.KeyboardArrowDown
     }
     Card(
         modifier = Modifier
             .clickable {
                 expanded = !expanded
             }
+            .widthIn(min = 100.dp)
     ) {
         Column {
-            Text(
-                text = "Room name".takeIf { selectedUnit.isEmpty() } ?: selectedUnit,
-                modifier = Modifier
-                    .padding(10.dp)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Room name".takeIf { selectedUnit == null } ?: "$selectedUnit",
+                    modifier = Modifier
+                        .padding(10.dp)
+                )
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null
+                )
+            }
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = !expanded }
@@ -217,7 +306,7 @@ fun FilterUnoccupiedUnitsByNameBox(
                             )
                         },
                         onClick = {
-                            selectedUnit = i
+                            onChangeSelectedUnitName(i)
                             expanded = false
                         }
                     )
@@ -229,15 +318,20 @@ fun FilterUnoccupiedUnitsByNameBox(
 
 @Composable
 fun UndoFilteringForUnoccupiedUnitsBox(
+    undoFilter: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card {
+    Card(
+        modifier = Modifier
+            .clickable {
+                undoFilter()
+            }
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(10.dp)
         ) {
-            Text(text = "Unfilter")
             Icon(
                 imageVector = Icons.Default.Clear,
                 contentDescription = "Clear search"
@@ -273,98 +367,38 @@ fun SearchFieldForUnoccupiedUnits(
     )
 }
 
+
 @Composable
-fun UnOccupiedUnitDetails(
+fun AssignUnitScreen(
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Row {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Previous screen"
-                )
-            }
-        }
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(20.dp)
-            ) {
 
-                Text(
-                    text = "Col C2",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Row {
-                    Text(
-                        text = "Uploaded on: ",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(text = "2024/05/08 12:08")
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                Row {
-                    Text(
-                        text = "No. Rooms: ",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(text = "4")
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                Row {
-                    Text(
-                        text = "Monthly rent: ",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(text = "Ksh25,000")
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-                Row {
-                    Text(
-                        text = "Current tenant: ",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(text = "Agnes Njoki")
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                Row {
-                    Text(
-                        text = "Tenant since: ",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(text = "2024/05/08 12:08")
-                }
-
-            }
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        Button(
-            onClick = { /*TODO*/ },
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text(text = "Assign Tenant")
-        }
-
-    }
 }
 
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Preview(showBackground = true)
+//@Composable
+//fun UnOccupiedUnitDetailsPreview() {
+//    Tenant_careTheme {
+//        UnOccupiedUnitDetails()
+//    }
+//}
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
-fun UnOccupiedUnitDetailsPreview() {
+fun UnOccupiedUnitsScreenPreview() {
     Tenant_careTheme {
-        UnOccupiedUnitDetails()
+        UnoccupiedUnitsScreen(
+            selectedNumOfRooms = "1",
+            onSelectNumOfRooms = {},
+            rooms = emptyList(),
+            selectedUnit = "",
+            onChangeSelectedUnitName = {},
+            undoFilter = { /*TODO*/ },
+            properties = mutableListOf(),
+            numberOfUnits = 5,
+            navigateToUnoccupiedPropertyDetailsScreen = {}
+        )
     }
 }

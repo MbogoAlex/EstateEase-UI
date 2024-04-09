@@ -1,6 +1,7 @@
 package com.example.tenant_care
 
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -9,6 +10,8 @@ import com.example.tenant_care.pManagerViews.PManagerHomeScreenViewModel
 import com.example.tenant_care.pManagerViews.PManagerLoginScreenViewModel
 import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitsScreenViewModel
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementScreenViewModel
+import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitDetailsScreenViewModel
+import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitsScreenViewModel
 
 object EstateEaseViewModelFactory {
     val Factory = viewModelFactory {
@@ -73,6 +76,30 @@ object EstateEaseViewModelFactory {
             OccupiedUnitsScreenViewModel(
                 apiRepository = apiRepository,
                 dsRepository = dsRepository
+            )
+        }
+
+        // initialize UnoccupiedUnitsScreen ViewModel
+
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            UnoccupiedUnitsScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        // initialize UnoccupiedUnitScreenDetails ViewModel
+
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            val savedStateHandle = this.createSavedStateHandle()
+            UnoccupiedUnitDetailsScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = savedStateHandle
             )
         }
     }
