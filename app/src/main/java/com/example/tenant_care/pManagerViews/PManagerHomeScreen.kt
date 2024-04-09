@@ -2,6 +2,7 @@ package com.example.tenant_care.pManagerViews
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,12 +50,26 @@ object PManagerHomeScreenDestination: AppNavigation {
 
 }
 @Composable
-fun PManagerHomeScreen(
-    navigateToAddUnitScreen: () -> Unit,
-    modifier: Modifier = Modifier
+fun PManagerHomeComposable(
+    navigateToUnitsManagementScreen: () -> Unit,
 ) {
     val viewModel: PManagerHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
+
+    Box {
+        PManagerHomeScreen(
+            uiState = uiState,
+            navigateToUnitsManagementScreen = navigateToUnitsManagementScreen
+        )
+    }
+}
+@Composable
+fun PManagerHomeScreen(
+    uiState: PManagerHomeScreenUiState,
+    navigateToUnitsManagementScreen: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
     Scaffold(
         topBar = {
             PManagerHomeTopBar(
@@ -78,7 +93,7 @@ fun PManagerHomeScreen(
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 PManagerUnitsHomeScreenBody(
-                    navigateToAddUnitScreen = navigateToAddUnitScreen
+                    navigateToAddUnitScreen = navigateToUnitsManagementScreen
                 )
             }
         }
@@ -227,7 +242,7 @@ fun PManagerUnitsHomeScreenBody(
                         .size(150.dp)
                 ) {
                     Text(
-                        text = "Add Unit",
+                        text = "Units Management",
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
@@ -344,7 +359,8 @@ fun RentPaymentCardPreview() {
 fun PManagerHomeScreenPreview() {
     Tenant_careTheme {
         PManagerHomeScreen(
-            navigateToAddUnitScreen = {}
+            navigateToUnitsManagementScreen = {},
+            uiState = PManagerHomeScreenUiState()
         )
     }
 }

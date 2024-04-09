@@ -2,7 +2,6 @@ package com.example.tenant_care.nav
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,12 +9,14 @@ import com.example.tenant_care.HomeScreen
 import com.example.tenant_care.HomeScreenDestination
 import com.example.tenant_care.SplashScreen
 import com.example.tenant_care.SplashScreenDestination
-import com.example.tenant_care.pManagerViews.PManagerAddUnitScreen
-import com.example.tenant_care.pManagerViews.PManagerAddUnitScreenDestination
+import com.example.tenant_care.pManagerViews.PManagerHomeComposable
+import com.example.tenant_care.pManagerViews.unitsManagementViews.PManagerAddUnitScreen
+import com.example.tenant_care.pManagerViews.unitsManagementViews.PManagerAddUnitScreenDestination
 import com.example.tenant_care.pManagerViews.PManagerHomeScreen
 import com.example.tenant_care.pManagerViews.PManagerHomeScreenDestination
 import com.example.tenant_care.pManagerViews.PManagerLoginScreen
 import com.example.tenant_care.pManagerViews.PManagerLoginScreenDestination
+import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementComposable
 
 @Composable
 fun NavigationGraph(
@@ -60,14 +61,14 @@ fun NavigationGraph(
             )
         }
         composable(PManagerHomeScreenDestination.route) {
-            PManagerHomeScreen(
-                navigateToAddUnitScreen = {
-                    navController.navigate(PManagerAddUnitScreenDestination.route)
+            PManagerHomeComposable(
+                navigateToUnitsManagementScreen = {
+                    navController.navigate(UnitsManagementComposable.route)
                 }
             )
         }
-        composable(PManagerAddUnitScreenDestination.route) {
-            PManagerAddUnitScreen(
+        composable(UnitsManagementComposable.route) {
+            UnitsManagementComposable(
                 navigateToPreviousScreen = {
                     navController.navigateUp()
                 }

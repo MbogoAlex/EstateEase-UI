@@ -2,8 +2,8 @@ package com.example.tenant_care.network
 
 import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.model.pManager.PManagerResponseBody
-import com.example.tenant_care.model.PropertyUnitResponseBody
-import com.example.tenant_care.model.SinglePropertyUnitResponseBody
+import com.example.tenant_care.model.property.PropertyUnitResponseBody
+import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
 import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
@@ -12,6 +12,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -32,7 +33,11 @@ interface ApiService {
 
     // fetch all occupied properties
     @GET("propertyunit/occupied")
-    suspend fun fetchAllOccupiedProperties(): Response<PropertyUnitResponseBody>
+    suspend fun fetchAllOccupiedProperties(
+        @Query("tenantName") tenantName: String?,
+        @Query("rooms") rooms: String?,
+        @Query("roomName") roomName: String?
+    ): Response<PropertyUnitResponseBody>
     @GET("rentpayment/overview/month={month}/year={year}")
     suspend fun fetchRentPaymentOverview(
         @Path("month") month: String,
@@ -44,4 +49,8 @@ interface ApiService {
     suspend fun addNewUnit(
         @Body propertyRequestBody: NewPropertyRequestBody
     ): Response<NewPropertyResponseBody>
+
+    // fetch unoccupied properties
+    @GET("propertyunit/unoccupied")
+    suspend fun fetchUnoccupiedUnits(): Response<PropertyUnitResponseBody>
 }

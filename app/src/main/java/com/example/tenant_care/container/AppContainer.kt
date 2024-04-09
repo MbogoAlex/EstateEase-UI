@@ -13,7 +13,7 @@ interface AppContainer {
 
 class DefaultContainer(context: Context): AppContainer {
     private val json = Json { ignoreUnknownKeys = true }
-    private val baseUrl = "http://192.168.47.6:8080/api/"
+    private val baseUrl = "http://192.168.53.6:8080/api/"
     private val retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))

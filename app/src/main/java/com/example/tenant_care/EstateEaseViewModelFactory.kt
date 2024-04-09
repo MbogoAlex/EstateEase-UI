@@ -7,6 +7,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.tenant_care.pManagerViews.PManagerAddUnitScreenViewModel
 import com.example.tenant_care.pManagerViews.PManagerHomeScreenViewModel
 import com.example.tenant_care.pManagerViews.PManagerLoginScreenViewModel
+import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitsScreenViewModel
+import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementScreenViewModel
 
 object EstateEaseViewModelFactory {
     val Factory = viewModelFactory {
@@ -47,6 +49,28 @@ object EstateEaseViewModelFactory {
             val apiRepository = estateEaseApplication().container.apiRepository
             val dsRepository = estateEaseApplication().dsRepository
             PManagerAddUnitScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        // initialize UnitsManagementScreen ViewModel
+
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            UnitsManagementScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        // initialize OccupiedUnitsScreen ViewModel
+
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            OccupiedUnitsScreenViewModel(
                 apiRepository = apiRepository,
                 dsRepository = dsRepository
             )

@@ -1,7 +1,11 @@
 package com.example.tenant_care.util
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.tenant_care.datastore.UserDSDetails
 import java.text.NumberFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 object ReusableFunctions {
@@ -36,4 +40,13 @@ object ReusableFunctions {
         userAddedAt = userAddedAt,
         phoneNumber = phoneNumber
     )
+
+    // format datetime value
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun formatDateTimeValue(dateTime: String): String {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+        val dateTime = LocalDateTime.parse(dateTime, formatter)
+        return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+    }
 }
