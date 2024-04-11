@@ -1,5 +1,7 @@
 package com.example.tenant_care
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -8,12 +10,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.tenant_care.pManagerViews.PManagerAddUnitScreenViewModel
 import com.example.tenant_care.pManagerViews.PManagerHomeScreenViewModel
 import com.example.tenant_care.pManagerViews.PManagerLoginScreenViewModel
+import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitDetailsScreenViewModel
 import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitsScreenViewModel
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementScreenViewModel
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitDetailsScreenViewModel
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitsScreenViewModel
 
 object EstateEaseViewModelFactory {
+    @RequiresApi(Build.VERSION_CODES.O)
     val Factory = viewModelFactory {
         // initialize PManagerLoginViewModel
 
@@ -62,9 +66,11 @@ object EstateEaseViewModelFactory {
         initializer {
             val apiRepository = estateEaseApplication().container.apiRepository
             val dsRepository = estateEaseApplication().dsRepository
+            val savedStateHandle = this.createSavedStateHandle()
             UnitsManagementScreenViewModel(
                 apiRepository = apiRepository,
-                dsRepository = dsRepository
+                dsRepository = dsRepository,
+                savedStateHandle = savedStateHandle
             )
         }
 
@@ -100,6 +106,19 @@ object EstateEaseViewModelFactory {
                 apiRepository = apiRepository,
                 dsRepository = dsRepository,
                 savedStateHandle = savedStateHandle
+            )
+        }
+
+        // initialize OccupiedUnitDetailsScreen ViewModel
+
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            val savedStateHandle = this.createSavedStateHandle()
+            OccupiedUnitDetailsScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = this.createSavedStateHandle()
             )
         }
     }

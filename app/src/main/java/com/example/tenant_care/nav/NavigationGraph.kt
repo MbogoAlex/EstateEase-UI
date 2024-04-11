@@ -21,8 +21,11 @@ import com.example.tenant_care.pManagerViews.PManagerHomeScreen
 import com.example.tenant_care.pManagerViews.PManagerHomeScreenDestination
 import com.example.tenant_care.pManagerViews.PManagerLoginScreen
 import com.example.tenant_care.pManagerViews.PManagerLoginScreenDestination
+import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitDetailsComposable
+import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitDetailsComposableDestination
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnOccupiedUnitDetailsComposableDestination
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementComposable
+import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementComposableDestination
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitDetailsComposable
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -71,17 +74,20 @@ fun NavigationGraph(
         composable(PManagerHomeScreenDestination.route) {
             PManagerHomeComposable(
                 navigateToUnitsManagementScreen = {
-                    navController.navigate(UnitsManagementComposable.route)
+                    navController.navigate(UnitsManagementComposableDestination.route)
                 }
             )
         }
-        composable(UnitsManagementComposable.route) {
+        composable(UnitsManagementComposableDestination.route) {
             UnitsManagementComposable(
                 navigateToPreviousScreen = {
                     navController.navigateUp()
                 },
                 navigateToUnoccupiedPropertyDetailsScreen = {
                     navController.navigate("${UnOccupiedUnitDetailsComposableDestination.route}/${it}")
+                },
+                navigateToOccupiedUnitDetailsScreen = {
+                    navController.navigate("${OccupiedUnitDetailsComposableDestination.route}/${it}")
                 }
             )
         }
@@ -98,7 +104,45 @@ fun NavigationGraph(
                     navController.navigateUp()
                 },
                 navigateToOccupiedUnitsScreen = {
-                    navController.navigate(UnitsManagementComposable.route)
+                    navController.navigate(UnitsManagementComposableDestination.route)
+                }
+            )
+        }
+        composable(
+            OccupiedUnitDetailsComposableDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(OccupiedUnitDetailsComposableDestination.propertyId) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            OccupiedUnitDetailsComposable(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                },
+                navigateToUnoccupiedUnits = {
+                    navController.popBackStack(OccupiedUnitDetailsComposableDestination.routeWithArgs, true)
+                    navController.navigate("${UnitsManagementComposableDestination.route}/${it}")
+                }
+            )
+        }
+        composable(
+            UnitsManagementComposableDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(UnitsManagementComposableDestination.childScreen) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            UnitsManagementComposable(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                },
+                navigateToUnoccupiedPropertyDetailsScreen = {
+                    navController.navigate("${UnOccupiedUnitDetailsComposableDestination.route}/${it}")
+                },
+                navigateToOccupiedUnitDetailsScreen = {
+                    navController.navigate("${OccupiedUnitDetailsComposableDestination.route}/${it}")
                 }
             )
         }

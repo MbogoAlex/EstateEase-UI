@@ -5,6 +5,7 @@ import com.example.tenant_care.model.pManager.PManagerResponseBody
 import com.example.tenant_care.model.property.PropertyUnitResponseBody
 import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
+import com.example.tenant_care.model.property.ArchiveUnitResponseBody
 import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
 import com.example.tenant_care.model.tenant.UnitAssignmentRequestBody
@@ -13,6 +14,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -63,4 +65,11 @@ interface ApiService {
     suspend fun assignPropertyUnit(
         @Body assignmentDetails: UnitAssignmentRequestBody
     ): Response<UnitAssignmentResponseBody>
+
+    // archive unit
+    @PUT("propertyunit/archive/propertyId={propertyId}/tenantId={tenantId}")
+    suspend fun archiveUnit(
+        @Path("propertyId") propertyId: String,
+        @Path("tenantId") tenantId: String
+    ): Response<ArchiveUnitResponseBody>
 }

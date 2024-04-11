@@ -33,3 +33,5 @@ data class TenantData (
     val tenantAddedAt: String,
     val tenantActive: Boolean
 )
+
+

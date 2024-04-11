@@ -45,3 +45,10 @@ data class SinglePropertyUnitResponseBody (
 data class SinglePropertyUnitData (
     val property: PropertyUnit,
 )
+
+// archive unit
+@Serializable
+data class ArchiveUnitResponseBody (
+    val statusCode: Int,
+    val message: String
+)

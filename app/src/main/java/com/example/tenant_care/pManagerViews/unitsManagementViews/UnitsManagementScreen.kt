@@ -42,10 +42,11 @@ data class NavigationItem (
     val color: Color
 )
 
-object UnitsManagementComposable: AppNavigation {
+object UnitsManagementComposableDestination: AppNavigation {
     override val title: String = "Units Management Screen"
     override val route: String = "units-management-screen"
-
+    val childScreen: String = "child-screen"
+    val routeWithArgs: String = "$route/{$childScreen}"
 }
 
 
@@ -54,10 +55,18 @@ object UnitsManagementComposable: AppNavigation {
 fun UnitsManagementComposable(
     navigateToPreviousScreen: () -> Unit,
     navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
+    navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: UnitsManagementScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
+
+    if(uiState.childScreen == "unoccupied-units") {
+        viewModel.changeScreen(
+            screen = Screen.UNOCCUPIED_UNITS
+        )
+        viewModel.resetChildScreen()
+    }
     val navigationItems = listOf<NavigationItem>(
         NavigationItem(
             title = "Occupied",
@@ -84,6 +93,7 @@ fun UnitsManagementComposable(
         currentScreen = uiState.currentScreen,
         navigationItems = navigationItems,
         navigateToUnoccupiedPropertyDetailsScreen = navigateToUnoccupiedPropertyDetailsScreen,
+        navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen,
         onChangeTab = {
             viewModel.changeScreen(it)
         }
@@ -97,6 +107,7 @@ fun UnitsManagementScreen(
     navigationItems: List<NavigationItem>,
     onChangeTab: (newScreen: Screen) -> Unit,
     navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
+    navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -106,6 +117,7 @@ fun UnitsManagementScreen(
         when(currentScreen) {
             Screen.OCCUPIED_UNITS -> {
                 OccupiedUnitsComposable(
+                    navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen,
                     modifier = Modifier
                         .weight(1f)
                 )
@@ -172,7 +184,8 @@ fun UnitsManagementComposablePreview() {
     Tenant_careTheme {
         UnitsManagementComposable(
             navigateToPreviousScreen = {},
-            navigateToUnoccupiedPropertyDetailsScreen = {}
+            navigateToUnoccupiedPropertyDetailsScreen = {},
+            navigateToOccupiedUnitDetailsScreen = {},
         )
     }
 }

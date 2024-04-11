@@ -5,6 +5,7 @@ import com.example.tenant_care.model.pManager.PManagerResponseBody
 import com.example.tenant_care.model.property.PropertyUnitResponseBody
 import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
+import com.example.tenant_care.model.property.ArchiveUnitResponseBody
 import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
 import com.example.tenant_care.model.tenant.AssignmentResponseData
@@ -28,6 +29,11 @@ interface ApiRepository {
 
     suspend fun addNewUnit(propertyRequestBody: NewPropertyRequestBody): Response<NewPropertyResponseBody>
     suspend fun assignPropertyUnit(assignmentDetails: UnitAssignmentRequestBody): Response<UnitAssignmentResponseBody>
+
+    suspend fun archiveUnit(
+        propertyId: String,
+        tenantId: String
+    ): Response<ArchiveUnitResponseBody>
 
 }
 
@@ -58,6 +64,13 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
     )
 
     override suspend fun assignPropertyUnit(assignmentDetails: UnitAssignmentRequestBody): Response<UnitAssignmentResponseBody> = apiService.assignPropertyUnit(assignmentDetails)
+    override suspend fun archiveUnit(
+        propertyId: String,
+        tenantId: String
+    ): Response<ArchiveUnitResponseBody> = apiService.archiveUnit(
+        propertyId = propertyId,
+        tenantId = tenantId
+    )
 
 
 }

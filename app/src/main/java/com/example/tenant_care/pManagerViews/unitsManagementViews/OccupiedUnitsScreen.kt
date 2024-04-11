@@ -62,6 +62,7 @@ import com.example.tenant_care.util.ReusableFunctions
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OccupiedUnitsComposable(
+    navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: OccupiedUnitsScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -101,10 +102,7 @@ fun OccupiedUnitsComposable(
                     viewModel.unfilterProperties()
                 },
                 numberOfUnits = uiState.properties.size,
-                onChangeSelectedIndex = {
-                    selectedPropertyIndex = it
-                    showUnitDetails = !showUnitDetails
-                }
+                navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen,
             )
         }
     }
@@ -123,7 +121,7 @@ fun OccupiedUnitsScreen(
     onChangeSelectedUnitName: (name: String) -> Unit,
     unfilterUnits: () -> Unit,
     numberOfUnits: Int,
-    onChangeSelectedIndex: (index: Int) -> Unit,
+    navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -164,7 +162,7 @@ fun OccupiedUnitsScreen(
         LazyColumn() {
             items(properties.size) {
                 OccupiedUnitItem(
-                    onChangeSelectedIndex = onChangeSelectedIndex,
+                    navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen,
                     propertyUnit = properties[it],
                     propertyIndex = it,
                     modifier = Modifier
@@ -180,16 +178,16 @@ fun OccupiedUnitsScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OccupiedUnitItem(
-    onChangeSelectedIndex: (index: Int) -> Unit,
     propertyUnit: PropertyUnit,
     propertyIndex: Int,
+    navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
-                onChangeSelectedIndex(propertyIndex)
+                navigateToOccupiedUnitDetailsScreen(propertyUnit.propertyUnitId.toString())
             }
     ) {
         Row(
@@ -529,7 +527,7 @@ fun OccupiedUnitItemPreview() {
         OccupiedUnitItem(
             propertyUnit = property,
             propertyIndex = 1,
-            onChangeSelectedIndex = {}
+            navigateToOccupiedUnitDetailsScreen = {}
         )
     }
 }
@@ -550,7 +548,7 @@ fun ActiveUnitsComposablePreview() {
             onSearchTextChanged = {},
             unfilterUnits = {},
             numberOfUnits = 5,
-            onChangeSelectedIndex = {}
+            navigateToOccupiedUnitDetailsScreen = {}
         )
     }
 }

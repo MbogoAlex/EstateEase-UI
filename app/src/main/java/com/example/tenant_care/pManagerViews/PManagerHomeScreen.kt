@@ -1,5 +1,7 @@
 package com.example.tenant_care.pManagerViews
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,12 +45,14 @@ import com.example.tenant_care.R
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 import com.example.tenant_care.util.ReusableFunctions
+import java.time.LocalDateTime
 
 object PManagerHomeScreenDestination: AppNavigation {
     override val title: String = "PManager Home Screen"
     override val route: String = "pmanager-home-screen"
 
 }
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PManagerHomeComposable(
     navigateToUnitsManagementScreen: () -> Unit,
@@ -63,6 +67,7 @@ fun PManagerHomeComposable(
         )
     }
 }
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PManagerHomeScreen(
     uiState: PManagerHomeScreenUiState,
@@ -100,6 +105,7 @@ fun PManagerHomeScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RentPaymentCard(
     uiState: PManagerHomeScreenUiState,
@@ -118,7 +124,7 @@ fun RentPaymentCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "February, 2024",
+                    text = "${LocalDateTime.now().month}, ${LocalDateTime.now().year}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -344,6 +350,7 @@ fun PManagerHomeTopBar(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun RentPaymentCardPreview() {
@@ -354,6 +361,7 @@ fun RentPaymentCardPreview() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun PManagerHomeScreenPreview() {
