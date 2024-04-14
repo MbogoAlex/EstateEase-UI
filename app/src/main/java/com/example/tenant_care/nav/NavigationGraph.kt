@@ -21,6 +21,10 @@ import com.example.tenant_care.pManagerViews.PManagerHomeScreen
 import com.example.tenant_care.pManagerViews.PManagerHomeScreenDestination
 import com.example.tenant_care.pManagerViews.PManagerLoginScreen
 import com.example.tenant_care.pManagerViews.PManagerLoginScreenDestination
+import com.example.tenant_care.pManagerViews.rentPayment.RentPaymentsComposable
+import com.example.tenant_care.pManagerViews.rentPayment.RentPaymentsComposableDestination
+import com.example.tenant_care.pManagerViews.rentPayment.SingleTenantPaymentDetailsComposable
+import com.example.tenant_care.pManagerViews.rentPayment.SingleTenantPaymentDetailsComposableDestination
 import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitDetailsComposable
 import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitDetailsComposableDestination
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnOccupiedUnitDetailsComposableDestination
@@ -75,6 +79,9 @@ fun NavigationGraph(
             PManagerHomeComposable(
                 navigateToUnitsManagementScreen = {
                     navController.navigate(UnitsManagementComposableDestination.route)
+                },
+                navigateToRentPaymentsScreen = {
+                    navController.navigate(RentPaymentsComposableDestination.route)
                 }
             )
         }
@@ -143,6 +150,27 @@ fun NavigationGraph(
                 },
                 navigateToOccupiedUnitDetailsScreen = {
                     navController.navigate("${OccupiedUnitDetailsComposableDestination.route}/${it}")
+                }
+            )
+        }
+        composable(RentPaymentsComposableDestination.route) {
+            RentPaymentsComposable(
+                navigateToSingleTenantPaymentDetails = {
+                    navController.navigate("${SingleTenantPaymentDetailsComposableDestination.route}/${it}")
+                }
+            )
+        }
+        composable(
+            SingleTenantPaymentDetailsComposableDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(SingleTenantPaymentDetailsComposableDestination.tenantId) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            SingleTenantPaymentDetailsComposable(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
                 }
             )
         }

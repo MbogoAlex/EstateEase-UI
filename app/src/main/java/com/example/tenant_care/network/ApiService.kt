@@ -2,6 +2,7 @@ package com.example.tenant_care.network
 
 import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.model.pManager.PManagerResponseBody
+import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
 import com.example.tenant_care.model.property.PropertyUnitResponseBody
 import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
@@ -72,4 +73,18 @@ interface ApiService {
         @Path("propertyId") propertyId: String,
         @Path("tenantId") tenantId: String
     ): Response<ArchiveUnitResponseBody>
+
+    // fetch rent payments for tenants
+
+    @GET("rentpayment/detailed")
+    suspend fun fetchRentPaymentStatusForAllTenants(
+        @Query("month") month: String,
+        @Query("year") year: String,
+        @Query("roomName") roomName: String?,
+        @Query("rooms") rooms: Int?,
+        @Query("tenantName") tenantName: String?,
+        @Query("tenantId") tenantId: Int?,
+        @Query("rentPaymentStatus") rentPaymentStatus: Boolean?,
+        @Query("paidLate") paidLate: Boolean?
+    ): Response<RentPaymentDetailsResponseBody>
 }

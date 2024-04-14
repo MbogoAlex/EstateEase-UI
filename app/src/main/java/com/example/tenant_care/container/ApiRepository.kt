@@ -2,6 +2,7 @@ package com.example.tenant_care.container
 
 import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.model.pManager.PManagerResponseBody
+import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
 import com.example.tenant_care.model.property.PropertyUnitResponseBody
 import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
@@ -34,6 +35,17 @@ interface ApiRepository {
         propertyId: String,
         tenantId: String
     ): Response<ArchiveUnitResponseBody>
+
+    suspend fun fetchRentPaymentStatusForAllTenants(
+        month: String,
+        year: String,
+        roomName: String?,
+        rooms: Int?,
+        tenantName: String?,
+        tenantId: Int?,
+        rentPaymentStatus: Boolean?,
+        paidLate: Boolean?
+    ): Response<RentPaymentDetailsResponseBody>
 
 }
 
@@ -70,6 +82,26 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
     ): Response<ArchiveUnitResponseBody> = apiService.archiveUnit(
         propertyId = propertyId,
         tenantId = tenantId
+    )
+
+    override suspend fun fetchRentPaymentStatusForAllTenants(
+        month: String,
+        year: String,
+        roomName: String?,
+        rooms: Int?,
+        tenantName: String?,
+        tenantId: Int?,
+        rentPaymentStatus: Boolean?,
+        paidLate: Boolean?
+    ): Response<RentPaymentDetailsResponseBody> = apiService.fetchRentPaymentStatusForAllTenants(
+        month = month,
+        year = year,
+        roomName = roomName,
+        rooms = rooms,
+        tenantName = tenantName,
+        tenantId = tenantId,
+        rentPaymentStatus = rentPaymentStatus,
+        paidLate = paidLate
     )
 
 

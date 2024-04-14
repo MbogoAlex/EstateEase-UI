@@ -56,6 +56,7 @@ object PManagerHomeScreenDestination: AppNavigation {
 @Composable
 fun PManagerHomeComposable(
     navigateToUnitsManagementScreen: () -> Unit,
+    navigateToRentPaymentsScreen: () -> Unit,
 ) {
     val viewModel: PManagerHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
@@ -63,7 +64,8 @@ fun PManagerHomeComposable(
     Box {
         PManagerHomeScreen(
             uiState = uiState,
-            navigateToUnitsManagementScreen = navigateToUnitsManagementScreen
+            navigateToUnitsManagementScreen = navigateToUnitsManagementScreen,
+            navigateToRentPaymentsScreen = navigateToRentPaymentsScreen,
         )
     }
 }
@@ -72,6 +74,7 @@ fun PManagerHomeComposable(
 fun PManagerHomeScreen(
     uiState: PManagerHomeScreenUiState,
     navigateToUnitsManagementScreen: () -> Unit,
+    navigateToRentPaymentsScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -94,7 +97,8 @@ fun PManagerHomeScreen(
                     .fillMaxSize()
             ) {
                 RentPaymentCard(
-                    uiState = uiState
+                    uiState = uiState,
+                    navigateToRentPaymentsScreen = navigateToRentPaymentsScreen
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 PManagerUnitsHomeScreenBody(
@@ -109,6 +113,7 @@ fun PManagerHomeScreen(
 @Composable
 fun RentPaymentCard(
     uiState: PManagerHomeScreenUiState,
+    navigateToRentPaymentsScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -217,7 +222,7 @@ fun RentPaymentCard(
             }
             Spacer(modifier = Modifier.height(20.dp))
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { navigateToRentPaymentsScreen() },
                 modifier = Modifier
                     .widthIn(250.dp)
                     .align(Alignment.CenterHorizontally)
@@ -356,7 +361,8 @@ fun PManagerHomeTopBar(
 fun RentPaymentCardPreview() {
     Tenant_careTheme {
         RentPaymentCard(
-            uiState = PManagerHomeScreenUiState()
+            uiState = PManagerHomeScreenUiState(),
+            navigateToRentPaymentsScreen = {}
         )
     }
 }
@@ -368,7 +374,8 @@ fun PManagerHomeScreenPreview() {
     Tenant_careTheme {
         PManagerHomeScreen(
             navigateToUnitsManagementScreen = {},
-            uiState = PManagerHomeScreenUiState()
+            uiState = PManagerHomeScreenUiState(),
+            navigateToRentPaymentsScreen = {}
         )
     }
 }

@@ -10,6 +10,11 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.tenant_care.pManagerViews.PManagerAddUnitScreenViewModel
 import com.example.tenant_care.pManagerViews.PManagerHomeScreenViewModel
 import com.example.tenant_care.pManagerViews.PManagerLoginScreenViewModel
+import com.example.tenant_care.pManagerViews.rentPayment.AllTenantsPaymentsScreenViewModel
+import com.example.tenant_care.pManagerViews.rentPayment.RentPaymentsScreenViewModel
+import com.example.tenant_care.pManagerViews.rentPayment.SingleTenantPaymentDataScreenViewModel
+import com.example.tenant_care.pManagerViews.rentPayment.TenantsNotPaidScreenViewModel
+import com.example.tenant_care.pManagerViews.rentPayment.TenantsPaidScreenViewModel
 import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitDetailsScreenViewModel
 import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitsScreenViewModel
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementScreenViewModel
@@ -118,7 +123,63 @@ object EstateEaseViewModelFactory {
             OccupiedUnitDetailsScreenViewModel(
                 apiRepository = apiRepository,
                 dsRepository = dsRepository,
-                savedStateHandle = this.createSavedStateHandle()
+                savedStateHandle = savedStateHandle
+            )
+        }
+
+        // initialize RentPaymentsScreenViewModel
+
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            val savedStateHandle = this.createSavedStateHandle()
+            RentPaymentsScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = savedStateHandle
+            )
+
+        }
+
+        // initialize TenantsPaidScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            TenantsPaidScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        // initialize TenantsNotPaidScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            TenantsNotPaidScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        // initialize TenantsNotPaidScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            AllTenantsPaymentsScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        // initialize SingleTenantPaymentScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            val savedStateHandle = this.createSavedStateHandle()
+            SingleTenantPaymentDataScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = savedStateHandle
             )
         }
     }
