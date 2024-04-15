@@ -78,13 +78,12 @@ fun TenantsPaidScreen(
                     rentPayment = rentPayments[it],
                     paymentStatus = rentPayments[it].rentPaymentStatus,
                     paidLate = rentPayments[it].paidLate.takeIf { paidLate ->  paidLate != null } ?: false,
+                    navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
                     modifier = Modifier
                         .padding(
                             top = 10.dp
                         )
-                        .clickable {
-                            navigateToSingleTenantPaymentDetails(rentPayments[it].tenantId!!.toString())
-                        }
+
                 )
             }
         }
@@ -97,12 +96,16 @@ fun IndividualTenantPaidCell(
     rentPayment: TenantRentPaymentData,
     paymentStatus: Boolean,
     paidLate: Boolean,
+    navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
+            .clickable {
+                navigateToSingleTenantPaymentDetails(rentPayment.tenantId!!.toString())
+            }
     ) {
         Column(
             modifier = Modifier
@@ -237,7 +240,9 @@ fun IndividualTenantPaidCell(
             OutlinedButton(
                 modifier = Modifier
                     .fillMaxWidth(),
-                onClick = { /*TODO*/ }
+                onClick = {
+                    navigateToSingleTenantPaymentDetails(rentPayment.tenantId!!.toString())
+                }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -264,7 +269,8 @@ fun IndividualTenantPaidCellPreview() {
         IndividualTenantPaidCell(
             rentPayment = rentPayments[0],
             paymentStatus = false,
-            paidLate = true
+            paidLate = true,
+            navigateToSingleTenantPaymentDetails = {}
         )
     }
 }

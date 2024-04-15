@@ -74,12 +74,13 @@ fun TenantsNotPaidScreen(
                     rentPayment = rentPayments[it],
                     paymentStatus = rentPayments[it].rentPaymentStatus,
                     paidLate = rentPayments[it].paidLate.takeIf { paidLate ->  paidLate != null } ?: false,
+                    navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
                     modifier = Modifier
                         .padding(
                             top = 10.dp
                         )
                         .clickable {
-                            navigateToSingleTenantPaymentDetails(rentPayments[it].tenantId!!.toString())
+
                         }
                 )
             }
@@ -93,12 +94,16 @@ fun IndividualNotPaidTenantCell(
     rentPayment: TenantRentPaymentData,
     paymentStatus: Boolean,
     paidLate: Boolean,
+    navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
+            .clickable {
+                navigateToSingleTenantPaymentDetails(rentPayment.tenantId!!.toString())
+            }
     ) {
         Column(
             modifier = Modifier
@@ -181,24 +186,12 @@ fun IndividualNotPaidTenantCell(
                 }
 
             }
-            if(paymentStatus && paidLate) {
-                Spacer(modifier = Modifier.height(10.dp))
-                Row {
-                    Column {
-                        Text(
-                            text = "PAID LATE",
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Blue,
-                            fontSize = 18.sp
-                        )
-
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = "On: ${ReusableFunctions.formatDateTimeValue(rentPayment.paidAt!!)}",
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Light
-                    )
+            if(!paymentStatus) {
+                val penalty: Double
+                if(rentPayment.daysLate != 0) {
+                    penalty = rentPayment.penaltyPerDay * rentPayment.daysLate
+                } else {
+                    penalty = 0.0
                 }
                 Spacer(modifier = Modifier.height(5.dp))
                 Row {
@@ -207,22 +200,7 @@ fun IndividualNotPaidTenantCell(
                     Row {
                         Text(text = "Penalty: ")
                         Text(
-                            text = ReusableFunctions.formatMoneyValue(rentPayment.penaltyPerDay * rentPayment.daysLate),
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Red
-                        )
-                    }
-                }
-            }
-            if(!paymentStatus) {
-                Spacer(modifier = Modifier.height(5.dp))
-                Row {
-                    Text(text = "0 days")
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Row {
-                        Text(text = "Penalty: ")
-                        Text(
-                            text = ReusableFunctions.formatMoneyValue(0.0),
+                            text = ReusableFunctions.formatMoneyValue(penalty),
                             fontWeight = FontWeight.Bold,
                             color = Color.Red
                         )
@@ -233,7 +211,9 @@ fun IndividualNotPaidTenantCell(
             OutlinedButton(
                 modifier = Modifier
                     .fillMaxWidth(),
-                onClick = { /*TODO*/ }
+                onClick = {
+                    navigateToSingleTenantPaymentDetails(rentPayment.tenantId!!.toString())
+                }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -260,7 +240,8 @@ fun IndividualNotPaidTenantCellPreview() {
         IndividualNotPaidTenantCell(
             rentPayment = rentPayments[0],
             paymentStatus = false,
-            paidLate = true
+            paidLate = true,
+            navigateToSingleTenantPaymentDetails = {}
         )
     }
 }

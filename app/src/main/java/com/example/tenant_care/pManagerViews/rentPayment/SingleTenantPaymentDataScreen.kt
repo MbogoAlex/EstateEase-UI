@@ -264,7 +264,7 @@ fun TenantNotPaid(
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Col C2",
+                text = rentPaymentData.propertyNumberOrName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 22.sp,
                 modifier = Modifier
