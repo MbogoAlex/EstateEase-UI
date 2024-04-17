@@ -14,6 +14,7 @@ data class RentPaymentDetailsResponseBodyData (
 )
 @Serializable
 data class TenantRentPaymentData(
+    val rentPaymentTblId: Int,
     val dueDate: String,
     val month: String,
     val monthlyRent: Double,

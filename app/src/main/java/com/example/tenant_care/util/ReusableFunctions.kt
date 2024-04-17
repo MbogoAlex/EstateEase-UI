@@ -45,8 +45,13 @@ object ReusableFunctions {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun formatDateTimeValue(dateTime: String): String {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
-        val dateTime = LocalDateTime.parse(dateTime, formatter)
-        return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+        val dateTimeParts = dateTime.split("T")
+        val datePart = dateTimeParts[0] // yyyy-MM-dd
+        val timePart = dateTimeParts[1].substring(0, 5) // HH:mm
+        return "$datePart $timePart"
     }
+
+
+
+
 }

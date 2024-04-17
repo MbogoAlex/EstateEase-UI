@@ -6,6 +6,9 @@ import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
 import com.example.tenant_care.model.property.PropertyUnitResponseBody
 import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
+import com.example.tenant_care.model.pManager.RentPaymentRowUpdateRequestBody
+import com.example.tenant_care.model.pManager.RentPaymentRowUpdateResponseBody
+import com.example.tenant_care.model.pManager.RentPaymentRowsUpdateResponseBody
 import com.example.tenant_care.model.property.ArchiveUnitResponseBody
 import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
@@ -87,4 +90,33 @@ interface ApiService {
         @Query("rentPaymentStatus") rentPaymentStatus: Boolean?,
         @Query("paidLate") paidLate: Boolean?
     ): Response<RentPaymentDetailsResponseBody>
+
+    // activate late payment penalty for single tenant
+    @PUT("tenant/penalty/activate/rentPaymentTblId={rentPaymentTblId}")
+    suspend fun activateLatePaymentPenaltyForSingleTenant(
+        @Body rentPayment: RentPaymentRowUpdateRequestBody,
+        @Path("rentPaymentTblId") rentPaymentTblId: Int
+    ): Response<RentPaymentRowUpdateResponseBody>
+
+    // activate late payment penalty for single tenant
+
+    @PUT("tenant/penalty/deactivate/rentPaymentTblId={rentPaymentTblId}")
+    suspend fun deActivateLatePaymentPenaltyForSingleTenant(
+        @Path("rentPaymentTblId") rentPaymentTblId: Int
+    ): Response<RentPaymentRowUpdateResponseBody>
+
+    // activate late payment penalty for single tenant
+
+    @PUT("tenant/penalty/activate/month={month}/year={year}")
+    suspend fun activateLatePaymentPenaltyForMultipleTenants(
+        @Body rentPayment: RentPaymentRowUpdateRequestBody,
+        @Path("month") month: String,
+        @Path("year") year: String,
+    ): Response<RentPaymentRowsUpdateResponseBody>
+
+    @PUT("tenant/penalty/deactivate/month={month}/year={year}")
+    suspend fun deActivateLatePaymentPenaltyForMultipleTenants(
+        @Path("month") month: String,
+        @Path("year") year: String,
+    ): Response<RentPaymentRowsUpdateResponseBody>
 }

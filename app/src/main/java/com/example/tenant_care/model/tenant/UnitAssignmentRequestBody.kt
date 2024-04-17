@@ -12,6 +12,7 @@ data class UnitAssignmentRequestBody(
     val roleId: Int,
     val propertyUnitId: Int,
     val tenantAddedByPManagerId: Int,
+    val penaltyPerDay: Double,
 )
 @Serializable
 data class UnitAssignmentResponseBody (

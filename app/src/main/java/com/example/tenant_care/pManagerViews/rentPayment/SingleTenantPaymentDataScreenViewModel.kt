@@ -36,6 +36,7 @@ data class SingleTenantPaymentScreenUiState(
     val tenantAddedAt: String = "",
     val rentPaidOn: String = "",
     val rentPaymentDueOn: String = "",
+    val penaltyActive: Boolean = false,
     val fetchingStatus: FetchingSingleTenantPaymentStatus = FetchingSingleTenantPaymentStatus.INITIAL
 )
 @RequiresApi(Build.VERSION_CODES.O)
@@ -91,7 +92,9 @@ class SingleTenantPaymentDataScreenViewModel(
                 if(response.isSuccessful) {
                     val paidAt: String
                     if(response.body()?.data!!.rentpayment[0].paidAt != null) {
+
                         paidAt = ReusableFunctions.formatDateTimeValue(response.body()?.data!!.rentpayment[0].paidAt!!)
+                        Log.i("FORMATTING_DATE", paidAt)
                     } else {
                         paidAt = ""
                     }
@@ -101,6 +104,7 @@ class SingleTenantPaymentDataScreenViewModel(
                             tenantAddedAt = ReusableFunctions.formatDateTimeValue(response.body()?.data!!.rentpayment[0].tenantAddedAt),
                             rentPaidOn = paidAt,
                             rentPaymentDueOn = response.body()?.data!!.rentpayment[0].dueDate,
+                            penaltyActive = response.body()?.data!!.rentpayment[0].penaltyActive,
                             fetchingStatus = FetchingSingleTenantPaymentStatus.SUCCESS
                         )
                     }

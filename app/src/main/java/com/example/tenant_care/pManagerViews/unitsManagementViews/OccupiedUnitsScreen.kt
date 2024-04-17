@@ -57,6 +57,7 @@ import com.example.tenant_care.R
 import com.example.tenant_care.model.property.PropertyTenant
 import com.example.tenant_care.model.property.PropertyUnit
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.ReusableComposables
 import com.example.tenant_care.util.ReusableFunctions
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -129,7 +130,7 @@ fun OccupiedUnitsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        SearchFieldForOccupiedUnits(
+        ReusableComposables.SearchFieldForTenants(
             labelText = "Search Tenant name",
             value = searchText.takeIf { it != null } ?: "",
             onValueChange = onSearchTextChanged,
@@ -138,18 +139,18 @@ fun OccupiedUnitsScreen(
         )
         Spacer(modifier = Modifier.height(10.dp))
         Row {
-            FilterOccupiedUnitsByNumOfRoomsBox(
+            ReusableComposables.FilterByNumOfRoomsBox(
                 selectedNumOfRooms = numberOfRoomsSelected,
                 onSelectNumOfRooms = onSelectNumOfRooms
             )
             Spacer(modifier = Modifier.width(10.dp))
-            FilterOccupiedUnitsByNameBox(
+            ReusableComposables.FilterByRoomNameBox(
                 rooms = rooms,
                 selectedUnit = selectedUnitName,
                 onChangeSelectedUnitName = onChangeSelectedUnitName
             )
             Spacer(modifier = Modifier.weight(1f))
-            UndoFilteringForOccupiedUnitsBox(
+            ReusableComposables.UndoFilteringBox(
                 unfilterUnits = unfilterUnits
             )
         }
@@ -231,181 +232,7 @@ fun OccupiedUnitItem(
     }
 }
 
-@Composable
-fun FilterOccupiedUnitsByNumOfRoomsBox(
-    selectedNumOfRooms: String?,
-    onSelectNumOfRooms: (rooms: Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var rooms = listOf<Int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-    var expanded by remember {
-        mutableStateOf(false)
-    }
 
-    var icon: ImageVector
-    if(expanded) {
-        icon = Icons.Default.KeyboardArrowUp
-    } else {
-        icon = Icons.Default.KeyboardArrowDown
-    }
-
-    Card(
-        modifier = Modifier
-            .clickable {
-                expanded = !expanded
-            }
-            .widthIn(min = 100.dp)
-    ) {
-        Column {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "No. Rooms".takeIf { selectedNumOfRooms == null } ?: "$selectedNumOfRooms room".takeIf { selectedNumOfRooms?.toInt() == 1 } ?: "$selectedNumOfRooms rooms",
-                    modifier = Modifier
-                        .padding(10.dp)
-                )
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null
-                )
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = !expanded }
-            ) {
-                rooms.forEachIndexed { index, i ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = "$i room".takeIf { i == 1 } ?: "$i rooms"
-                            )
-                        },
-                        onClick = {
-                            onSelectNumOfRooms(i)
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun FilterOccupiedUnitsByNameBox(
-    rooms: List<String>,
-    selectedUnit: String?,
-    onChangeSelectedUnitName: (name: String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-    var icon: ImageVector
-    if(expanded) {
-        icon = Icons.Default.KeyboardArrowUp
-    } else {
-        icon = Icons.Default.KeyboardArrowDown
-    }
-    Card(
-        modifier = Modifier
-            .clickable {
-                expanded = !expanded
-            }
-            .widthIn(min = 100.dp)
-    ) {
-        Column {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Room name".takeIf { selectedUnit == null } ?: "$selectedUnit",
-                    modifier = Modifier
-                        .padding(10.dp)
-                )
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null
-                )
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = !expanded }
-            ) {
-                rooms.forEachIndexed { index, i ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = i
-                            )
-                        },
-                        onClick = {
-                            onChangeSelectedUnitName(i)
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun UndoFilteringForOccupiedUnitsBox(
-    unfilterUnits: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = Modifier
-            .clickable {
-                unfilterUnits()
-            }
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(10.dp)
-        ) {
-
-            Icon(
-                imageVector = Icons.Default.Clear,
-                contentDescription = "Clear search"
-            )
-        }
-    }
-}
-
-@Composable
-fun SearchFieldForOccupiedUnits(
-    labelText: String,
-    value: String,
-    onValueChange: (value: String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    TextField(
-        label = {
-            Text(text = labelText)
-        },
-        leadingIcon = {
-            Icon(
-                painter = painterResource(id = R.drawable.person),
-                contentDescription = null
-            )
-        },
-        value = value,
-        onValueChange = onValueChange,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Text
-        ),
-        colors = TextFieldDefaults.colors(
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent
-        ),
-        modifier = modifier
-    )
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -500,15 +327,6 @@ fun OccupiedUnitDetails(
 
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun OccupiedUnitDetailsPreview() {
-//    Tenant_careTheme {
-//        OccupiedUnitDetails()
-//    }
-//}
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable

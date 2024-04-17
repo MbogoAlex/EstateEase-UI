@@ -31,7 +31,12 @@ val paidRentPaymentsDataInit = RentPaymentDetailsResponseBodyData(
 data class TenantsPaidScreenUiState(
     val rentPaymentsData: RentPaymentDetailsResponseBodyData = paidRentPaymentsDataInit,
     val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
-    val fetchingStatus: FetchingTenantsPaidStatus = FetchingTenantsPaidStatus.INITIAL
+    val fetchingStatus: FetchingTenantsPaidStatus = FetchingTenantsPaidStatus.INITIAL,
+    val rentPaidAt: String = "",
+    val tenantName: String? = null,
+    val selectedNumOfRooms: String? = null,
+    val rooms: List<String> = emptyList(),
+    val selectedUnitName: String? = null,
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -84,9 +89,15 @@ class TenantsPaidScreenViewModel(
                     paidLate = paidLate
                 )
                 if(response.isSuccessful) {
+                    val rooms = mutableListOf<String>()
+                    for(rentPayment in response.body()?.data!!.rentpayment) {
+                        rooms.add(rentPayment.propertyNumberOrName)
+                    }
                     _uiState.update {
                         it.copy(
                             rentPaymentsData = response.body()?.data!!,
+                            rooms = rooms,
+                            rentPaidAt = ReusableFunctions.formatDateTimeValue(response.body()?.data?.rentpayment!![0].paidAt!!),
                             fetchingStatus = FetchingTenantsPaidStatus.SUCCESS
                         )
                     }
@@ -112,6 +123,93 @@ class TenantsPaidScreenViewModel(
         }
     }
 
+    fun filterByTenantName(tenantName: String?) {
+        Log.i("TENANT_NAME", tenantName!!)
+        var rooms: Int?
+        if(_uiState.value.selectedNumOfRooms == null) {
+            rooms = null
+        } else {
+            rooms = _uiState.value.selectedNumOfRooms!!.toInt()
+        }
+        _uiState.update {
+            it.copy(
+                tenantName = tenantName
+            )
+        }
+        fetchRentPaymentsData(
+            month = LocalDateTime.now().month.toString(),
+            year = LocalDateTime.now().year.toString(),
+            tenantName = tenantName,
+            tenantId = null,
+            rooms = rooms,
+            roomName = _uiState.value.selectedUnitName,
+            rentPaymentStatus = true,
+            paidLate = null
+        )
+    }
+
+    fun filterByNumberOfRooms(selectedNumOfRooms: String?) {
+        Log.i("NoRooms", selectedNumOfRooms!!.toString())
+        _uiState.update {
+            it.copy(
+                selectedNumOfRooms = selectedNumOfRooms
+            )
+        }
+        fetchRentPaymentsData(
+            month = LocalDateTime.now().month.toString(),
+            year = LocalDateTime.now().year.toString(),
+            tenantName = _uiState.value.tenantName,
+            tenantId = null,
+            rooms = selectedNumOfRooms!!.toInt(),
+            roomName = _uiState.value.selectedUnitName,
+            rentPaymentStatus = true,
+            paidLate = null
+        )
+    }
+
+    fun filterByUnitName(roomName: String?) {
+        var rooms: Int?
+        if(_uiState.value.selectedNumOfRooms == null) {
+            rooms = null
+        } else {
+            rooms = _uiState.value.selectedNumOfRooms!!.toInt()
+        }
+        _uiState.update {
+            it.copy(
+                selectedUnitName = roomName
+            )
+        }
+        fetchRentPaymentsData(
+            month = LocalDateTime.now().month.toString(),
+            year = LocalDateTime.now().year.toString(),
+            tenantName = _uiState.value.tenantName,
+            tenantId = null,
+            rooms = rooms,
+            roomName = roomName,
+            rentPaymentStatus = true,
+            paidLate = null
+        )
+    }
+
+    fun unfilterUnits() {
+        _uiState.update {
+            it.copy(
+                tenantName = null,
+                selectedNumOfRooms = null,
+                selectedUnitName = null
+            )
+        }
+        fetchRentPaymentsData(
+            month = LocalDateTime.now().month.toString(),
+            year = LocalDateTime.now().year.toString(),
+            tenantName = _uiState.value.tenantName,
+            tenantId = null,
+            rooms = null,
+            roomName = null,
+            rentPaymentStatus = true,
+            paidLate = null
+        )
+    }
 
     fun resetFetchingStatus() {
         _uiState.update {

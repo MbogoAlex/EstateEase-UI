@@ -6,6 +6,9 @@ import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
 import com.example.tenant_care.model.property.PropertyUnitResponseBody
 import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
+import com.example.tenant_care.model.pManager.RentPaymentRowUpdateRequestBody
+import com.example.tenant_care.model.pManager.RentPaymentRowUpdateResponseBody
+import com.example.tenant_care.model.pManager.RentPaymentRowsUpdateResponseBody
 import com.example.tenant_care.model.property.ArchiveUnitResponseBody
 import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
@@ -47,6 +50,25 @@ interface ApiRepository {
         paidLate: Boolean?
     ): Response<RentPaymentDetailsResponseBody>
 
+    suspend fun activatePenaltyForSingleTenant(
+        rentPayment: RentPaymentRowUpdateRequestBody,
+        rentPaymentTblId: Int
+    ): Response<RentPaymentRowUpdateResponseBody>
+
+    suspend fun deActivatePenaltyForSingleTenant(
+        rentPaymentTblId: Int
+    ): Response<RentPaymentRowUpdateResponseBody>
+
+    suspend fun activatePenaltyForMultipleTenants(
+        rentPayment: RentPaymentRowUpdateRequestBody,
+        month: String,
+        year: String
+    ): Response<RentPaymentRowsUpdateResponseBody>
+
+    suspend fun deActivatePenaltyForMultipleTenants(
+        month: String,
+        year: String
+    ): Response<RentPaymentRowsUpdateResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -102,6 +124,36 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         tenantId = tenantId,
         rentPaymentStatus = rentPaymentStatus,
         paidLate = paidLate
+    )
+
+    override suspend fun activatePenaltyForSingleTenant(
+        rentPayment: RentPaymentRowUpdateRequestBody,
+        rentPaymentTblId: Int
+    ): Response<RentPaymentRowUpdateResponseBody> = apiService.activateLatePaymentPenaltyForSingleTenant(
+        rentPayment = rentPayment,
+        rentPaymentTblId = rentPaymentTblId
+    )
+
+    override suspend fun deActivatePenaltyForSingleTenant(rentPaymentTblId: Int): Response<RentPaymentRowUpdateResponseBody> = apiService.deActivateLatePaymentPenaltyForSingleTenant(
+        rentPaymentTblId = rentPaymentTblId
+    )
+
+    override suspend fun activatePenaltyForMultipleTenants(
+        rentPayment: RentPaymentRowUpdateRequestBody,
+        month: String,
+        year: String
+    ): Response<RentPaymentRowsUpdateResponseBody> = apiService.activateLatePaymentPenaltyForMultipleTenants(
+        rentPayment = rentPayment,
+        month = month,
+        year = year,
+    )
+
+    override suspend fun deActivatePenaltyForMultipleTenants(
+        month: String,
+        year: String
+    ): Response<RentPaymentRowsUpdateResponseBody> = apiService.deActivateLatePaymentPenaltyForMultipleTenants(
+        month = month,
+        year = year
     )
 
 

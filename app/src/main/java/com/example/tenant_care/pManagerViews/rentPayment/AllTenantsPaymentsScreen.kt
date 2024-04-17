@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.model.pManager.TenantRentPaymentData
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.ReusableComposables
 import com.example.tenant_care.util.ReusableFunctions
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -51,16 +52,49 @@ fun AllTenantsPaymentsScreenComposable(
         modifier = modifier
     ) {
         AllTenantsPaymentsScreen(
+            tenantName = uiState.tenantName,
+            onSearchTextChanged = {
+                viewModel.filterByTenantName(
+                    tenantName = it,
+                )
+            },
+            numberOfRoomsSelected = uiState.selectedNumOfRooms,
+            onSelectNumOfRooms = {
+                viewModel.filterByNumberOfRooms(
+                    selectedNumOfRooms = it.toString(),
+                )
+            },
+            rooms = uiState.rooms,
+            selectedUnitName = uiState.selectedUnitName,
+            onChangeSelectedUnitName = {
+                viewModel.filterByUnitName(
+                    roomName = it,
+                )
+            },
             rentPayments = uiState.rentPaymentsData.rentpayment,
+            unfilterUnits = {
+                viewModel.unfilterUnits()
+            },
+            numberOfUnits = uiState.rentPaymentsData.rentpayment.size,
             navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails
         )
+
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AllTenantsPaymentsScreen(
+    tenantName: String?,
+    onSearchTextChanged: (searchText: String) -> Unit,
+    numberOfRoomsSelected: String?,
+    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    rooms: List<String>,
+    selectedUnitName: String?,
+    onChangeSelectedUnitName: (unitName: String) -> Unit,
     rentPayments: List<TenantRentPaymentData>,
+    unfilterUnits: () -> Unit,
+    numberOfUnits: Int?,
     navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -69,6 +103,36 @@ fun AllTenantsPaymentsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        ReusableComposables.SearchFieldForTenants(
+            labelText = "Search Tenant name",
+            value = tenantName.takeIf { it != null } ?: "",
+            onValueChange = onSearchTextChanged,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Row {
+            ReusableComposables.FilterByNumOfRoomsBox(
+                selectedNumOfRooms = numberOfRoomsSelected,
+                onSelectNumOfRooms = onSelectNumOfRooms
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            ReusableComposables.FilterByRoomNameBox(
+                rooms = rooms,
+                selectedUnit = selectedUnitName,
+                onChangeSelectedUnitName = onChangeSelectedUnitName
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            ReusableComposables.UndoFilteringBox(
+                unfilterUnits = unfilterUnits
+            )
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = "$numberOfUnits units",
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(10.dp))
         LazyColumn() {
             items(rentPayments.size) {
                 IndividualTenantCell(
@@ -143,11 +207,11 @@ fun IndividualTenantCell(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Rent due: ",
+                    text = "Monthly rent: ",
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = rentPayment.dueDate
+                    text = ReusableFunctions.formatMoneyValue(rentPayment.monthlyRent)
                 )
 
 

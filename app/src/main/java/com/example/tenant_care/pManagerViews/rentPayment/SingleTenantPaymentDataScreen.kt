@@ -1,6 +1,7 @@
 package com.example.tenant_care.pManagerViews.rentPayment
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +60,7 @@ fun SingleTenantPaymentDetailsComposable(
 
 
     if(uiState.fetchingStatus == FetchingSingleTenantPaymentStatus.SUCCESS) {
+        Log.i("FORMATTED_DATE_IS", uiState.rentPaidOn)
         Box(modifier = modifier) {
             SingleTenantPaymentDetailsScreen(
                 rentPaymentData = uiState.rentPaymentsData.rentpayment[0],
@@ -66,7 +68,8 @@ fun SingleTenantPaymentDetailsComposable(
                 rentPaymentDueOn = uiState.rentPaymentDueOn,
                 paidLate = uiState.rentPaymentsData.rentpayment[0].paidLate.takeIf { it != null } ?: false,
                 rentPaid = uiState.rentPaymentsData.rentpayment[0].rentPaymentStatus,
-                paidOn = uiState.rentPaymentsData.rentpayment[0].paidAt.takeIf { it != null } ?: "",
+                paidOn = uiState.rentPaidOn,
+                penaltyActive = uiState.penaltyActive,
                 navigateToPreviousScreen = navigateToPreviousScreen
             )
         }
@@ -83,7 +86,7 @@ fun SingleTenantPaymentDetailsScreen(
     tenantSince: String,
     rentPaymentDueOn: String,
     paidOn: String,
-
+    penaltyActive: Boolean,
     navigateToPreviousScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -113,19 +116,21 @@ fun SingleTenantPaymentDetailsScreen(
             TenantPaidLate(
                 rentPaymentData = rentPaymentData,
                 rentPaymentDueOn = rentPaymentDueOn,
-                tenantSince = tenantSince
+                tenantSince = tenantSince,
+                rentPaidOn = paidOn
             )
         } else if(rentPaid && !paidLate) {
             TenantPaid(
                 rentPaymentData = rentPaymentData,
                 tenantSince = tenantSince,
-                rentPaidOn = rentPaymentDueOn
+                rentPaidOn = paidOn
             )
         } else if(!rentPaid) {
             TenantNotPaid(
                 rentPaymentData = rentPaymentData,
                 rentPaymentDueOn = rentPaymentDueOn,
-                tenantSince = tenantSince
+                tenantSince = tenantSince,
+                penaltyActive = penaltyActive
             )
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -239,9 +244,11 @@ fun TenantNotPaid(
     rentPaymentData: TenantRentPaymentData,
     rentPaymentDueOn: String,
     tenantSince: String,
+    penaltyActive: Boolean,
     modifier: Modifier = Modifier
 ) {
     val penaltyAccrued: Double
+
     if(rentPaymentData.daysLate != 0) {
         penaltyAccrued = rentPaymentData.penaltyPerDay * rentPaymentData.daysLate
     } else {
@@ -390,6 +397,7 @@ fun TenantNotPaid(
                     fontWeight = FontWeight.Light
                 )
             }
+
             Spacer(modifier = Modifier.height(20.dp))
             OutlinedButton(
                 modifier = Modifier
@@ -407,6 +415,7 @@ fun TenantPaidLate(
     rentPaymentData: TenantRentPaymentData,
     rentPaymentDueOn: String,
     tenantSince: String,
+    rentPaidOn: String,
     modifier: Modifier = Modifier
 ) {
     val penaltyAccrued: Double
@@ -503,6 +512,18 @@ fun TenantPaidLate(
                 )
                 Text(
                     text = rentPaymentDueOn,
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Light
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row {
+                Text(
+                    text = "Paid on: ",
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = rentPaidOn,
                     fontStyle = FontStyle.Italic,
                     fontWeight = FontWeight.Light
                 )

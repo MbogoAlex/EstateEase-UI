@@ -151,7 +151,8 @@ class UnoccupiedUnitDetailsScreenViewModel(
             password = _uiState.value.password,
             roleId = _uiState.value.roleId,
             propertyUnitId = propertyId!!.toInt(),
-            tenantAddedByPManagerId = _uiState.value.userDetails.userId
+            tenantAddedByPManagerId = _uiState.value.userDetails.userId,
+            penaltyPerDay = 200.00
         )
 
         viewModelScope.launch {
