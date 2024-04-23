@@ -37,6 +37,9 @@ data class TenantsPaidScreenUiState(
     val selectedNumOfRooms: String? = null,
     val rooms: List<String> = emptyList(),
     val selectedUnitName: String? = null,
+    val tenantActive: Boolean? = null,
+    val activeTenantsSelected: Boolean = false,
+    val inactiveTenantsSelected: Boolean = false
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -68,7 +71,8 @@ class TenantsPaidScreenViewModel(
         tenantName: String?,
         tenantId: Int?,
         rentPaymentStatus: Boolean?,
-        paidLate: Boolean?
+        paidLate: Boolean?,
+        tenantActive: Boolean?
     ) {
         Log.i("FETCHING_WITH_TENANT_ID", tenantId.toString())
         _uiState.update {
@@ -87,7 +91,7 @@ class TenantsPaidScreenViewModel(
                     tenantId = tenantId,
                     rentPaymentStatus = rentPaymentStatus,
                     paidLate = paidLate,
-                    tenantActive = null
+                    tenantActive = tenantActive
                 )
                 if(response.isSuccessful) {
                     val rooms = mutableListOf<String>()
@@ -145,7 +149,8 @@ class TenantsPaidScreenViewModel(
             rooms = rooms,
             roomName = _uiState.value.selectedUnitName,
             rentPaymentStatus = true,
-            paidLate = null
+            paidLate = null,
+            tenantActive = _uiState.value.tenantActive
         )
     }
 
@@ -164,7 +169,8 @@ class TenantsPaidScreenViewModel(
             rooms = selectedNumOfRooms!!.toInt(),
             roomName = _uiState.value.selectedUnitName,
             rentPaymentStatus = true,
-            paidLate = null
+            paidLate = null,
+            tenantActive = _uiState.value.tenantActive
         )
     }
 
@@ -188,7 +194,8 @@ class TenantsPaidScreenViewModel(
             rooms = rooms,
             roomName = roomName,
             rentPaymentStatus = true,
-            paidLate = null
+            paidLate = null,
+            tenantActive = _uiState.value.tenantActive
         )
     }
 
@@ -197,7 +204,10 @@ class TenantsPaidScreenViewModel(
             it.copy(
                 tenantName = null,
                 selectedNumOfRooms = null,
-                selectedUnitName = null
+                selectedUnitName = null,
+                tenantActive = null,
+                activeTenantsSelected = false,
+                inactiveTenantsSelected = false
             )
         }
         fetchRentPaymentsData(
@@ -208,7 +218,40 @@ class TenantsPaidScreenViewModel(
             rooms = null,
             roomName = null,
             rentPaymentStatus = true,
-            paidLate = null
+            paidLate = null,
+            tenantActive = null
+        )
+    }
+
+    fun filterByActiveTenants(tenantActive: Boolean) {
+        _uiState.update {
+            it.copy(
+                tenantActive = tenantActive,
+                activeTenantsSelected = tenantActive,
+                inactiveTenantsSelected = !tenantActive
+            )
+        }
+        var rooms: Int?
+        if(_uiState.value.selectedNumOfRooms == null) {
+            rooms = null
+        } else {
+            rooms = _uiState.value.selectedNumOfRooms!!.toInt()
+        }
+        _uiState.update {
+            it.copy(
+                tenantActive = tenantActive
+            )
+        }
+        fetchRentPaymentsData(
+            month = LocalDateTime.now().month.toString(),
+            year = LocalDateTime.now().year.toString(),
+            tenantName = _uiState.value.tenantName,
+            tenantId = null,
+            rooms = rooms,
+            roomName = _uiState.value.selectedUnitName,
+            rentPaymentStatus = true,
+            paidLate = null,
+            tenantActive = tenantActive
         )
     }
 
@@ -230,7 +273,8 @@ class TenantsPaidScreenViewModel(
             rooms = null,
             roomName = null,
             rentPaymentStatus = true,
-            paidLate = null
+            paidLate = null,
+            tenantActive = null
         )
     }
 }
