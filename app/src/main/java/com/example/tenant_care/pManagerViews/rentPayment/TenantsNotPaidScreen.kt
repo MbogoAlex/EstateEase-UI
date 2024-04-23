@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -22,6 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,11 +53,18 @@ fun TenantsNotPaidScreenComposable(
     val viewModel: TenantsNotPaidScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiStatus.collectAsState()
 
+    var showMenuPopup by remember {
+        mutableStateOf(false)
+    }
+
+    val popUpItems = listOf<String>("Active tenants", "Removed tenants")
 
     Box(
         modifier = modifier
     ) {
         TenantsNotPaidScreen(
+            activeTenantsSelected = uiState.activeTenantsSelected,
+            inActiveTenantsSelected = uiState.inactiveTenantsSelected,
             tenantName = uiState.tenantName,
             onSearchTextChanged = {
                 viewModel.filterByTenantName(
@@ -78,7 +89,22 @@ fun TenantsNotPaidScreenComposable(
             },
             rentPayments = uiState.rentPaymentsData.rentpayment,
             numberOfUnits = uiState.rentPaymentsData.rentpayment.size,
-            navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails
+            navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
+            onDismissRequest = {
+                showMenuPopup = !showMenuPopup
+            },
+            onMenuButtonClicked = {
+                showMenuPopup = !showMenuPopup
+            },
+            showMenuPopup = showMenuPopup,
+            popUpItems = popUpItems,
+            onPopupMenuItemClicked = {item ->
+                if(item == "Active tenants") {
+                    viewModel.filterByActiveTenants(true)
+                } else if(item == "Removed tenants") {
+                    viewModel.filterByActiveTenants(false)
+                }
+            }
         )
 
     }
@@ -87,6 +113,8 @@ fun TenantsNotPaidScreenComposable(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TenantsNotPaidScreen(
+    activeTenantsSelected: Boolean,
+    inActiveTenantsSelected: Boolean,
     tenantName: String?,
     onSearchTextChanged: (searchText: String) -> Unit,
     numberOfRoomsSelected: String?,
@@ -98,6 +126,11 @@ fun TenantsNotPaidScreen(
     numberOfUnits: Int?,
     rentPayments: List<TenantRentPaymentData>,
     navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
+    onPopupMenuItemClicked: (item: String) -> Unit,
+    onMenuButtonClicked: () -> Unit,
+    showMenuPopup: Boolean,
+    onDismissRequest: () -> Unit,
+    popUpItems: List<String>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -139,22 +172,62 @@ fun TenantsNotPaidScreen(
                 text = "$numberOfUnits units",
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.width(5.dp))
+            if(activeTenantsSelected) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        tint = Color.Green,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Active tenants")
+                }
+
+            } else if(inActiveTenantsSelected) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        tint = Color.Red,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Removed tenants")
+                }
+            }
             Spacer(modifier = Modifier.weight(1f))
             ElevatedCard {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(
-                        modifier = Modifier,
-//                            .padding(10.dp),
-                        onClick = { /*TODO*/ }
+                if(showMenuPopup) {
+                    PopupMenu(
+                        onDismissRequest = onDismissRequest,
+                        popupMenuItems = popUpItems,
+                        onPopupMenuItemClicked = onPopupMenuItemClicked
+                    )
+                } else {
+                    Box(
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.menu),
-                            contentDescription = null,
-                        )
+                        IconButton(
+                            modifier = Modifier,
+//                            .padding(10.dp),
+                            onClick = onMenuButtonClicked
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.menu),
+                                contentDescription = null,
+                            )
+                        }
                     }
                 }
+
             }
         }
         Spacer(modifier = Modifier.height(10.dp))
