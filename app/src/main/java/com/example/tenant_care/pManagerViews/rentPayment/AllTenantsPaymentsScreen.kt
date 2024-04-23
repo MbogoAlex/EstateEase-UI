@@ -10,28 +10,45 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenant_care.EstateEaseViewModelFactory
+import com.example.tenant_care.R
 import com.example.tenant_care.model.pManager.TenantRentPaymentData
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 import com.example.tenant_care.util.ReusableComposables
@@ -47,11 +64,22 @@ fun AllTenantsPaymentsScreenComposable(
     val viewModel: AllTenantsPaymentsScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
 
+    var showMenuPopup by remember {
+        mutableStateOf(false)
+    }
+    
+    
+
+    val popUpItems = listOf<String>("Active tenants", "Removed tenants")
+
+
 
     Box(
         modifier = modifier
     ) {
         AllTenantsPaymentsScreen(
+            activeTenantsSelected = uiState.activeTenantsSelected,
+            inActiveTenantsSelected = uiState.inactiveTenantsSelected,
             tenantName = uiState.tenantName,
             onSearchTextChanged = {
                 viewModel.filterByTenantName(
@@ -76,15 +104,81 @@ fun AllTenantsPaymentsScreenComposable(
                 viewModel.unfilterUnits()
             },
             numberOfUnits = uiState.rentPaymentsData.rentpayment.size,
-            navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails
+            navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
+            onMenuButtonClicked = {
+                showMenuPopup = !showMenuPopup
+            },
+            onDismissRequest = {
+                showMenuPopup = !showMenuPopup
+            },
+            popUpItems = popUpItems,
+            showMenuPopup = showMenuPopup,
+            onPopupMenuItemClicked = {item ->
+                if(item == "Active tenants") {
+                    viewModel.filterByActiveTenants(true)
+                } else if(item == "Removed tenants") {
+                    viewModel.filterByActiveTenants(false)
+                }
+            }
         )
 
+    }
+}
+
+@Composable
+fun PopupMenu(
+    popupMenuItems: List<String>,
+    onDismissRequest: () -> Unit,
+    onPopupMenuItemClicked: (item: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card {
+        Popup(
+            alignment = Alignment.TopEnd,
+            properties = PopupProperties(
+                excludeFromSystemGesture = true
+            ),
+            onDismissRequest = onDismissRequest
+        ) {
+            Card(
+                shape = RoundedCornerShape(0.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 200.dp)
+                        .padding(
+                            start = 10.dp,
+                            end = 10.dp
+                        )
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    popupMenuItems.forEachIndexed { index, s ->
+                        Text(
+                            text = s,
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .clickable {
+                                    onPopupMenuItemClicked(s)
+                                    onDismissRequest()
+                                }
+                        )
+                        Divider(
+                            modifier = Modifier
+                                .widthIn(max = 150.dp)
+                        )
+
+                    }
+                }
+            }
+        }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AllTenantsPaymentsScreen(
+    activeTenantsSelected: Boolean,
+    inActiveTenantsSelected: Boolean,
     tenantName: String?,
     onSearchTextChanged: (searchText: String) -> Unit,
     numberOfRoomsSelected: String?,
@@ -95,7 +189,12 @@ fun AllTenantsPaymentsScreen(
     rentPayments: List<TenantRentPaymentData>,
     unfilterUnits: () -> Unit,
     numberOfUnits: Int?,
+    onMenuButtonClicked: () -> Unit,
     navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
+    onDismissRequest: () -> Unit,
+    showMenuPopup: Boolean,
+    popUpItems: List<String>,
+    onPopupMenuItemClicked: (item: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -111,7 +210,9 @@ fun AllTenantsPaymentsScreen(
                 .fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Row {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             ReusableComposables.FilterByNumOfRoomsBox(
                 selectedNumOfRooms = numberOfRoomsSelected,
                 onSelectNumOfRooms = onSelectNumOfRooms
@@ -128,10 +229,71 @@ fun AllTenantsPaymentsScreen(
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            text = "$numberOfUnits units",
-            fontWeight = FontWeight.Bold
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "$numberOfUnits units",
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+            if(activeTenantsSelected) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        tint = Color.Green,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Active tenants")
+                }
+
+            } else if(inActiveTenantsSelected) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        tint = Color.Red,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Removed tenants")
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            ElevatedCard {
+                if(showMenuPopup) {
+                    PopupMenu(
+                        onDismissRequest = onDismissRequest,
+                        popupMenuItems = popUpItems,
+                        onPopupMenuItemClicked = onPopupMenuItemClicked
+                    )
+                } else {
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        IconButton(
+                            modifier = Modifier,
+//                            .padding(10.dp),
+                            onClick = onMenuButtonClicked
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.menu),
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
         Spacer(modifier = Modifier.height(10.dp))
         LazyColumn() {
             items(rentPayments.size) {

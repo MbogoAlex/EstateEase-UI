@@ -94,7 +94,8 @@ class RentPaymentsScreenViewModel(
                     tenantName = tenantName,
                     tenantId = tenantId,
                     rentPaymentStatus = rentPaymentStatus,
-                    paidLate = paidLate
+                    paidLate = paidLate,
+                    tenantActive = null
                 )
                 if(response.isSuccessful) {
                     if(tenantId != null) {

@@ -38,6 +38,9 @@ data class AllTenantsPaymentsScreenUiState(
     val selectedNumOfRooms: String? = null,
     val rooms: List<String> = emptyList(),
     val selectedUnitName: String? = null,
+    val tenantActive: Boolean? = null,
+    val activeTenantsSelected: Boolean = false,
+    val inactiveTenantsSelected: Boolean = false
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -69,7 +72,8 @@ class AllTenantsPaymentsScreenViewModel(
         tenantName: String?,
         tenantId: Int?,
         rentPaymentStatus: Boolean?,
-        paidLate: Boolean?
+        paidLate: Boolean?,
+        tenantActive: Boolean?
     ) {
         Log.i("FETCHING_WITH_TENANT_ID", tenantId.toString())
         _uiState.update {
@@ -87,7 +91,8 @@ class AllTenantsPaymentsScreenViewModel(
                     tenantName = tenantName,
                     tenantId = tenantId,
                     rentPaymentStatus = rentPaymentStatus,
-                    paidLate = paidLate
+                    paidLate = paidLate,
+                    tenantActive = tenantActive
                 )
                 if(response.isSuccessful) {
                     val rooms = mutableListOf<String>()
@@ -145,10 +150,12 @@ class AllTenantsPaymentsScreenViewModel(
             rooms = rooms,
             roomName = _uiState.value.selectedUnitName,
             rentPaymentStatus = null,
-            paidLate = null
+            paidLate = null,
+            tenantActive = _uiState.value.tenantActive
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun filterByNumberOfRooms(selectedNumOfRooms: String?) {
         Log.i("NoRooms", selectedNumOfRooms!!.toString())
         _uiState.update {
@@ -161,10 +168,11 @@ class AllTenantsPaymentsScreenViewModel(
             year = LocalDateTime.now().year.toString(),
             tenantName = _uiState.value.tenantName,
             tenantId = null,
-            rooms = selectedNumOfRooms!!.toInt(),
+            rooms = selectedNumOfRooms.toInt(),
             roomName = _uiState.value.selectedUnitName,
             rentPaymentStatus = null,
-            paidLate = null
+            paidLate = null,
+            tenantActive = _uiState.value.tenantActive
         )
     }
 
@@ -188,7 +196,40 @@ class AllTenantsPaymentsScreenViewModel(
             rooms = rooms,
             roomName = roomName,
             rentPaymentStatus = null,
-            paidLate = null
+            paidLate = null,
+            tenantActive = _uiState.value.tenantActive
+        )
+    }
+
+    fun filterByActiveTenants(tenantActive: Boolean) {
+        _uiState.update {
+            it.copy(
+                tenantActive = tenantActive,
+                activeTenantsSelected = tenantActive,
+                inactiveTenantsSelected = !tenantActive
+            )
+        }
+        var rooms: Int?
+        if(_uiState.value.selectedNumOfRooms == null) {
+            rooms = null
+        } else {
+            rooms = _uiState.value.selectedNumOfRooms!!.toInt()
+        }
+        _uiState.update {
+            it.copy(
+                tenantActive = tenantActive
+            )
+        }
+        fetchRentPaymentsData(
+            month = LocalDateTime.now().month.toString(),
+            year = LocalDateTime.now().year.toString(),
+            tenantName = _uiState.value.tenantName,
+            tenantId = null,
+            rooms = rooms,
+            roomName = _uiState.value.selectedUnitName,
+            rentPaymentStatus = null,
+            paidLate = null,
+            tenantActive = tenantActive
         )
     }
 
@@ -197,7 +238,10 @@ class AllTenantsPaymentsScreenViewModel(
             it.copy(
                 tenantName = null,
                 selectedNumOfRooms = null,
-                selectedUnitName = null
+                selectedUnitName = null,
+                tenantActive = null,
+                activeTenantsSelected = false,
+                inactiveTenantsSelected = false
             )
         }
         fetchRentPaymentsData(
@@ -208,7 +252,8 @@ class AllTenantsPaymentsScreenViewModel(
             rooms = null,
             roomName = null,
             rentPaymentStatus = null,
-            paidLate = null
+            paidLate = null,
+            tenantActive = null,
         )
     }
     fun resetFetchingStatus() {
@@ -229,7 +274,8 @@ class AllTenantsPaymentsScreenViewModel(
             rooms = null,
             roomName = null,
             rentPaymentStatus = null,
-            paidLate = null
+            paidLate = null,
+            tenantActive = null
         )
     }
 }

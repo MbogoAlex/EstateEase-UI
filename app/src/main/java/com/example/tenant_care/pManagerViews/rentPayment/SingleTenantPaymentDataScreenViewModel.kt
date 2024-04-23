@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.container.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
 import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBodyData
+import com.example.tenant_care.model.pManager.RentPaymentRowUpdateRequestBody
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.ReusableFunctions.toUserDetails
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,10 +18,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.time.temporal.TemporalAmount
 
 enum class FetchingSingleTenantPaymentStatus {
     INITIAL,
     FETCHING,
+    SUCCESS,
+    FAIL
+}
+
+enum class SingleTenantPenaltyToggleStatus {
+    INITIAL,
+    LOADING,
     SUCCESS,
     FAIL
 }
@@ -37,6 +46,12 @@ data class SingleTenantPaymentScreenUiState(
     val rentPaidOn: String = "",
     val rentPaymentDueOn: String = "",
     val penaltyActive: Boolean = false,
+    val penaltyPerDay: Double = 0.0,
+    val newPenaltyPerDay: Double? = null,
+    val rentPaymentRowId: Int = 0,
+    val rentPenaltySwitchResponse: String = "",
+    val showPenaltyChangeDialog: Boolean = false,
+    val singleTenantPenaltyToggleStatus: SingleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.INITIAL,
     val fetchingStatus: FetchingSingleTenantPaymentStatus = FetchingSingleTenantPaymentStatus.INITIAL
 )
 @RequiresApi(Build.VERSION_CODES.O)
@@ -87,7 +102,8 @@ class SingleTenantPaymentDataScreenViewModel(
                     tenantName = tenantName,
                     tenantId = tenantId,
                     rentPaymentStatus = rentPaymentStatus,
-                    paidLate = paidLate
+                    paidLate = paidLate,
+                    tenantActive = null
                 )
                 if(response.isSuccessful) {
                     val paidAt: String
@@ -105,6 +121,8 @@ class SingleTenantPaymentDataScreenViewModel(
                             rentPaidOn = paidAt,
                             rentPaymentDueOn = response.body()?.data!!.rentpayment[0].dueDate,
                             penaltyActive = response.body()?.data!!.rentpayment[0].penaltyActive,
+                            penaltyPerDay = response.body()?.data!!.rentpayment[0].penaltyPerDay,
+                            rentPaymentRowId = response.body()?.data!!.rentpayment[0].rentPaymentTblId,
                             fetchingStatus = FetchingSingleTenantPaymentStatus.SUCCESS
                         )
                     }
@@ -130,11 +148,130 @@ class SingleTenantPaymentDataScreenViewModel(
         }
     }
 
+    fun activateLatePaymentPenalty(penaltyPerDay: String) {
+        Log.i("ACTIVATING_STATUS", "Deactivating")
+        _uiState.update {
+            it.copy(
+                singleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.LOADING
+            )
+        }
+        val penalty = ReusableFunctions.formatMoneyValue(penaltyPerDay.toDouble())
+        val rentPaymentRowUpdateRequestBody = RentPaymentRowUpdateRequestBody(
+            penaltyPerDay = penaltyPerDay.toDouble()
+        )
+        viewModelScope.launch {
+            try {
+                val response = apiRepository.activatePenaltyForSingleTenant(
+                    rentPayment = rentPaymentRowUpdateRequestBody,
+                    rentPaymentTblId = _uiState.value.rentPaymentRowId
+                )
+                if(response.isSuccessful) {
+                    _uiState.update {
+                        it.copy(
+                            penaltyPerDay = penaltyPerDay.toDouble(),
+                            penaltyActive = true,
+                            singleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.SUCCESS,
+                            rentPenaltySwitchResponse = "Penalty activated. Penalty amount: $penalty"
+                        )
+                    }
+                    Log.i("PENALTY_ACTIVATED", "Penalty activated")
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            singleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.FAIL,
+                            rentPenaltySwitchResponse = "Failed to activate penalty. Try again later"
+                        )
+                    }
+                    Log.e("PENALTY_ACTIVATED_ERROR", response.toString())
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        singleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.SUCCESS,
+                        rentPenaltySwitchResponse = "Failed to activate penalty. Try again later"
+                    )
+                }
+                Log.e("PENALTY_ACTIVATED_EXCEPTION", e.toString())
+            }
+        }
+    }
 
+    fun deActivateLatePaymentPenalty() {
+        Log.i("DEACTIVATING_STATUS", "Deactivating")
+        _uiState.update {
+            it.copy(
+                singleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.LOADING
+            )
+        }
+        viewModelScope.launch {
+            try {
+                val response = apiRepository.deActivatePenaltyForSingleTenant(
+                    rentPaymentTblId = _uiState.value.rentPaymentRowId
+                )
+                if(response.isSuccessful) {
+                    _uiState.update {
+                        it.copy(
+                            penaltyActive = false,
+                            singleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.SUCCESS,
+                            rentPenaltySwitchResponse = "Penalty deactivated."
+                        )
+                    }
+                    Log.i("PENALTY_DEACTIVATED", "Penalty deactivated")
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            singleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.FAIL,
+                            rentPenaltySwitchResponse = "Failed to deactivate penalty"
+                        )
+                    }
+                    Log.e("PENALTY_DEACTIVATED_ERROR", response.toString())
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        singleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.SUCCESS,
+                        rentPenaltySwitchResponse = "Failed to deactivate penalty"
+                    )
+                }
+                Log.e("PENALTY_DEACTIVATED_EXCEPTION", e.toString())
+            }
+        }
+    }
+
+    fun changePenaltyAmount(penaltyAmount: String) {
+        _uiState.update {
+            it.copy(
+                newPenaltyPerDay = penaltyAmount.toDouble()
+            )
+        }
+    }
+
+    fun dismissPenaltyChange() {
+        _uiState.update {
+            it.copy(
+                newPenaltyPerDay = null
+            )
+        }
+    }
     fun resetFetchingStatus() {
         _uiState.update {
             it.copy(
                 fetchingStatus = FetchingSingleTenantPaymentStatus.INITIAL
+            )
+        }
+    }
+
+    fun togglePenaltyChangeDialog() {
+        _uiState.update {
+            it.copy(
+                showPenaltyChangeDialog = !(_uiState.value.showPenaltyChangeDialog)
+            )
+        }
+    }
+    fun resetPenaltySwitchingStatus() {
+        _uiState.update {
+            it.copy(
+                singleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.INITIAL
             )
         }
     }

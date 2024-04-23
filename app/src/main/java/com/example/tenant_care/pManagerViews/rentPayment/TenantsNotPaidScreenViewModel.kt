@@ -85,7 +85,8 @@ class TenantsNotPaidScreenViewModel(
                     tenantName = tenantName,
                     tenantId = tenantId,
                     rentPaymentStatus = rentPaymentStatus,
-                    paidLate = paidLate
+                    paidLate = paidLate,
+                    tenantActive = null
                 )
                 if(response.isSuccessful) {
                     val rooms = mutableListOf<String>()
@@ -141,7 +142,7 @@ class TenantsNotPaidScreenViewModel(
             tenantId = null,
             rooms = rooms,
             roomName = _uiState.value.selectedUnitName,
-            rentPaymentStatus = null,
+            rentPaymentStatus = false,
             paidLate = null
         )
     }

@@ -12,10 +12,10 @@ data class RentPaymentRowUpdateRequestBody(
 data class RentPaymentRowUpdateResponseBody(
     val statusCode: Int,
     val message: String,
-    val data: RentPaymentRowUpdateRequestBodyData
+    val data: RentPaymentRowUpdateResponseBodyData
 )
 @Serializable
-data class RentPaymentRowUpdateRequestBodyData(
+data class RentPaymentRowUpdateResponseBodyData(
     val rentpayment: UpdatedRentPaymentDetails
 )
 @Serializable

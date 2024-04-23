@@ -88,7 +88,8 @@ interface ApiService {
         @Query("tenantName") tenantName: String?,
         @Query("tenantId") tenantId: Int?,
         @Query("rentPaymentStatus") rentPaymentStatus: Boolean?,
-        @Query("paidLate") paidLate: Boolean?
+        @Query("paidLate") paidLate: Boolean?,
+        @Query("tenantActive") tenantActive: Boolean?,
     ): Response<RentPaymentDetailsResponseBody>
 
     // activate late payment penalty for single tenant

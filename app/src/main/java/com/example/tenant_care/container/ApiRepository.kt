@@ -47,7 +47,8 @@ interface ApiRepository {
         tenantName: String?,
         tenantId: Int?,
         rentPaymentStatus: Boolean?,
-        paidLate: Boolean?
+        paidLate: Boolean?,
+        tenantActive: Boolean?
     ): Response<RentPaymentDetailsResponseBody>
 
     suspend fun activatePenaltyForSingleTenant(
@@ -114,7 +115,8 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         tenantName: String?,
         tenantId: Int?,
         rentPaymentStatus: Boolean?,
-        paidLate: Boolean?
+        paidLate: Boolean?,
+        tenantActive: Boolean?
     ): Response<RentPaymentDetailsResponseBody> = apiService.fetchRentPaymentStatusForAllTenants(
         month = month,
         year = year,
@@ -123,7 +125,8 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         tenantName = tenantName,
         tenantId = tenantId,
         rentPaymentStatus = rentPaymentStatus,
-        paidLate = paidLate
+        paidLate = paidLate,
+        tenantActive = tenantActive
     )
 
     override suspend fun activatePenaltyForSingleTenant(

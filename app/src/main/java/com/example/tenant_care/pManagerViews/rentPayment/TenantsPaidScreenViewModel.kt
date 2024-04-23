@@ -86,7 +86,8 @@ class TenantsPaidScreenViewModel(
                     tenantName = tenantName,
                     tenantId = tenantId,
                     rentPaymentStatus = rentPaymentStatus,
-                    paidLate = paidLate
+                    paidLate = paidLate,
+                    tenantActive = null
                 )
                 if(response.isSuccessful) {
                     val rooms = mutableListOf<String>()
