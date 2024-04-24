@@ -37,6 +37,7 @@ object SplashScreenDestination: AppNavigation {
 fun SplashScreen(
     navigateToHomeScreen: () -> Unit,
     navigateToPManagerHomeScreen: () -> Unit,
+    navigateToTenantHomeScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: SplashScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -55,6 +56,8 @@ fun SplashScreen(
                 if(uiState.userDSDetails.roleId == 1) {
                     navigateToPManagerHomeScreen()
 
+                } else if(uiState.userDSDetails.roleId == 3) {
+                    navigateToTenantHomeScreen()
                 }
             } else {
                 Log.i("INITIALIZATION_STATUS", uiState.initializingStatus.name)
@@ -90,7 +93,8 @@ fun SplashScreenPreview() {
     Tenant_careTheme {
         SplashScreen(
             navigateToHomeScreen = {},
-            navigateToPManagerHomeScreen = {}
+            navigateToPManagerHomeScreen = {},
+            navigateToTenantHomeScreen = {}
         )
     }
 }

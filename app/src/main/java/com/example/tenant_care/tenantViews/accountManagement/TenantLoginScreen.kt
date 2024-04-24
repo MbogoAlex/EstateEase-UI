@@ -1,6 +1,7 @@
 package com.example.tenant_care.tenantViews.accountManagement
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -23,7 +26,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,11 +46,22 @@ object TenantLoginScreenDestination: AppNavigation {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TenantLoginComposable(
+fun TenantLoginScreenComposable(
+    navigateToTenantHomeScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val viewModel: TenantLoginScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
+
+    if(uiState.loginStatus == LoginStatus.SUCCESS) {
+        Toast.makeText(context, "Login success", Toast.LENGTH_SHORT).show()
+        navigateToTenantHomeScreen()
+        viewModel.resetLoginStatus()
+    } else if(uiState.loginStatus == LoginStatus.FAILURE) {
+        Toast.makeText(context, "Invalid credentials", Toast.LENGTH_SHORT).show()
+        viewModel.resetLoginStatus()
+    }
 
     Box {
         TenantLoginScreen(
@@ -63,7 +80,8 @@ fun TenantLoginComposable(
             },
             onLoginButtonClicked = {
                 viewModel.loginTenant()
-            }
+            },
+            loginStatus = uiState.loginStatus
         )
     }
 }
@@ -77,6 +95,7 @@ fun TenantLoginScreen(
     onChangePasswordValue: (newValue: String) -> Unit,
     onLoginButtonClicked: () -> Unit,
     enabled: Boolean,
+    loginStatus: LoginStatus,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -100,7 +119,8 @@ fun TenantLoginScreen(
             passwordValue = passwordValue,
             onChangePasswordValue = onChangePasswordValue,
             enabled = enabled,
-            onLoginButtonClicked = onLoginButtonClicked
+            onLoginButtonClicked = onLoginButtonClicked,
+            loginStatus = loginStatus
         )
     }
 }
@@ -115,6 +135,7 @@ fun TenantLoginBody(
     onChangePasswordValue: (newValue: String) -> Unit,
     onLoginButtonClicked: () -> Unit,
     enabled: Boolean,
+    loginStatus: LoginStatus,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -144,7 +165,8 @@ fun TenantLoginBody(
         Spacer(modifier = Modifier.height(30.dp))
         TenantLoginButton(
             enabled = enabled,
-            onLoginButtonClicked = onLoginButtonClicked
+            onLoginButtonClicked = onLoginButtonClicked,
+            loginStatus = loginStatus
         )
     }
 }
@@ -166,6 +188,10 @@ fun TenantLoginInputFieldsDisplay(
         TenantLoginInputField(
             value = roomValue,
             label = "Room Number",
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Text
+            ),
             onValueChanged = {
                 onChangeRoomValue(it)
             }
@@ -174,6 +200,10 @@ fun TenantLoginInputFieldsDisplay(
         TenantLoginInputField(
             value = phoneNumberValue,
             label = "Phone Number",
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Phone
+            ),
             onValueChanged = {
                 onChangePhoneNumberValue(it)
             }
@@ -182,6 +212,10 @@ fun TenantLoginInputFieldsDisplay(
         TenantLoginInputField(
             value = passwordValue,
             label = "Password",
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Password
+            ),
             onValueChanged = {
                 onChangePasswordValue(it)
             }
@@ -194,20 +228,25 @@ fun TenantLoginInputFieldsDisplay(
 fun TenantLoginButton(
     onLoginButtonClicked: () -> Unit,
     enabled: Boolean,
+    loginStatus: LoginStatus,
     modifier: Modifier = Modifier
 ) {
     Button(
-        enabled = enabled,
+        enabled = enabled && loginStatus != LoginStatus.LOADING,
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .height(52.dp)
             .fillMaxWidth(),
         onClick = { onLoginButtonClicked() }
     ) {
-        Text(
-            text = "LOGIN",
-            fontWeight = FontWeight.Bold
-        )
+        if(loginStatus == LoginStatus.LOADING) {
+            CircularProgressIndicator()
+        } else {
+            Text(
+                text = "LOGIN",
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
@@ -216,6 +255,7 @@ fun TenantLoginButton(
 fun TenantLoginInputField(
     label: String,
     value: String,
+    keyboardOptions: KeyboardOptions,
     onValueChanged: (newValue: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -227,6 +267,7 @@ fun TenantLoginInputField(
                 )
         },
         onValueChange = onValueChanged,
+        keyboardOptions = keyboardOptions,
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
@@ -244,6 +285,10 @@ fun TenantLoginInputFieldPreview() {
         TenantLoginInputField(
             label = "National ID / Passport",
             value = "",
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Text
+            ),
             onValueChanged = {}
         )
     }
@@ -262,7 +307,8 @@ fun TenantLoginScreenPreview() {
             passwordValue = "",
             onChangePasswordValue = {},
             enabled = false,
-            onLoginButtonClicked = {}
+            onLoginButtonClicked = {},
+            loginStatus = LoginStatus.INITIAL
         )
     }
 }

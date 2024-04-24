@@ -10,7 +10,7 @@ data class LoginTenantRequestBody(
 )
 @Serializable
 data class LoginTenantResponseBody(
-    val statusCode: String,
+    val statusCode: Int,
     val message: String,
     val data: LoginTenantResponseBodyData
 )
@@ -26,7 +26,7 @@ data class TenantDetails(
     val phoneNumber: String,
     val email: String,
     val tenantAddedAt: String,
-    val tenantActive: String,
+    val tenantActive: Boolean,
     val propertyUnit: TenantPropertyUnit,
 )
 @Serializable

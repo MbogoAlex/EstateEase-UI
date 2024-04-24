@@ -1,5 +1,6 @@
 package com.example.tenant_care.tenantViews.accountManagement
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.container.ApiRepository
@@ -95,6 +96,7 @@ class TenantLoginScreenViewModel(
                             loginStatus = LoginStatus.FAILURE
                         )
                     }
+                    Log.e("TENANT_LOGIN_FAIL_RESPONSE", response.toString())
                 }
             } catch (e: Exception) {
                 _uiState.update {
@@ -102,7 +104,16 @@ class TenantLoginScreenViewModel(
                         loginStatus = LoginStatus.FAILURE
                     )
                 }
+                Log.e("TENANT_LOGIN_FAIL_EXCEPTION", e.toString())
             }
+        }
+    }
+
+    fun resetLoginStatus() {
+        _uiState.update {
+            it.copy(
+                loginStatus = LoginStatus.INITIAL
+            )
         }
     }
 

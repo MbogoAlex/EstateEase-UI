@@ -30,6 +30,7 @@ object HomeScreenDestination: AppNavigation {
 @Composable
 fun HomeScreen(
     navigateToPManagerLoginScreen: () -> Unit,
+    navigateToTenantLoginScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -53,7 +54,8 @@ fun HomeScreen(
         )
         Spacer(modifier = Modifier.height(100.dp))
         LoginButtonsDisplay(
-            navigateToPManagerLoginScreen = navigateToPManagerLoginScreen
+            navigateToPManagerLoginScreen = navigateToPManagerLoginScreen,
+            navigateToTenantLoginScreen = navigateToTenantLoginScreen
         )
     }
 }
@@ -61,6 +63,7 @@ fun HomeScreen(
 @Composable
 fun LoginButtonsDisplay(
     navigateToPManagerLoginScreen: () -> Unit,
+    navigateToTenantLoginScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -71,7 +74,7 @@ fun LoginButtonsDisplay(
         Spacer(modifier = Modifier.height(50.dp))
         LoginButton(
             buttonText = "TENANT",
-            onClickButton = { /*TODO*/ }
+            onClickButton = navigateToTenantLoginScreen
         )
         Spacer(modifier = Modifier.height(50.dp))
         LoginButton(
@@ -128,7 +131,8 @@ fun HomeScreenPreview(
 ) {
     Tenant_careTheme {
         HomeScreen(
-            navigateToPManagerLoginScreen = {}
+            navigateToPManagerLoginScreen = {},
+            navigateToTenantLoginScreen = {}
         )
     }
 }

@@ -31,6 +31,10 @@ import com.example.tenant_care.pManagerViews.unitsManagementViews.UnOccupiedUnit
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementComposable
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementComposableDestination
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitDetailsComposable
+import com.example.tenant_care.tenantViews.TenantHomeScreenComposable
+import com.example.tenant_care.tenantViews.TenantHomeScreenDestination
+import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenComposable
+import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenDestination
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -52,6 +56,10 @@ fun NavigationGraph(
                 navigateToPManagerHomeScreen = {
                     navController.popBackStack(SplashScreenDestination.route, true)
                     navController.navigate(PManagerHomeScreenDestination.route)
+                },
+                navigateToTenantHomeScreen = {
+                    navController.popBackStack(SplashScreenDestination.route, true)
+                    navController.navigate(TenantHomeScreenDestination.route)
                 }
             )
         }
@@ -60,6 +68,10 @@ fun NavigationGraph(
                 navigateToPManagerLoginScreen = {
                     navController.popBackStack(HomeScreenDestination.route, true)
                     navController.navigate(PManagerLoginScreenDestination.route)
+                },
+                navigateToTenantLoginScreen = {
+                    navController.popBackStack(HomeScreenDestination.route, true)
+                    navController.navigate(TenantLoginScreenDestination.route)
                 }
             )
         }
@@ -173,6 +185,17 @@ fun NavigationGraph(
                     navController.navigateUp()
                 }
             )
+        }
+        composable(TenantLoginScreenDestination.route) {
+            TenantLoginScreenComposable(
+                navigateToTenantHomeScreen = {
+                    navController.popBackStack(TenantLoginScreenDestination.route, true)
+                    navController.navigate(TenantHomeScreenDestination.route)
+                }
+            )
+        }
+        composable(TenantHomeScreenDestination.route) {
+            TenantHomeScreenComposable()
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.tenant_care.tenantViews
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,12 +18,26 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.tenant_care.R
+import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.tenantViews.amenity.AmenityComposable
 import com.example.tenant_care.tenantViews.model.BottomNavigationBar
 import com.example.tenant_care.tenantViews.rentPayment.PaymentHomeScreenComposable
 import com.example.tenant_care.tenantViews.rentPayment.RentStatusCard
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
+object TenantHomeScreenDestination: AppNavigation {
+    override val title: String = "Tenant home screen"
+    override val route: String = "tenant-home-screen"
+
+}
+@Composable
+fun TenantHomeScreenComposable(
+    modifier: Modifier = Modifier
+) {
+    Box {
+        TenantHomeScreen()
+    }
+}
 @Composable
 fun TenantHomeScreen(
     modifier: Modifier = Modifier
