@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.container.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
+import com.example.tenant_care.datastore.UserDSDetails
+import com.example.tenant_care.model.tenant.LoginTenantRequestBody
+import com.example.tenant_care.model.tenant.LoginTenantResponseBody
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,11 +61,47 @@ class TenantLoginScreenViewModel(
     }
 
     fun loginTenant() {
+        _uiState.update {
+            it.copy(
+                loginStatus = LoginStatus.LOADING
+            )
+        }
+        val tenant: LoginTenantRequestBody = LoginTenantRequestBody(
+            tenantRoomNameOrNumber = _uiState.value.roomName,
+            tenantPhoneNumber = _uiState.value.phoneNumber,
+            tenantPassword = _uiState.value.password
+        )
         viewModelScope.launch {
             try {
-                val response = apiRepository
+                val response = apiRepository.loginTenant(tenant)
+                if(response.isSuccessful) {
+                    val userDSDetails: UserDSDetails = UserDSDetails(
+                        roleId = 3,
+                        userId = response.body()?.data?.tenant?.tenantId!!,
+                        fullName = response.body()?.data?.tenant?.fullName!!,
+                        email = response.body()?.data?.tenant?.email!!,
+                        userAddedAt = response.body()?.data?.tenant?.tenantAddedAt!!,
+                        phoneNumber = response.body()?.data?.tenant?.phoneNumber!!
+                    )
+                    dsRepository.saveUserDetails(userDSDetails)
+                    _uiState.update {
+                        it.copy(
+                            loginStatus = LoginStatus.SUCCESS
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            loginStatus = LoginStatus.FAILURE
+                        )
+                    }
+                }
             } catch (e: Exception) {
-
+                _uiState.update {
+                    it.copy(
+                        loginStatus = LoginStatus.FAILURE
+                    )
+                }
             }
         }
     }

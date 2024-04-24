@@ -1,5 +1,8 @@
 package com.example.tenant_care.tenantViews.accountManagement
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +18,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
@@ -30,8 +37,46 @@ object TenantLoginScreenDestination: AppNavigation {
     override val route: String = "tenant-login-screen"
 
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun TenantLoginComposable(
+    modifier: Modifier = Modifier
+) {
+    val viewModel: TenantLoginScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
+    val uiState by viewModel.uiState.collectAsState()
+
+    Box {
+        TenantLoginScreen(
+            roomValue = uiState.roomName,
+            onChangeRoomValue = {
+                viewModel.updateRoomName(it)
+            },
+            phoneNumberValue = uiState.phoneNumber,
+            onChangePhoneNumberValue = {
+                viewModel.updatePhoneNumber(it)
+            },
+            passwordValue = uiState.password,
+            enabled = uiState.buttonEnabled,
+            onChangePasswordValue = {
+                viewModel.updatePassword(it)
+            },
+            onLoginButtonClicked = {
+                viewModel.loginTenant()
+            }
+        )
+    }
+}
 @Composable
 fun TenantLoginScreen(
+    roomValue: String,
+    onChangeRoomValue: (newValue: String) -> Unit,
+    phoneNumberValue: String,
+    onChangePhoneNumberValue: (newValue: String) -> Unit,
+    passwordValue: String,
+    onChangePasswordValue: (newValue: String) -> Unit,
+    onLoginButtonClicked: () -> Unit,
+    enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -47,12 +92,29 @@ fun TenantLoginScreen(
             fontSize = 25.sp
         )
         Spacer(modifier = Modifier.height(70.dp))
-        TenantLoginBody()
+        TenantLoginBody(
+            roomValue = roomValue,
+            onChangeRoomValue = onChangeRoomValue,
+            phoneNumberValue = phoneNumberValue,
+            onChangePhoneNumberValue = onChangePhoneNumberValue,
+            passwordValue = passwordValue,
+            onChangePasswordValue = onChangePasswordValue,
+            enabled = enabled,
+            onLoginButtonClicked = onLoginButtonClicked
+        )
     }
 }
 
 @Composable
 fun TenantLoginBody(
+    roomValue: String,
+    onChangeRoomValue: (newValue: String) -> Unit,
+    phoneNumberValue: String,
+    onChangePhoneNumberValue: (newValue: String) -> Unit,
+    passwordValue: String,
+    onChangePasswordValue: (newValue: String) -> Unit,
+    onLoginButtonClicked: () -> Unit,
+    enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -60,7 +122,14 @@ fun TenantLoginBody(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        TenantLoginInputFieldsDisplay()
+        TenantLoginInputFieldsDisplay(
+            roomValue = roomValue,
+            onChangeRoomValue = onChangeRoomValue,
+            phoneNumberValue = phoneNumberValue,
+            onChangePhoneNumberValue = onChangePhoneNumberValue,
+            passwordValue = passwordValue,
+            onChangePasswordValue = onChangePasswordValue
+        )
         Spacer(modifier = Modifier.height(10.dp))
         Row(
             modifier = Modifier
@@ -73,12 +142,21 @@ fun TenantLoginBody(
             }
         }
         Spacer(modifier = Modifier.height(30.dp))
-        TenantLoginButton(onLoginButtonClicked = { /*TODO*/ })
+        TenantLoginButton(
+            enabled = enabled,
+            onLoginButtonClicked = onLoginButtonClicked
+        )
     }
 }
 
 @Composable
 fun TenantLoginInputFieldsDisplay(
+    roomValue: String,
+    onChangeRoomValue: (newValue: String) -> Unit,
+    phoneNumberValue: String,
+    onChangePhoneNumberValue: (newValue: String) -> Unit,
+    passwordValue: String,
+    onChangePasswordValue: (newValue: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -86,18 +164,27 @@ fun TenantLoginInputFieldsDisplay(
             .fillMaxWidth()
     ) {
         TenantLoginInputField(
+            value = roomValue,
             label = "Room Number",
-            onValueChanged = { /*TODO*/ }
+            onValueChanged = {
+                onChangeRoomValue(it)
+            }
         )
         Spacer(modifier = Modifier.height(40.dp))
         TenantLoginInputField(
+            value = phoneNumberValue,
             label = "Phone Number",
-            onValueChanged = { /*TODO*/ }
+            onValueChanged = {
+                onChangePhoneNumberValue(it)
+            }
         )
         Spacer(modifier = Modifier.height(40.dp))
         TenantLoginInputField(
+            value = passwordValue,
             label = "Password",
-            onValueChanged = { /*TODO*/ }
+            onValueChanged = {
+                onChangePasswordValue(it)
+            }
         )
         Spacer(modifier = Modifier.height(20.dp))
     }
@@ -106,9 +193,11 @@ fun TenantLoginInputFieldsDisplay(
 @Composable
 fun TenantLoginButton(
     onLoginButtonClicked: () -> Unit,
+    enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     Button(
+        enabled = enabled,
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .height(52.dp)
@@ -126,17 +215,18 @@ fun TenantLoginButton(
 @Composable
 fun TenantLoginInputField(
     label: String,
-    onValueChanged: () -> Unit,
+    value: String,
+    onValueChanged: (newValue: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     TextField(
-        value = "",
+        value = value,
         label = {
                 Text(
                     text = label
                 )
         },
-        onValueChange = {},
+        onValueChange = onValueChanged,
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
@@ -153,6 +243,7 @@ fun TenantLoginInputFieldPreview() {
     Tenant_careTheme {
         TenantLoginInputField(
             label = "National ID / Passport",
+            value = "",
             onValueChanged = {}
         )
     }
@@ -163,6 +254,15 @@ fun TenantLoginInputFieldPreview() {
 @Composable
 fun TenantLoginScreenPreview() {
     Tenant_careTheme {
-        TenantLoginScreen()
+        TenantLoginScreen(
+            roomValue = "",
+            onChangeRoomValue = {},
+            phoneNumberValue = "",
+            onChangePhoneNumberValue = {},
+            passwordValue = "",
+            onChangePasswordValue = {},
+            enabled = false,
+            onLoginButtonClicked = {}
+        )
     }
 }
