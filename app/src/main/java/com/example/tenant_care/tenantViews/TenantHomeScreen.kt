@@ -152,15 +152,15 @@ fun TenantBottomNavigationBarPreview(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun RentStatusCardPreview(
-    modifier: Modifier = Modifier
-) {
-    Tenant_careTheme {
-        RentStatusCard()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun RentStatusCardPreview(
+//    modifier: Modifier = Modifier
+//) {
+//    Tenant_careTheme {
+//        RentStatusCard()
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable

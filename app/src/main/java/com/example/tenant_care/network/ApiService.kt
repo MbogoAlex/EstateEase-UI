@@ -14,6 +14,7 @@ import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
 import com.example.tenant_care.model.tenant.LoginTenantRequestBody
 import com.example.tenant_care.model.tenant.LoginTenantResponseBody
+import com.example.tenant_care.model.tenant.RentPaymentRowsResponse
 import com.example.tenant_care.model.tenant.UnitAssignmentRequestBody
 import com.example.tenant_care.model.tenant.UnitAssignmentResponseBody
 import retrofit2.Response
@@ -128,4 +129,18 @@ interface ApiService {
     suspend fun loginTenant(
         @Body tenant: LoginTenantRequestBody
     ): Response<LoginTenantResponseBody>
+
+    // get rent payment rows for various tenants
+    @GET("tenant/tenantrentpaymentrow")
+    suspend fun getRentPaymentRows(
+        @Query("tenantId") tenantId: Int,
+        @Query("month") month: String?,
+        @Query("year") year: String?,
+        @Query("roomName") roomName: String?,
+        @Query("rooms") rooms: Int?,
+        @Query("tenantName") tenantName: String?,
+        @Query("rentPaymentStatus") rentPaymentStatus: Boolean?,
+        @Query("paidLate") paidLate: Boolean?,
+        @Query("tenantActive") tenantActive: Boolean?
+    ): Response<RentPaymentRowsResponse>
 }

@@ -21,6 +21,7 @@ import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagemen
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitDetailsScreenViewModel
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitsScreenViewModel
 import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenViewModel
+import com.example.tenant_care.tenantViews.rentPayment.PaymentHomeScreenViewModel
 
 object EstateEaseViewModelFactory {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -189,6 +190,16 @@ object EstateEaseViewModelFactory {
             val apiRepository = estateEaseApplication().container.apiRepository
             val dsRepository = estateEaseApplication().dsRepository
             TenantLoginScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        // initialize PaymentHomeScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            PaymentHomeScreenViewModel(
                 apiRepository = apiRepository,
                 dsRepository = dsRepository
             )

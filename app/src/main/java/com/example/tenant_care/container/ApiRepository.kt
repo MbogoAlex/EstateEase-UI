@@ -15,6 +15,7 @@ import com.example.tenant_care.model.property.NewPropertyResponseBody
 import com.example.tenant_care.model.tenant.AssignmentResponseData
 import com.example.tenant_care.model.tenant.LoginTenantRequestBody
 import com.example.tenant_care.model.tenant.LoginTenantResponseBody
+import com.example.tenant_care.model.tenant.RentPaymentRowsResponse
 import com.example.tenant_care.model.tenant.UnitAssignmentRequestBody
 import com.example.tenant_care.model.tenant.UnitAssignmentResponseBody
 import com.example.tenant_care.network.ApiService
@@ -75,6 +76,20 @@ interface ApiRepository {
 
     // login tenant
     suspend fun loginTenant(tenant: LoginTenantRequestBody): Response<LoginTenantResponseBody>
+
+    // get rent payment rows for various tenants
+
+    suspend fun getRentPaymentRows(
+        tenantId: Int,
+        month: String?,
+        year: String?,
+        roomName: String?,
+        rooms: Int?,
+        tenantName: String?,
+        rentPaymentStatus: Boolean?,
+        paidLate: Boolean?,
+        tenantActive: Boolean?
+    ): Response<RentPaymentRowsResponse>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -166,6 +181,28 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
 
     override suspend fun loginTenant(tenant: LoginTenantRequestBody): Response<LoginTenantResponseBody> = apiService.loginTenant(
         tenant = tenant
+    )
+
+    override suspend fun getRentPaymentRows(
+        tenantId: Int,
+        month: String?,
+        year: String?,
+        roomName: String?,
+        rooms: Int?,
+        tenantName: String?,
+        rentPaymentStatus: Boolean?,
+        paidLate: Boolean?,
+        tenantActive: Boolean?
+    ): Response<RentPaymentRowsResponse> = apiService.getRentPaymentRows(
+        tenantId = tenantId,
+        month = month,
+        year = year,
+        roomName = roomName,
+        rooms = rooms,
+        tenantName = tenantName,
+        rentPaymentStatus = rentPaymentStatus,
+        paidLate = paidLate,
+        tenantActive = tenantActive
     )
 
 
