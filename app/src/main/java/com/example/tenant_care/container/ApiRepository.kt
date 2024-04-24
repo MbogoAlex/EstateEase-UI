@@ -13,6 +13,8 @@ import com.example.tenant_care.model.property.ArchiveUnitResponseBody
 import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
 import com.example.tenant_care.model.tenant.AssignmentResponseData
+import com.example.tenant_care.model.tenant.LoginTenantRequestBody
+import com.example.tenant_care.model.tenant.LoginTenantResponseBody
 import com.example.tenant_care.model.tenant.UnitAssignmentRequestBody
 import com.example.tenant_care.model.tenant.UnitAssignmentResponseBody
 import com.example.tenant_care.network.ApiService
@@ -70,6 +72,9 @@ interface ApiRepository {
         month: String,
         year: String
     ): Response<RentPaymentRowsUpdateResponseBody>
+
+    // login tenant
+    suspend fun loginTenant(tenant: LoginTenantRequestBody): Response<LoginTenantResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -157,6 +162,10 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
     ): Response<RentPaymentRowsUpdateResponseBody> = apiService.deActivateLatePaymentPenaltyForMultipleTenants(
         month = month,
         year = year
+    )
+
+    override suspend fun loginTenant(tenant: LoginTenantRequestBody): Response<LoginTenantResponseBody> = apiService.loginTenant(
+        tenant = tenant
     )
 
 

@@ -12,6 +12,8 @@ import com.example.tenant_care.model.pManager.RentPaymentRowsUpdateResponseBody
 import com.example.tenant_care.model.property.ArchiveUnitResponseBody
 import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
+import com.example.tenant_care.model.tenant.LoginTenantRequestBody
+import com.example.tenant_care.model.tenant.LoginTenantResponseBody
 import com.example.tenant_care.model.tenant.UnitAssignmentRequestBody
 import com.example.tenant_care.model.tenant.UnitAssignmentResponseBody
 import retrofit2.Response
@@ -120,4 +122,10 @@ interface ApiService {
         @Path("month") month: String,
         @Path("year") year: String,
     ): Response<RentPaymentRowsUpdateResponseBody>
+
+    // login tenant
+    @POST("tenant/login")
+    suspend fun loginTenant(
+        @Body tenant: LoginTenantRequestBody
+    ): Response<LoginTenantResponseBody>
 }

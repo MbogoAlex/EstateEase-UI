@@ -1,4 +1,4 @@
-package com.example.tenant_care.tenantViews
+package com.example.tenant_care.tenantViews.accountManagement
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -86,12 +86,12 @@ fun TenantLoginInputFieldsDisplay(
             .fillMaxWidth()
     ) {
         TenantLoginInputField(
-            label = "National ID / Passport Number",
+            label = "Room Number",
             onValueChanged = { /*TODO*/ }
         )
         Spacer(modifier = Modifier.height(40.dp))
         TenantLoginInputField(
-            label = "Room Number",
+            label = "Phone Number",
             onValueChanged = { /*TODO*/ }
         )
         Spacer(modifier = Modifier.height(40.dp))
