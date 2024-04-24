@@ -22,6 +22,7 @@ import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnit
 import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitsScreenViewModel
 import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenViewModel
 import com.example.tenant_care.tenantViews.rentPayment.PaymentHomeScreenViewModel
+import com.example.tenant_care.tenantViews.rentPayment.RentInvoiceScreenViewModel
 
 object EstateEaseViewModelFactory {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -202,6 +203,18 @@ object EstateEaseViewModelFactory {
             PaymentHomeScreenViewModel(
                 apiRepository = apiRepository,
                 dsRepository = dsRepository
+            )
+        }
+
+        // initialize RentInvoiceScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            val savedStateHandle = this.createSavedStateHandle()
+            RentInvoiceScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = savedStateHandle
             )
         }
     }

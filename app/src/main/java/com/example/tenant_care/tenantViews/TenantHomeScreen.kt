@@ -1,5 +1,7 @@
 package com.example.tenant_care.tenantViews
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,16 +32,22 @@ object TenantHomeScreenDestination: AppNavigation {
     override val route: String = "tenant-home-screen"
 
 }
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TenantHomeScreenComposable(
+    navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box {
-        TenantHomeScreen()
+        TenantHomeScreen(
+            navigateToRentInvoiceScreen = navigateToRentInvoiceScreen
+        )
     }
 }
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TenantHomeScreen(
+    navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var currentBottomBar by rememberSaveable {
@@ -50,7 +58,10 @@ fun TenantHomeScreen(
             .fillMaxSize()
     ) {
         when(currentBottomBar) {
-            BottomNavigationBar.HOME -> PaymentHomeScreenComposable(modifier = Modifier.weight(1f))
+            BottomNavigationBar.HOME -> PaymentHomeScreenComposable(
+                navigateToRentInvoiceScreen = navigateToRentInvoiceScreen,
+                modifier = Modifier.weight(1f)
+            )
             BottomNavigationBar.CHAT -> {
 //                TenantReportScreen(
 //                    modifier = Modifier.weight(1f)
@@ -162,12 +173,15 @@ fun TenantBottomNavigationBarPreview(
 //    }
 //}
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun TenantHomeScreenPreview(
     modifier: Modifier = Modifier
 ) {
     Tenant_careTheme {
-        TenantHomeScreen()
+        TenantHomeScreen(
+            navigateToRentInvoiceScreen = {tenantId, month, year ->  }
+        )
     }
 }

@@ -52,6 +52,7 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaymentHomeScreenComposable(
+    navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: PaymentHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -68,7 +69,8 @@ fun PaymentHomeScreenComposable(
             tenantSince = ReusableFunctions.formatDateTimeValue(uiState.userDetails.userAddedAt),
             tenancyDays = difference.toString(),
             roomName = uiState.roomName,
-            rentPayments = uiState.rentPayments
+            rentPayments = uiState.rentPayments,
+            navigateToRentInvoiceScreen = navigateToRentInvoiceScreen
         )
     }
 }
@@ -80,6 +82,7 @@ fun PaymentHomeScreen(
     tenantName: String,
     tenancyDays: String,
     tenantSince: String,
+    navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -156,6 +159,7 @@ fun PaymentHomeScreen(
                 LazyColumn {
                     items(rentPayments) { rentPayment ->
                         RentStatusCard(
+                            navigateToRentInvoiceScreen = navigateToRentInvoiceScreen,
                             rentPayment = rentPayment
                         )
                     }
@@ -176,6 +180,7 @@ fun PaymentHomeScreen(
 @Composable
 fun RentStatusCard(
     rentPayment: RentPayment,
+    navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val penaltyAccrued: Double
@@ -221,7 +226,7 @@ fun RentStatusCard(
                 if(rentPayment.rentPaymentStatus) {
                     Text(
                         text = "PAID",
-                        color = Color.Red
+                        color = Color.Blue
                     )
                 } else if(!rentPayment.rentPaymentStatus) {
                     Text(
@@ -306,9 +311,12 @@ fun RentStatusCard(
             }
             Spacer(modifier = Modifier.height(20.dp))
             RentPaymentButton(
+                navigateToRentInvoiceScreen = navigateToRentInvoiceScreen,
+                tenantId = rentPayment.tenantId.toString(),
+                month = rentPayment.month,
+                year = rentPayment.year,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally),
-                navigateToRentInvoice = { /*TODO*/ }
             )
         }
     }
@@ -334,13 +342,16 @@ fun RentStatusCardItem(
 
 @Composable
 fun RentPaymentButton(
-    navigateToRentInvoice: () -> Unit,
+    navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
+    tenantId: String,
+    month: String,
+    year: String,
     modifier: Modifier = Modifier
 ) {
     Button(
         shape = RoundedCornerShape(10.dp),
         modifier = modifier,
-        onClick = { navigateToRentInvoice() }
+        onClick = { navigateToRentInvoiceScreen(tenantId, month, year) }
     ) {
         Text(text = "PROCEED TO PAYMENT")
     }
@@ -448,7 +459,8 @@ fun TenantRentViewScreenPreview() {
             tenantSince = "2024-04-04 1-:32",
             roomName = "Col C2",
             tenantName = "Mbogo AG",
-            rentPayments = rentPayments
+            rentPayments = rentPayments,
+            navigateToRentInvoiceScreen = {tenantId, month, year ->  }
         )
     }
 }

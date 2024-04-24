@@ -1,0 +1,124 @@
+package com.example.tenant_care.tenantViews.rentPayment
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.tenant_care.container.ApiRepository
+import com.example.tenant_care.datastore.DSRepository
+import com.example.tenant_care.model.tenant.RentPayment
+import com.example.tenant_care.util.ReusableFunctions
+import com.example.tenant_care.util.ReusableFunctions.toUserDetails
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+enum class FetchingInvoiceStatus {
+    INITIAL,
+    LOADING,
+    SUCCESS,
+    FAILURE
+}
+
+val rentPaymentPlaceHolder = RentPayment(
+    rentPaymentTblId = 1,
+    dueDate = "2024-09-10 11:44",
+    month = "April",
+    monthlyRent = 10000.0,
+    paidAmount = 10400.0,
+    paidAt = "",
+    paidLate = true,
+    daysLate = 2,
+    rentPaymentStatus = true,
+    penaltyActive = true,
+    penaltyPerDay = 200.0,
+    transactionId = "123432111",
+    year = "2024",
+    propertyNumberOrName = "Col C2",
+    numberOfRooms = 2,
+    tenantId = 2,
+    email = "tenant@gmail.com",
+    fullName = "Mbogo AGM",
+    nationalIdOrPassport = "234543234",
+    phoneNumber = "0119987282",
+    tenantAddedAt = "2023-09-23 10:32",
+    tenantActive = true
+)
+
+data class RentInvoiceScreenUiState(
+    val rentPayment: RentPayment = rentPaymentPlaceHolder,
+    val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
+    val fetchingInvoiceStatus: FetchingInvoiceStatus = FetchingInvoiceStatus.INITIAL
+)
+class RentInvoiceScreenViewModel(
+    private val apiRepository: ApiRepository,
+    private val dsRepository: DSRepository,
+    private val savedStateHandle: SavedStateHandle
+): ViewModel() {
+    private val _uiState = MutableStateFlow(RentInvoiceScreenUiState())
+    val uiState: StateFlow<RentInvoiceScreenUiState> = _uiState.asStateFlow()
+
+    val tenantId: String? = savedStateHandle[RentInvoiceScreenDestination.tenantId]
+    val month: String? = savedStateHandle[RentInvoiceScreenDestination.month]
+    val year: String? = savedStateHandle[RentInvoiceScreenDestination.year]
+    fun loadStartupData() {
+        viewModelScope.launch {
+            dsRepository.userDSDetails.collect() {dsUserDetails ->
+                _uiState.update {
+                    it.copy(
+                        userDetails = dsUserDetails.toUserDetails()
+                    )
+                }
+            }
+        }
+    }
+
+    fun getUserInvoice() {
+        _uiState.update {
+            it.copy(
+                fetchingInvoiceStatus = FetchingInvoiceStatus.LOADING
+            )
+        }
+        viewModelScope.launch {
+            try {
+                val response = apiRepository.getRentPaymentRows(
+                    tenantId = tenantId!!.toInt(),
+                    month = month,
+                    year = year,
+                    roomName = null,
+                    rooms = null,
+                    tenantName = null,
+                    rentPaymentStatus = null,
+                    paidLate = null,
+                    tenantActive = null
+                )
+                if(response.isSuccessful) {
+                    _uiState.update {
+                        it.copy(
+                            rentPayment = response.body()?.data?.rentpayment!![0],
+                            fetchingInvoiceStatus = FetchingInvoiceStatus.SUCCESS
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            fetchingInvoiceStatus = FetchingInvoiceStatus.FAILURE
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        fetchingInvoiceStatus = FetchingInvoiceStatus.FAILURE
+                    )
+                }
+            }
+        }
+    }
+
+    init {
+        loadStartupData()
+        getUserInvoice()
+    }
+}

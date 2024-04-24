@@ -4,7 +4,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavArgument
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,9 +14,6 @@ import com.example.tenant_care.HomeScreenDestination
 import com.example.tenant_care.SplashScreen
 import com.example.tenant_care.SplashScreenDestination
 import com.example.tenant_care.pManagerViews.PManagerHomeComposable
-import com.example.tenant_care.pManagerViews.unitsManagementViews.PManagerAddUnitScreen
-import com.example.tenant_care.pManagerViews.unitsManagementViews.PManagerAddUnitScreenDestination
-import com.example.tenant_care.pManagerViews.PManagerHomeScreen
 import com.example.tenant_care.pManagerViews.PManagerHomeScreenDestination
 import com.example.tenant_care.pManagerViews.PManagerLoginScreen
 import com.example.tenant_care.pManagerViews.PManagerLoginScreenDestination
@@ -35,6 +31,8 @@ import com.example.tenant_care.tenantViews.TenantHomeScreenComposable
 import com.example.tenant_care.tenantViews.TenantHomeScreenDestination
 import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenComposable
 import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenDestination
+import com.example.tenant_care.tenantViews.rentPayment.RentInvoiceScreenComposable
+import com.example.tenant_care.tenantViews.rentPayment.RentInvoiceScreenDestination
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -195,7 +193,31 @@ fun NavigationGraph(
             )
         }
         composable(TenantHomeScreenDestination.route) {
-            TenantHomeScreenComposable()
+            TenantHomeScreenComposable(
+                navigateToRentInvoiceScreen = {tenantId, month, year ->
+                    navController.navigate("${RentInvoiceScreenDestination.route}/${tenantId}/${month}/${year}")
+                }
+            )
+        }
+        composable(
+            RentInvoiceScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(RentInvoiceScreenDestination.tenantId) {
+                    type = NavType.StringType
+                },
+                navArgument(RentInvoiceScreenDestination.month) {
+                    type = NavType.StringType
+                },
+                navArgument(RentInvoiceScreenDestination.year) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            RentInvoiceScreenComposable(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                }
+            )
         }
     }
 }
