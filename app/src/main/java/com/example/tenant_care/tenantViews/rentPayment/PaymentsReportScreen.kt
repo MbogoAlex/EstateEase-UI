@@ -1,6 +1,6 @@
-package com.example.tenant_care.tenantViews
+package com.example.tenant_care.tenantViews.rentPayment
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,7 +32,15 @@ import com.example.tenant_care.R
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
 @Composable
-fun TenantReportScreen(
+fun PaymentsReportScreenComposable(
+    modifier: Modifier = Modifier
+) {
+    Box {
+        PaymentsReportScreen()
+    }
+}
+@Composable
+fun PaymentsReportScreen(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -147,6 +155,6 @@ fun TransactionItemPreview() {
 @Composable
 fun TenantReportScreenPreview() {
     Tenant_careTheme {
-        TenantReportScreen()
+        PaymentsReportScreen()
     }
 }

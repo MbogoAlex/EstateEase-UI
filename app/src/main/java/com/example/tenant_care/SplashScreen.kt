@@ -1,6 +1,8 @@
 package com.example.tenant_care
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +32,7 @@ object SplashScreenDestination: AppNavigation {
     override val route: String = "splash-screen"
 
 }
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SplashScreen(
     navigateToHomeScreen: () -> Unit,
@@ -80,6 +83,7 @@ fun SplashScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun SplashScreenPreview() {

@@ -1,9 +1,7 @@
 package com.example.tenant_care.pManagerViews.rentPayment
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,9 +41,11 @@ import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
 import com.example.tenant_care.model.pManager.TenantRentPaymentData
 import com.example.tenant_care.ui.theme.Tenant_careTheme
-import com.example.tenant_care.util.ReusableComposables
+import com.example.tenant_care.util.FilterByNumOfRoomsBox
+import com.example.tenant_care.util.FilterByRoomNameBox
 import com.example.tenant_care.util.ReusableFunctions
-import java.time.LocalDateTime
+import com.example.tenant_care.util.SearchFieldForTenants
+import com.example.tenant_care.util.UndoFilteringBox
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -62,7 +61,7 @@ fun TenantsPaidScreenComposable(
         mutableStateOf(false)
     }
 
-    val popUpItems = listOf<String>("Active tenants", "Removed tenants")
+    val popUpItems = listOf<String>("Active tenants", "Removed tenants", "Paid early", "Paid late")
 
     Box(
         modifier = modifier
@@ -70,6 +69,8 @@ fun TenantsPaidScreenComposable(
         TenantsPaidScreen(
             activeTenantsSelected = uiState.activeTenantsSelected,
             inActiveTenantsSelected = uiState.inactiveTenantsSelected,
+            latePaymentsSelected = uiState.latePaymentsSelected,
+            earlyPaymentsSelected = uiState.earlyPaymentsSelected,
             tenantName = uiState.tenantName,
             onSearchTextChanged = {
                 viewModel.filterByTenantName(
@@ -109,6 +110,10 @@ fun TenantsPaidScreenComposable(
                     viewModel.filterByActiveTenants(true)
                 } else if(item == "Removed tenants") {
                     viewModel.filterByActiveTenants(false)
+                } else if(item == "Paid early") {
+                    viewModel.filterByTimeOfPayment(false)
+                } else if(item == "Paid late") {
+                    viewModel.filterByTimeOfPayment(true)
                 }
             }
         )
@@ -120,6 +125,8 @@ fun TenantsPaidScreenComposable(
 fun TenantsPaidScreen(
     activeTenantsSelected: Boolean,
     inActiveTenantsSelected: Boolean,
+    latePaymentsSelected: Boolean,
+    earlyPaymentsSelected: Boolean,
     tenantName: String?,
     onSearchTextChanged: (searchText: String) -> Unit,
     numberOfRoomsSelected: String?,
@@ -144,7 +151,7 @@ fun TenantsPaidScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        ReusableComposables.SearchFieldForTenants(
+        SearchFieldForTenants(
             labelText = "Search Tenant name",
             value = tenantName.takeIf { it != null } ?: "",
             onValueChange = onSearchTextChanged,
@@ -155,18 +162,18 @@ fun TenantsPaidScreen(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ReusableComposables.FilterByNumOfRoomsBox(
+            FilterByNumOfRoomsBox(
                 selectedNumOfRooms = numberOfRoomsSelected,
                 onSelectNumOfRooms = onSelectNumOfRooms
             )
             Spacer(modifier = Modifier.width(10.dp))
-            ReusableComposables.FilterByRoomNameBox(
+            FilterByRoomNameBox(
                 rooms = rooms,
                 selectedUnit = selectedUnitName,
                 onChangeSelectedUnitName = onChangeSelectedUnitName
             )
             Spacer(modifier = Modifier.weight(1f))
-            ReusableComposables.UndoFilteringBox(
+            UndoFilteringBox(
                 unfilterUnits = unfilterUnits
             )
         }
@@ -179,7 +186,7 @@ fun TenantsPaidScreen(
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.width(5.dp))
-            if(activeTenantsSelected) {
+            if(activeTenantsSelected && earlyPaymentsSelected) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -191,9 +198,65 @@ fun TenantsPaidScreen(
                             .size(10.dp)
                     )
                     Spacer(modifier = Modifier.width(3.dp))
-                    Text(text = "Active tenants")
+                    Text(text = "Active tenants | paid early")
                 }
 
+            } else if(activeTenantsSelected && latePaymentsSelected) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        tint = Color.Green,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Active tenants | paid late")
+                }
+            } else if(inActiveTenantsSelected && earlyPaymentsSelected) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        tint = Color.Red,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Removed tenants | paid early")
+                }
+            } else if (inActiveTenantsSelected && latePaymentsSelected) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        tint = Color.Red,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Removed tenants | paid late")
+                }
+            } else if(activeTenantsSelected) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        tint = Color.Red,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Active tenants")
+                }
             } else if(inActiveTenantsSelected) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -207,6 +270,34 @@ fun TenantsPaidScreen(
                     )
                     Spacer(modifier = Modifier.width(3.dp))
                     Text(text = "Removed tenants")
+                }
+            } else if (earlyPaymentsSelected) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        tint = Color.Green,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Paid early")
+                }
+            } else if(latePaymentsSelected) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        tint = Color.Red,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Paid late")
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -307,6 +398,28 @@ fun IndividualTenantPaidCell(
                 Text(
                     text = rentPayment.fullName
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                if(rentPayment.tenantActive) {
+                    Icon(
+                        tint = Color.Green,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Active")
+                } else if(!rentPayment.tenantActive) {
+                    Icon(
+                        tint = Color.Red,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Removed")
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row(

@@ -32,183 +32,179 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.tenant_care.R
 
-object ReusableComposables {
-    // filter by name
-    @Composable
-
-    fun FilterByNumOfRoomsBox(
-        selectedNumOfRooms: String?,
-        onSelectNumOfRooms: (rooms: Int) -> Unit,
-        modifier: Modifier = Modifier
-    ) {
-        var rooms = listOf<Int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-        var expanded by remember {
-            mutableStateOf(false)
-        }
-
-        var icon: ImageVector
-        if(expanded) {
-            icon = Icons.Default.KeyboardArrowUp
-        } else {
-            icon = Icons.Default.KeyboardArrowDown
-        }
-
-        Card(
-            modifier = Modifier
-                .clickable {
-                    expanded = !expanded
-                }
-                .widthIn(min = 100.dp)
-        ) {
-            Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "No. Rooms".takeIf { selectedNumOfRooms == null } ?: "$selectedNumOfRooms room".takeIf { selectedNumOfRooms?.toInt() == 1 } ?: "$selectedNumOfRooms rooms",
-                        modifier = Modifier
-                            .padding(10.dp)
-                    )
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null
-                    )
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = !expanded }
-                ) {
-                    rooms.forEachIndexed { index, i ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = "$i room".takeIf { i == 1 } ?: "$i rooms"
-                                )
-                            },
-                            onClick = {
-                                onSelectNumOfRooms(i)
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-        }
+// filter by name
+@Composable
+fun FilterByNumOfRoomsBox(
+    selectedNumOfRooms: String?,
+    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var rooms = listOf<Int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    var expanded by remember {
+        mutableStateOf(false)
     }
 
-    @Composable
-    fun FilterByRoomNameBox(
-        rooms: List<String>,
-        selectedUnit: String?,
-        onChangeSelectedUnitName: (name: String) -> Unit,
-        modifier: Modifier = Modifier
-    ) {
-        var expanded by remember {
-            mutableStateOf(false)
-        }
-        var icon: ImageVector
-        if(expanded) {
-            icon = Icons.Default.KeyboardArrowUp
-        } else {
-            icon = Icons.Default.KeyboardArrowDown
-        }
-        Card(
-            modifier = Modifier
-                .clickable {
-                    expanded = !expanded
-                }
-                .widthIn(min = 100.dp)
-        ) {
-            Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Room name".takeIf { selectedUnit == null } ?: "$selectedUnit",
-                        modifier = Modifier
-                            .padding(10.dp)
-                    )
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null
-                    )
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = !expanded }
-                ) {
-                    rooms.forEachIndexed { index, i ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = i
-                                )
-                            },
-                            onClick = {
-                                onChangeSelectedUnitName(i)
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-        }
+    var icon: ImageVector
+    if(expanded) {
+        icon = Icons.Default.KeyboardArrowUp
+    } else {
+        icon = Icons.Default.KeyboardArrowDown
     }
 
-    @Composable
-    fun UndoFilteringBox(
-        unfilterUnits: () -> Unit,
-        modifier: Modifier = Modifier
+    Card(
+        modifier = Modifier
+            .clickable {
+                expanded = !expanded
+            }
+            .widthIn(min = 100.dp)
     ) {
-        Card(
-            modifier = Modifier
-                .clickable {
-                    unfilterUnits()
-                }
-        ) {
+        Column {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(10.dp)
+                verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = "Clear search"
+                Text(
+                    text = "No. Rooms".takeIf { selectedNumOfRooms == null } ?: "$selectedNumOfRooms room".takeIf { selectedNumOfRooms?.toInt() == 1 } ?: "$selectedNumOfRooms rooms",
+                    modifier = Modifier
+                        .padding(10.dp)
                 )
-            }
-        }
-    }
-
-    @Composable
-    fun SearchFieldForTenants(
-        labelText: String,
-        value: String,
-        onValueChange: (value: String) -> Unit,
-        modifier: Modifier = Modifier
-    ) {
-        TextField(
-            label = {
-                Text(text = labelText)
-            },
-            leadingIcon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.person),
+                    imageVector = icon,
                     contentDescription = null
                 )
-            },
-            value = value,
-            onValueChange = onValueChange,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Text
-            ),
-            colors = TextFieldDefaults.colors(
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent
-            ),
-            modifier = modifier
-        )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = !expanded }
+            ) {
+                rooms.forEachIndexed { index, i ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = "$i room".takeIf { i == 1 } ?: "$i rooms"
+                            )
+                        },
+                        onClick = {
+                            onSelectNumOfRooms(i)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
     }
+}
 
+@Composable
+fun FilterByRoomNameBox(
+    rooms: List<String>,
+    selectedUnit: String?,
+    onChangeSelectedUnitName: (name: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    var icon: ImageVector
+    if(expanded) {
+        icon = Icons.Default.KeyboardArrowUp
+    } else {
+        icon = Icons.Default.KeyboardArrowDown
+    }
+    Card(
+        modifier = Modifier
+            .clickable {
+                expanded = !expanded
+            }
+            .widthIn(min = 100.dp)
+    ) {
+        Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Room name".takeIf { selectedUnit == null } ?: "$selectedUnit",
+                    modifier = Modifier
+                        .padding(10.dp)
+                )
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = !expanded }
+            ) {
+                rooms.forEachIndexed { index, i ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = i
+                            )
+                        },
+                        onClick = {
+                            onChangeSelectedUnitName(i)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UndoFilteringBox(
+    unfilterUnits: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = Modifier
+            .clickable {
+                unfilterUnits()
+            }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(10.dp)
+        ) {
+
+            Icon(
+                imageVector = Icons.Default.Clear,
+                contentDescription = "Clear search"
+            )
+        }
+    }
+}
+
+@Composable
+fun SearchFieldForTenants(
+    labelText: String,
+    value: String,
+    onValueChange: (value: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        label = {
+            Text(text = labelText)
+        },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.person),
+                contentDescription = null
+            )
+        },
+        value = value,
+        onValueChange = onValueChange,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Text
+        ),
+        colors = TextFieldDefaults.colors(
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent
+        ),
+        modifier = modifier
+    )
 }

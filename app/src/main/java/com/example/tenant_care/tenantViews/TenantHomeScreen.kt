@@ -17,7 +17,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.tenant_care.R
+import com.example.tenant_care.tenantViews.amenity.AmenityComposable
 import com.example.tenant_care.tenantViews.model.BottomNavigationBar
+import com.example.tenant_care.tenantViews.rentPayment.PaymentHomeScreenComposable
+import com.example.tenant_care.tenantViews.rentPayment.RentStatusCard
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
 @Composable
@@ -32,24 +35,23 @@ fun TenantHomeScreen(
             .fillMaxSize()
     ) {
         when(currentBottomBar) {
-            BottomNavigationBar.HOME -> TenantRentViewScreen(modifier = Modifier.weight(1f))
-            BottomNavigationBar.REPORTS -> {
-                TenantReportScreen(
-                    modifier = Modifier.weight(1f)
-                )
+            BottomNavigationBar.HOME -> PaymentHomeScreenComposable(modifier = Modifier.weight(1f))
+            BottomNavigationBar.CHAT -> {
+//                TenantReportScreen(
+//                    modifier = Modifier.weight(1f)
+//                )
             }
-            BottomNavigationBar.NOTIFICATIONS -> {
-                TenantsNotificationsScreen(
+            BottomNavigationBar.SERVICES -> {
+                AmenityComposable(
                     modifier = Modifier
                         .weight(1f)
                 )
+//                TenantsNotificationsScreen(
+//                    modifier = Modifier
+//                        .weight(1f)
+//                )
             }
-            BottomNavigationBar.ACCOUNT -> {
-                TenantAccountScreen(
-                    modifier = Modifier
-                        .weight(1f)
-                )
-            }
+
         }
         TenantViewBottomNavigationBar(
             onSelected = {currentBottomBar = it},
@@ -76,22 +78,16 @@ fun TenantViewBottomNavigationBar(
             description = "Navigate to home"
         ),
         NavigationContentItem(
-            name = "Report",
-            icon = painterResource(id = R.drawable.report),
-            bottomNavigationBar = BottomNavigationBar.REPORTS,
-            description = "Navigate to reports"
+            name = "Chat",
+            icon = painterResource(id = R.drawable.chat),
+            bottomNavigationBar = BottomNavigationBar.CHAT,
+            description = "Navigate to chat screen"
         ),
         NavigationContentItem(
-            name = "Notifications",
-            icon = painterResource(id = R.drawable.notifications),
-            bottomNavigationBar = BottomNavigationBar.NOTIFICATIONS,
-            description = "Navigate to notifications"
-        ),
-        NavigationContentItem(
-            name = "Account",
-            icon = painterResource(id = R.drawable.account),
-            bottomNavigationBar = BottomNavigationBar.ACCOUNT,
-            description = "Navigate to your account"
+            name = "Amenities",
+            icon = painterResource(id = R.drawable.business),
+            bottomNavigationBar = BottomNavigationBar.SERVICES,
+            description = "Navigate to amenities"
         ),
     )
 

@@ -51,8 +51,11 @@ import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
 import com.example.tenant_care.model.pManager.TenantRentPaymentData
 import com.example.tenant_care.ui.theme.Tenant_careTheme
-import com.example.tenant_care.util.ReusableComposables
+import com.example.tenant_care.util.FilterByNumOfRoomsBox
+import com.example.tenant_care.util.FilterByRoomNameBox
 import com.example.tenant_care.util.ReusableFunctions
+import com.example.tenant_care.util.SearchFieldForTenants
+import com.example.tenant_care.util.UndoFilteringBox
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -202,7 +205,7 @@ fun AllTenantsPaymentsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        ReusableComposables.SearchFieldForTenants(
+        SearchFieldForTenants(
             labelText = "Search Tenant name",
             value = tenantName.takeIf { it != null } ?: "",
             onValueChange = onSearchTextChanged,
@@ -213,18 +216,18 @@ fun AllTenantsPaymentsScreen(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ReusableComposables.FilterByNumOfRoomsBox(
+            FilterByNumOfRoomsBox(
                 selectedNumOfRooms = numberOfRoomsSelected,
                 onSelectNumOfRooms = onSelectNumOfRooms
             )
             Spacer(modifier = Modifier.width(10.dp))
-            ReusableComposables.FilterByRoomNameBox(
+            FilterByRoomNameBox(
                 rooms = rooms,
                 selectedUnit = selectedUnitName,
                 onChangeSelectedUnitName = onChangeSelectedUnitName
             )
             Spacer(modifier = Modifier.weight(1f))
-            ReusableComposables.UndoFilteringBox(
+            UndoFilteringBox(
                 unfilterUnits = unfilterUnits
             )
         }
@@ -322,7 +325,6 @@ fun IndividualTenantCell(
     navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
@@ -363,6 +365,28 @@ fun IndividualTenantCell(
                 Text(
                     text = rentPayment.fullName
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                if(rentPayment.tenantActive) {
+                    Icon(
+                        tint = Color.Green,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Active")
+                } else if(!rentPayment.tenantActive) {
+                    Icon(
+                        tint = Color.Red,
+                        painter = painterResource(id = R.drawable.circle),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Removed")
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row(

@@ -57,8 +57,11 @@ import com.example.tenant_care.R
 import com.example.tenant_care.model.property.PropertyTenant
 import com.example.tenant_care.model.property.PropertyUnit
 import com.example.tenant_care.ui.theme.Tenant_careTheme
-import com.example.tenant_care.util.ReusableComposables
+import com.example.tenant_care.util.FilterByNumOfRoomsBox
+import com.example.tenant_care.util.FilterByRoomNameBox
 import com.example.tenant_care.util.ReusableFunctions
+import com.example.tenant_care.util.SearchFieldForTenants
+import com.example.tenant_care.util.UndoFilteringBox
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -130,7 +133,7 @@ fun OccupiedUnitsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        ReusableComposables.SearchFieldForTenants(
+        SearchFieldForTenants(
             labelText = "Search Tenant name",
             value = searchText.takeIf { it != null } ?: "",
             onValueChange = onSearchTextChanged,
@@ -139,18 +142,18 @@ fun OccupiedUnitsScreen(
         )
         Spacer(modifier = Modifier.height(10.dp))
         Row {
-            ReusableComposables.FilterByNumOfRoomsBox(
+            FilterByNumOfRoomsBox(
                 selectedNumOfRooms = numberOfRoomsSelected,
                 onSelectNumOfRooms = onSelectNumOfRooms
             )
             Spacer(modifier = Modifier.width(10.dp))
-            ReusableComposables.FilterByRoomNameBox(
+            FilterByRoomNameBox(
                 rooms = rooms,
                 selectedUnit = selectedUnitName,
                 onChangeSelectedUnitName = onChangeSelectedUnitName
             )
             Spacer(modifier = Modifier.weight(1f))
-            ReusableComposables.UndoFilteringBox(
+            UndoFilteringBox(
                 unfilterUnits = unfilterUnits
             )
         }
