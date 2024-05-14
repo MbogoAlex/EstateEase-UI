@@ -14,9 +14,12 @@ import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
 import com.example.tenant_care.model.tenant.LoginTenantRequestBody
 import com.example.tenant_care.model.tenant.LoginTenantResponseBody
+import com.example.tenant_care.model.tenant.RentPaymentRequestBody
+import com.example.tenant_care.model.tenant.RentPaymentResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRowsResponse
 import com.example.tenant_care.model.tenant.UnitAssignmentRequestBody
 import com.example.tenant_care.model.tenant.UnitAssignmentResponseBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -143,5 +146,25 @@ interface ApiService {
         @Query("paidLate") paidLate: Boolean?,
         @Query("tenantActive") tenantActive: Boolean?
     ): Response<RentPaymentRowsResponse>
+
+    // pay rent
+    @POST("rentpayment/rentPaymentTblId={rentPaymentTblId}")
+    suspend fun payRent(
+        @Path("rentPaymentTblId") rentPaymentTblId: Int,
+        @Body rentPaymentRequestBody: RentPaymentRequestBody
+    ): Response<RentPaymentResponseBody>
+
+    @GET("tenant/rentpaymentsreport")
+    suspend fun getRentPaymentRowsAndGenerateReport(
+        @Query("tenantId") tenantId: Int,
+        @Query("month") month: String?,
+        @Query("year") year: String?,
+        @Query("roomName") roomName: String?,
+        @Query("rooms") rooms: Int?,
+        @Query("tenantName") tenantName: String?,
+        @Query("rentPaymentStatus") rentPaymentStatus: Boolean?,
+        @Query("paidLate") paidLate: Boolean?,
+        @Query("tenantActive") tenantActive: Boolean?
+    ): Response<ResponseBody>
 
 }

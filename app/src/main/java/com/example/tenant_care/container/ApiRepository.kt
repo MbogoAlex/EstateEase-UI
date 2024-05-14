@@ -15,10 +15,13 @@ import com.example.tenant_care.model.property.NewPropertyResponseBody
 import com.example.tenant_care.model.tenant.AssignmentResponseData
 import com.example.tenant_care.model.tenant.LoginTenantRequestBody
 import com.example.tenant_care.model.tenant.LoginTenantResponseBody
+import com.example.tenant_care.model.tenant.RentPaymentRequestBody
+import com.example.tenant_care.model.tenant.RentPaymentResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRowsResponse
 import com.example.tenant_care.model.tenant.UnitAssignmentRequestBody
 import com.example.tenant_care.model.tenant.UnitAssignmentResponseBody
 import com.example.tenant_care.network.ApiService
+import okhttp3.ResponseBody
 import retrofit2.Response
 
 interface ApiRepository {
@@ -90,6 +93,24 @@ interface ApiRepository {
         paidLate: Boolean?,
         tenantActive: Boolean?
     ): Response<RentPaymentRowsResponse>
+
+    // pay rent
+    suspend fun payRent(
+        rentPaymentTblId: Int,
+        rentPaymentRequestBody: RentPaymentRequestBody
+    ): Response<RentPaymentResponseBody>
+
+    suspend fun getRentPaymentRowsAndGenerateReport(
+        tenantId: Int,
+        month: String?,
+        year: String?,
+        roomName: String?,
+        rooms: Int?,
+        tenantName: String?,
+        rentPaymentStatus: Boolean?,
+        paidLate: Boolean?,
+        tenantActive: Boolean?
+    ): Response<ResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -194,6 +215,36 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         paidLate: Boolean?,
         tenantActive: Boolean?
     ): Response<RentPaymentRowsResponse> = apiService.getRentPaymentRows(
+        tenantId = tenantId,
+        month = month,
+        year = year,
+        roomName = roomName,
+        rooms = rooms,
+        tenantName = tenantName,
+        rentPaymentStatus = rentPaymentStatus,
+        paidLate = paidLate,
+        tenantActive = tenantActive
+    )
+
+    override suspend fun payRent(
+        rentPaymentTblId: Int,
+        rentPaymentRequestBody: RentPaymentRequestBody
+    ): Response<RentPaymentResponseBody> = apiService.payRent(
+        rentPaymentTblId = rentPaymentTblId,
+        rentPaymentRequestBody = rentPaymentRequestBody
+    )
+
+    override suspend fun getRentPaymentRowsAndGenerateReport(
+        tenantId: Int,
+        month: String?,
+        year: String?,
+        roomName: String?,
+        rooms: Int?,
+        tenantName: String?,
+        rentPaymentStatus: Boolean?,
+        paidLate: Boolean?,
+        tenantActive: Boolean?
+    ): Response<ResponseBody> = apiService.getRentPaymentRowsAndGenerateReport(
         tenantId = tenantId,
         month = month,
         year = year,

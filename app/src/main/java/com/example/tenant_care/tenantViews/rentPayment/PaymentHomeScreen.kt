@@ -53,6 +53,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun PaymentHomeScreenComposable(
     navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
+    navigateToTenantReportScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: PaymentHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -70,7 +71,8 @@ fun PaymentHomeScreenComposable(
             tenancyDays = difference.toString(),
             roomName = uiState.roomName,
             rentPayments = uiState.rentPayments,
-            navigateToRentInvoiceScreen = navigateToRentInvoiceScreen
+            navigateToRentInvoiceScreen = navigateToRentInvoiceScreen,
+            navigateToTenantReportScreen = navigateToTenantReportScreen
         )
     }
 }
@@ -83,11 +85,12 @@ fun PaymentHomeScreen(
     tenancyDays: String,
     tenantSince: String,
     navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
+    navigateToTenantReportScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
+            FloatingActionButton(onClick = navigateToTenantReportScreen) {
                 Icon(
                     painter = painterResource(id = R.drawable.report),
                     contentDescription = "Payments record"
@@ -160,7 +163,11 @@ fun PaymentHomeScreen(
                     items(rentPayments) { rentPayment ->
                         RentStatusCard(
                             navigateToRentInvoiceScreen = navigateToRentInvoiceScreen,
-                            rentPayment = rentPayment
+                            rentPayment = rentPayment,
+                            modifier = Modifier
+                                .padding(
+                                    top = 10.dp
+                                )
                         )
                     }
                 }
@@ -200,7 +207,7 @@ fun RentStatusCard(
     val totalPayable = rentPayment.monthlyRent + penaltyAccrued
     val formattedTotalPayable = ReusableFunctions.formatMoneyValue(totalPayable)
     ElevatedCard(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
     ) {
         Column(
@@ -460,7 +467,8 @@ fun TenantRentViewScreenPreview() {
             roomName = "Col C2",
             tenantName = "Mbogo AG",
             rentPayments = rentPayments,
-            navigateToRentInvoiceScreen = {tenantId, month, year ->  }
+            navigateToRentInvoiceScreen = {tenantId, month, year ->  },
+            navigateToTenantReportScreen = {}
         )
     }
 }

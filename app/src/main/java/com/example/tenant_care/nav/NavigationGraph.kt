@@ -31,6 +31,8 @@ import com.example.tenant_care.tenantViews.TenantHomeScreenComposable
 import com.example.tenant_care.tenantViews.TenantHomeScreenDestination
 import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenComposable
 import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenDestination
+import com.example.tenant_care.tenantViews.rentPayment.PaymentsReportScreenComposable
+import com.example.tenant_care.tenantViews.rentPayment.PaymentsReportScreenDestination
 import com.example.tenant_care.tenantViews.rentPayment.RentInvoiceScreenComposable
 import com.example.tenant_care.tenantViews.rentPayment.RentInvoiceScreenDestination
 
@@ -196,6 +198,9 @@ fun NavigationGraph(
             TenantHomeScreenComposable(
                 navigateToRentInvoiceScreen = {tenantId, month, year ->
                     navController.navigate("${RentInvoiceScreenDestination.route}/${tenantId}/${month}/${year}")
+                },
+                navigateToTenantReportScreen = {
+                    navController.navigate(PaymentsReportScreenDestination.route)
                 }
             )
         }
@@ -216,6 +221,17 @@ fun NavigationGraph(
             RentInvoiceScreenComposable(
                 navigateToPreviousScreen = {
                     navController.navigateUp()
+                },
+                navigateToTenantHomeScreen = {
+                    navController.popBackStack(RentInvoiceScreenDestination.routeWithArgs, true)
+                    navController.navigate(TenantHomeScreenDestination.route)
+                }
+            )
+        }
+        composable(PaymentsReportScreenDestination.route) {
+            PaymentsReportScreenComposable(
+                navigateToRentInvoiceScreen = {tenantId, month, year ->
+                    navController.navigate("${RentInvoiceScreenDestination.route}/${tenantId}/${month}/${year}")
                 }
             )
         }

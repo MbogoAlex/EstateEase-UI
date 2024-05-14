@@ -1,11 +1,14 @@
 package com.example.tenant_care.tenantViews.rentPayment
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.container.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
 import com.example.tenant_care.model.tenant.RentPayment
+import com.example.tenant_care.model.tenant.RentPaymentRequestBody
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.ReusableFunctions.toUserDetails
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +18,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 enum class FetchingInvoiceStatus {
+    INITIAL,
+    LOADING,
+    SUCCESS,
+    FAILURE
+}
+
+enum class PayRentStatus {
     INITIAL,
     LOADING,
     SUCCESS,
@@ -49,8 +59,11 @@ val rentPaymentPlaceHolder = RentPayment(
 data class RentInvoiceScreenUiState(
     val rentPayment: RentPayment = rentPaymentPlaceHolder,
     val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
+    val paidAt: String = "",
+    val payRentStatus: PayRentStatus = PayRentStatus.INITIAL,
     val fetchingInvoiceStatus: FetchingInvoiceStatus = FetchingInvoiceStatus.INITIAL
 )
+@RequiresApi(Build.VERSION_CODES.O)
 class RentInvoiceScreenViewModel(
     private val apiRepository: ApiRepository,
     private val dsRepository: DSRepository,
@@ -74,6 +87,7 @@ class RentInvoiceScreenViewModel(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getUserInvoice() {
         _uiState.update {
             it.copy(
@@ -94,12 +108,23 @@ class RentInvoiceScreenViewModel(
                     tenantActive = null
                 )
                 if(response.isSuccessful) {
-                    _uiState.update {
-                        it.copy(
-                            rentPayment = response.body()?.data?.rentpayment!![0],
-                            fetchingInvoiceStatus = FetchingInvoiceStatus.SUCCESS
-                        )
+                    if(response.body()?.data?.rentpayment!![0].paidAt != null) {
+                        _uiState.update {
+                            it.copy(
+                                rentPayment = response.body()?.data?.rentpayment!![0],
+                                paidAt = ReusableFunctions.formatDateTimeValue(response.body()?.data?.rentpayment!![0].paidAt!!),
+                                fetchingInvoiceStatus = FetchingInvoiceStatus.SUCCESS
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                rentPayment = response.body()?.data?.rentpayment!![0],
+                                fetchingInvoiceStatus = FetchingInvoiceStatus.SUCCESS
+                            )
+                        }
                     }
+
                 } else {
                     _uiState.update {
                         it.copy(
@@ -114,6 +139,54 @@ class RentInvoiceScreenViewModel(
                     )
                 }
             }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun payRent(payableAmount: Double) {
+        _uiState.update {
+            it.copy(
+                payRentStatus = PayRentStatus.LOADING
+            )
+        }
+        viewModelScope.launch {
+            val rentPaymentRequestBody = RentPaymentRequestBody(
+                payableAmount = payableAmount
+            )
+            try {
+                val response = apiRepository.payRent(
+                    rentPaymentTblId = _uiState.value.rentPayment.rentPaymentTblId,
+                    rentPaymentRequestBody = rentPaymentRequestBody
+                )
+                if(response.isSuccessful) {
+                    _uiState.update {
+                        it.copy(
+                            paidAt = ReusableFunctions.formatDateTimeValue(response.body()?.data?.rentPayment?.paidAt!!),
+                            payRentStatus = PayRentStatus.SUCCESS
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            payRentStatus = PayRentStatus.FAILURE
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        payRentStatus = PayRentStatus.FAILURE
+                    )
+                }
+            }
+        }
+    }
+
+    fun resetRentPaymentStatus() {
+        _uiState.update {
+            it.copy(
+                payRentStatus = PayRentStatus.INITIAL
+            )
         }
     }
 

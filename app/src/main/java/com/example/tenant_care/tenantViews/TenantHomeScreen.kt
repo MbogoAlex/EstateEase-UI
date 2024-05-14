@@ -36,11 +36,13 @@ object TenantHomeScreenDestination: AppNavigation {
 @Composable
 fun TenantHomeScreenComposable(
     navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
+    navigateToTenantReportScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box {
         TenantHomeScreen(
-            navigateToRentInvoiceScreen = navigateToRentInvoiceScreen
+            navigateToRentInvoiceScreen = navigateToRentInvoiceScreen,
+            navigateToTenantReportScreen = navigateToTenantReportScreen
         )
     }
 }
@@ -48,6 +50,7 @@ fun TenantHomeScreenComposable(
 @Composable
 fun TenantHomeScreen(
     navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
+    navigateToTenantReportScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var currentBottomBar by rememberSaveable {
@@ -60,6 +63,7 @@ fun TenantHomeScreen(
         when(currentBottomBar) {
             BottomNavigationBar.HOME -> PaymentHomeScreenComposable(
                 navigateToRentInvoiceScreen = navigateToRentInvoiceScreen,
+                navigateToTenantReportScreen = navigateToTenantReportScreen,
                 modifier = Modifier.weight(1f)
             )
             BottomNavigationBar.CHAT -> {
@@ -181,7 +185,8 @@ fun TenantHomeScreenPreview(
 ) {
     Tenant_careTheme {
         TenantHomeScreen(
-            navigateToRentInvoiceScreen = {tenantId, month, year ->  }
+            navigateToRentInvoiceScreen = {tenantId, month, year ->  },
+            navigateToTenantReportScreen = {}
         )
     }
 }
