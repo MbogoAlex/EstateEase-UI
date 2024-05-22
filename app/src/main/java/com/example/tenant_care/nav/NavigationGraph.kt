@@ -13,28 +13,28 @@ import com.example.tenant_care.HomeScreen
 import com.example.tenant_care.HomeScreenDestination
 import com.example.tenant_care.SplashScreen
 import com.example.tenant_care.SplashScreenDestination
-import com.example.tenant_care.pManagerViews.PManagerHomeComposable
-import com.example.tenant_care.pManagerViews.PManagerHomeScreenDestination
-import com.example.tenant_care.pManagerViews.PManagerLoginScreen
-import com.example.tenant_care.pManagerViews.PManagerLoginScreenDestination
-import com.example.tenant_care.pManagerViews.rentPayment.RentPaymentsComposable
-import com.example.tenant_care.pManagerViews.rentPayment.RentPaymentsComposableDestination
-import com.example.tenant_care.pManagerViews.rentPayment.SingleTenantPaymentDetailsComposable
-import com.example.tenant_care.pManagerViews.rentPayment.SingleTenantPaymentDetailsComposableDestination
-import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitDetailsComposable
-import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitDetailsComposableDestination
-import com.example.tenant_care.pManagerViews.unitsManagementViews.UnOccupiedUnitDetailsComposableDestination
-import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementComposable
-import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementComposableDestination
-import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitDetailsComposable
-import com.example.tenant_care.tenantViews.TenantHomeScreenComposable
-import com.example.tenant_care.tenantViews.TenantHomeScreenDestination
-import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenComposable
-import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenDestination
-import com.example.tenant_care.tenantViews.rentPayment.PaymentsReportScreenComposable
-import com.example.tenant_care.tenantViews.rentPayment.PaymentsReportScreenDestination
-import com.example.tenant_care.tenantViews.rentPayment.RentInvoiceScreenComposable
-import com.example.tenant_care.tenantViews.rentPayment.RentInvoiceScreenDestination
+import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeComposable
+import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeScreenDestination
+import com.example.tenant_care.ui.screens.pManagerViews.PManagerLoginScreen
+import com.example.tenant_care.ui.screens.pManagerViews.PManagerLoginScreenDestination
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsComposable
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsComposableDestination
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.SingleTenantPaymentDetailsComposable
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.SingleTenantPaymentDetailsComposableDestination
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.OccupiedUnitDetailsComposable
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.OccupiedUnitDetailsComposableDestination
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnOccupiedUnitDetailsComposableDestination
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnitsManagementComposable
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnitsManagementComposableDestination
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnoccupiedUnitDetailsComposable
+import com.example.tenant_care.ui.screens.tenantViews.TenantHomeScreenComposable
+import com.example.tenant_care.ui.screens.tenantViews.TenantHomeScreenDestination
+import com.example.tenant_care.ui.screens.tenantViews.accountManagement.TenantLoginScreenComposable
+import com.example.tenant_care.ui.screens.tenantViews.accountManagement.TenantLoginScreenDestination
+import com.example.tenant_care.ui.screens.tenantViews.rentPayment.PaymentsReportScreenComposable
+import com.example.tenant_care.ui.screens.tenantViews.rentPayment.PaymentsReportScreenDestination
+import com.example.tenant_care.ui.screens.tenantViews.rentPayment.RentInvoiceScreenComposable
+import com.example.tenant_care.ui.screens.tenantViews.rentPayment.RentInvoiceScreenDestination
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -194,6 +194,24 @@ fun NavigationGraph(
                 }
             )
         }
+        composable(
+            TenantLoginScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(TenantLoginScreenDestination.phoneNumber) {
+                    type = NavType.StringType
+                },
+                navArgument(TenantLoginScreenDestination.password) {
+                    type = NavType.StringType
+                },
+            )
+        ) {
+            TenantLoginScreenComposable(
+                navigateToTenantHomeScreen = {
+                    navController.popBackStack(TenantLoginScreenDestination.route, true)
+                    navController.navigate(TenantHomeScreenDestination.route)
+                }
+            )
+        }
         composable(TenantHomeScreenDestination.route) {
             TenantHomeScreenComposable(
                 navigateToRentInvoiceScreen = {tenantId, month, year ->
@@ -201,6 +219,12 @@ fun NavigationGraph(
                 },
                 navigateToTenantReportScreen = {
                     navController.navigate(PaymentsReportScreenDestination.route)
+                },
+                navigateToLoginScreenWithArgs = {phoneNumber, password ->
+                    navController.navigate("${TenantLoginScreenDestination.route}/${phoneNumber}/${password}")
+                },
+                navigateToHomeScreen = {
+                    navController.navigate(HomeScreenDestination.route)
                 }
             )
         }

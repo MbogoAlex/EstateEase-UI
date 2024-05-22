@@ -22,6 +22,8 @@ class DSRepository(
         private val USER_EMAIL = stringPreferencesKey("userEmail")
         private val PHONE_NUMBER = stringPreferencesKey("phoneNumber")
         private val USER_ADDED_AT = stringPreferencesKey("userAddedAt")
+        private val ROOM = stringPreferencesKey("room")
+        private val PASSWORD = stringPreferencesKey("password")
     }
 
     suspend fun saveUserDetails(
@@ -34,6 +36,8 @@ class DSRepository(
             preferences[USER_EMAIL] = userDSDetails.email
             preferences[PHONE_NUMBER] = userDSDetails.phoneNumber
             preferences[USER_ADDED_AT] = userDSDetails.userAddedAt
+            preferences[ROOM] = userDSDetails.room
+            preferences[PASSWORD] = userDSDetails.password
         }
     }
 
@@ -52,7 +56,9 @@ class DSRepository(
                 fullName = it[USER_NAME] ?: "",
                 email = it[USER_EMAIL] ?: "",
                 phoneNumber = it[PHONE_NUMBER] ?: "",
-                userAddedAt = it[USER_ADDED_AT] ?: ""
+                userAddedAt = it[USER_ADDED_AT] ?: "",
+                room = it[ROOM] ?: "",
+                password = it[PASSWORD] ?: ""
             )
         }
 
@@ -62,14 +68,18 @@ class DSRepository(
         fullName: String,
         email: String,
         userAddedAt: String,
-        phoneNumber: String
+        phoneNumber: String,
+        room: String,
+        password: String
     ): UserDSDetails = UserDSDetails(
         roleId = roleId,
         userId = userId,
         fullName = fullName,
         email = email,
         userAddedAt = userAddedAt,
-        phoneNumber = phoneNumber
+        phoneNumber = phoneNumber,
+        room = room,
+        password = password
 
     )
 

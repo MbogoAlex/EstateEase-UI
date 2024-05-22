@@ -7,23 +7,23 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.tenant_care.pManagerViews.PManagerAddUnitScreenViewModel
-import com.example.tenant_care.pManagerViews.PManagerHomeScreenViewModel
-import com.example.tenant_care.pManagerViews.PManagerLoginScreenViewModel
-import com.example.tenant_care.pManagerViews.rentPayment.AllTenantsPaymentsScreenViewModel
-import com.example.tenant_care.pManagerViews.rentPayment.RentPaymentsScreenViewModel
-import com.example.tenant_care.pManagerViews.rentPayment.SingleTenantPaymentDataScreenViewModel
-import com.example.tenant_care.pManagerViews.rentPayment.TenantsNotPaidScreenViewModel
-import com.example.tenant_care.pManagerViews.rentPayment.TenantsPaidScreenViewModel
-import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitDetailsScreenViewModel
-import com.example.tenant_care.pManagerViews.unitsManagementViews.OccupiedUnitsScreenViewModel
-import com.example.tenant_care.pManagerViews.unitsManagementViews.UnitsManagementScreenViewModel
-import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitDetailsScreenViewModel
-import com.example.tenant_care.pManagerViews.unitsManagementViews.UnoccupiedUnitsScreenViewModel
-import com.example.tenant_care.tenantViews.accountManagement.TenantLoginScreenViewModel
-import com.example.tenant_care.tenantViews.rentPayment.PaymentHomeScreenViewModel
-import com.example.tenant_care.tenantViews.rentPayment.PaymentsReportScreenViewModel
-import com.example.tenant_care.tenantViews.rentPayment.RentInvoiceScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.PManagerLoginScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.AllTenantsPaymentsScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.SingleTenantPaymentDataScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.TenantsNotPaidScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.TenantsPaidScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.OccupiedUnitDetailsScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.OccupiedUnitsScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnitsManagementScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnoccupiedUnitDetailsScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnoccupiedUnitsScreenViewModel
+import com.example.tenant_care.ui.screens.tenantViews.TenantHomeScreenViewModel
+import com.example.tenant_care.ui.screens.tenantViews.accountManagement.TenantLoginScreenViewModel
+import com.example.tenant_care.ui.screens.tenantViews.rentPayment.PaymentHomeScreenViewModel
+import com.example.tenant_care.ui.screens.tenantViews.rentPayment.PaymentsReportScreenViewModel
+import com.example.tenant_care.ui.screens.tenantViews.rentPayment.RentInvoiceScreenViewModel
 
 object EstateEaseViewModelFactory {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -64,7 +64,7 @@ object EstateEaseViewModelFactory {
         initializer {
             val apiRepository = estateEaseApplication().container.apiRepository
             val dsRepository = estateEaseApplication().dsRepository
-            PManagerAddUnitScreenViewModel(
+            com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenViewModel(
                 apiRepository = apiRepository,
                 dsRepository = dsRepository
             )
@@ -193,7 +193,8 @@ object EstateEaseViewModelFactory {
             val dsRepository = estateEaseApplication().dsRepository
             TenantLoginScreenViewModel(
                 apiRepository = apiRepository,
-                dsRepository = dsRepository
+                dsRepository = dsRepository,
+                savedStateHandle = this.createSavedStateHandle()
             )
         }
 
@@ -225,6 +226,14 @@ object EstateEaseViewModelFactory {
             val dsRepository = estateEaseApplication().dsRepository
             PaymentsReportScreenViewModel(
                 apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        // initialize TenantHomeScreenViewModel
+        initializer {
+            val dsRepository = estateEaseApplication().dsRepository
+            TenantHomeScreenViewModel(
                 dsRepository = dsRepository
             )
         }

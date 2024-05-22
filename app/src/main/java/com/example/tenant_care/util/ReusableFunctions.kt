@@ -16,12 +16,14 @@ object ReusableFunctions {
     }
 
     data class UserDetails(
-        val roleId: Int = 0,
-        val userId: Int = 0,
+        val roleId: Int? = 0,
+        val userId: Int? = 0,
         val fullName: String = "",
         val email: String = "",
         val userAddedAt: String = "",
-        val phoneNumber: String = ""
+        val phoneNumber: String = "",
+        val room: String = "",
+        val password: String = ""
     )
 
     // format currency values
@@ -33,12 +35,14 @@ object ReusableFunctions {
     // userUDDetails to UserDetails
 
     fun UserDSDetails.toUserDetails(): UserDetails = UserDetails(
-        userId = userId!!,
-        roleId = roleId!!,
+        userId = userId,
+        roleId = roleId,
         fullName = fullName,
         email = email,
         userAddedAt = userAddedAt,
-        phoneNumber = phoneNumber
+        phoneNumber = phoneNumber,
+        room = room,
+        password = password
     )
 
     // format datetime value

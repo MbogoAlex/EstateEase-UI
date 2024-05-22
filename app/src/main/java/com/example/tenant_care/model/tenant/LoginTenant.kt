@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LoginTenantRequestBody(
-    val tenantRoomNameOrNumber: String,
     val tenantPhoneNumber: String,
     val tenantPassword: String
 )

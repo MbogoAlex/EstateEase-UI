@@ -19,7 +19,7 @@ enum class InitializingStatus {
 
 data class SplashScreenUIState(
     val initializingStatus: InitializingStatus = InitializingStatus.INITIAL,
-    val userDSDetails: UserDSDetails = UserDSDetails(0, 0, "", "", "", "")
+    val userDSDetails: UserDSDetails = UserDSDetails(0, 0, "", "", "", "", "", "")
 )
 
 class SplashScreenViewModel(
