@@ -1,5 +1,7 @@
 package com.example.tenant_care.network
 
+import com.example.tenant_care.model.caretaker.CaretakerLoginRequestBody
+import com.example.tenant_care.model.caretaker.CaretakerLoginResponseBody
 import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.model.pManager.PManagerResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
@@ -166,5 +168,11 @@ interface ApiService {
         @Query("paidLate") paidLate: Boolean?,
         @Query("tenantActive") tenantActive: Boolean?
     ): Response<ResponseBody>
+
+    // caretaker login
+    @POST("caretaker/login")
+    suspend fun loginAsCaretaker(
+        @Body caretaker: CaretakerLoginRequestBody,
+    ): Response<CaretakerLoginResponseBody>
 
 }

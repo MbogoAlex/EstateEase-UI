@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.example.tenant_care.ui.screens.account.LoginScreenComposable
+import com.example.tenant_care.ui.screens.caretakerViews.CaretakerHomeScreenComposable
+import com.example.tenant_care.ui.screens.caretakerViews.units.OccupiedUnitsScreenComposable
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,7 +27,10 @@ class MainActivity : ComponentActivity() {
                 ) {
 //                    TenantHomeScreen()
 //                    PManagerLoginScreen()
-                    EstateEaseApp()
+//                    EstateEaseApp()
+                    CaretakerHomeScreenComposable()
+//                    OccupiedUnitsScreenComposable()
+//                    LoginScreenComposable()
 //                 a   TenantsManagementScreen()
 //                    PManagerAddUnitScreen()
 //                    UnitsManagementComposable()

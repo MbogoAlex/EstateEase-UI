@@ -26,6 +26,7 @@ val propertyUnitData = PropertyUnit(
     monthlyRent = 0.0,
     propertyAddedAt = "",
     propertyAssignmentStatus = false,
+    activeTenant = null,
     tenants = emptyList()
 )
 

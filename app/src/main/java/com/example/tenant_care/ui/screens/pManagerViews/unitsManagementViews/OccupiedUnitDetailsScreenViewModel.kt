@@ -11,6 +11,7 @@ import com.example.tenant_care.model.property.PropertyTenant
 import com.example.tenant_care.model.property.PropertyUnit
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.ReusableFunctions.toUserDetails
+import com.example.tenant_care.util.tenant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,6 +33,7 @@ val occupiedPropertyUnitData = PropertyUnit(
     monthlyRent = 0.0,
     propertyAddedAt = "",
     propertyAssignmentStatus = false,
+    activeTenant = tenant,
     tenants = emptyList()
 )
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.tenant_care.ui.screens.account.LoginScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerLoginScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.AllTenantsPaymentsScreenViewModel
@@ -24,6 +25,8 @@ import com.example.tenant_care.ui.screens.tenantViews.accountManagement.TenantLo
 import com.example.tenant_care.ui.screens.tenantViews.rentPayment.PaymentHomeScreenViewModel
 import com.example.tenant_care.ui.screens.tenantViews.rentPayment.PaymentsReportScreenViewModel
 import com.example.tenant_care.ui.screens.tenantViews.rentPayment.RentInvoiceScreenViewModel
+import com.example.tenant_care.ui.screens.caretakerViews.units.OccupiedUnitsScreenViewModel as OccupiedUnitsScreenViewModelCaretakerView
+import com.example.tenant_care.ui.screens.caretakerViews.units.UnoccupiedUnitsScreenViewModel as UnoccupiedUnitsScreenViewModelCaretakerView
 
 object EstateEaseViewModelFactory {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -234,6 +237,38 @@ object EstateEaseViewModelFactory {
         initializer {
             val dsRepository = estateEaseApplication().dsRepository
             TenantHomeScreenViewModel(
+                dsRepository = dsRepository
+            )
+        }
+
+        //initialize LoginScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            val savedStateHandle = this.createSavedStateHandle()
+            LoginScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = savedStateHandle
+            )
+        }
+
+        //initialize OccupiedUnitsScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            OccupiedUnitsScreenViewModelCaretakerView(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        //initialize UnoccupiedUnitsScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            UnoccupiedUnitsScreenViewModelCaretakerView(
+                apiRepository =  apiRepository,
                 dsRepository = dsRepository
             )
         }

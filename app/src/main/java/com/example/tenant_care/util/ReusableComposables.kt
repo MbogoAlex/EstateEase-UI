@@ -1,18 +1,28 @@
 package com.example.tenant_care.util
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -27,10 +37,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.tenant_care.R
+import com.example.tenant_care.model.property.PropertyTenant
+import com.example.tenant_care.model.property.PropertyUnit
 
 // filter by name
 @Composable
@@ -63,7 +77,7 @@ fun FilterByNumOfRoomsBox(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "No. Rooms".takeIf { selectedNumOfRooms == null } ?: "$selectedNumOfRooms room".takeIf { selectedNumOfRooms?.toInt() == 1 } ?: "$selectedNumOfRooms rooms",
+                    text = "No. Rooms".takeIf { selectedNumOfRooms.isNullOrEmpty() } ?: "$selectedNumOfRooms room".takeIf { selectedNumOfRooms?.toInt() == 1 } ?: "$selectedNumOfRooms rooms",
                     modifier = Modifier
                         .padding(10.dp)
                 )
@@ -76,18 +90,25 @@ fun FilterByNumOfRoomsBox(
                 expanded = expanded,
                 onDismissRequest = { expanded = !expanded }
             ) {
-                rooms.forEachIndexed { index, i ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = "$i room".takeIf { i == 1 } ?: "$i rooms"
-                            )
-                        },
-                        onClick = {
-                            onSelectNumOfRooms(i)
-                            expanded = false
-                        }
-                    )
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 250.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    rooms.forEachIndexed { index, i ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = "$i room".takeIf { i == 1 } ?: "$i rooms"
+                                )
+                            },
+                            onClick = {
+                                onSelectNumOfRooms(i)
+                                expanded = false
+                            }
+                        )
+                        Divider()
+                    }
                 }
             }
         }
@@ -122,7 +143,7 @@ fun FilterByRoomNameBox(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Room name".takeIf { selectedUnit == null } ?: "$selectedUnit",
+                    text = "Room name".takeIf { selectedUnit.isNullOrEmpty() } ?: "$selectedUnit",
                     modifier = Modifier
                         .padding(10.dp)
                 )
@@ -135,18 +156,25 @@ fun FilterByRoomNameBox(
                 expanded = expanded,
                 onDismissRequest = { expanded = !expanded }
             ) {
-                rooms.forEachIndexed { index, i ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = i
-                            )
-                        },
-                        onClick = {
-                            onChangeSelectedUnitName(i)
-                            expanded = false
-                        }
-                    )
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 250.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    rooms.forEachIndexed { index, i ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = i
+                                )
+                            },
+                            onClick = {
+                                onChangeSelectedUnitName(i)
+                                expanded = false
+                            }
+                        )
+                        Divider()
+                    }
                 }
             }
         }
@@ -207,4 +235,63 @@ fun SearchFieldForTenants(
         ),
         modifier = modifier
     )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun HouseUnitItem(
+    propertyUnit: PropertyUnit,
+    tenant: PropertyTenant?,
+//    navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ElevatedCard(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(20.dp)
+        ) {
+            Row {
+                Text(text = "Room No: ")
+                Text(
+                    text = propertyUnit.propertyNumberOrName,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row {
+                Text(text = "Rooms:")
+                Text(text = propertyUnit.numberOfRooms.toString())
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            if(tenant != null) {
+                Column {
+                    Row {
+                        Text(text = "Occupant: ")
+                        Text(text = tenant.fullName)
+                    }
+                    Row {
+                        Text(text = "Phone no: ")
+                        Text(
+                            text = tenant.phoneNumber,
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.Light
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+                Column {
+                    Text(text = "Occupant Since: ")
+                    Text(
+                        text = ReusableFunctions.formatDateTimeValue(tenant.tenantAddedAt),
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Light
+                    )
+                }
+            }
+        }
+    }
 }

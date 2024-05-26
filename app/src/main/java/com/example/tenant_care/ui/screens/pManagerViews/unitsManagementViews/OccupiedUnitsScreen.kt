@@ -62,6 +62,7 @@ import com.example.tenant_care.util.FilterByRoomNameBox
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.SearchFieldForTenants
 import com.example.tenant_care.util.UndoFilteringBox
+import com.example.tenant_care.util.tenant
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -342,6 +343,7 @@ fun OccupiedUnitItemPreview() {
         monthlyRent = 7200.00,
         propertyAddedAt = "20/08/2023 18:06",
         propertyAssignmentStatus = false,
+        activeTenant = tenant,
         tenants = emptyList()
     )
     Tenant_careTheme {

@@ -22,6 +22,7 @@ data class PropertyUnit (
     val monthlyRent: Double,
     val propertyAddedAt: String,
     val propertyAssignmentStatus: Boolean,
+    val activeTenant: PropertyTenant?,
     val tenants: List<PropertyTenant>
 )
 @Serializable

@@ -1,5 +1,7 @@
 package com.example.tenant_care.container
 
+import com.example.tenant_care.model.caretaker.CaretakerLoginRequestBody
+import com.example.tenant_care.model.caretaker.CaretakerLoginResponseBody
 import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.model.pManager.PManagerResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
@@ -12,7 +14,6 @@ import com.example.tenant_care.model.pManager.RentPaymentRowsUpdateResponseBody
 import com.example.tenant_care.model.property.ArchiveUnitResponseBody
 import com.example.tenant_care.model.property.NewPropertyRequestBody
 import com.example.tenant_care.model.property.NewPropertyResponseBody
-import com.example.tenant_care.model.tenant.AssignmentResponseData
 import com.example.tenant_care.model.tenant.LoginTenantRequestBody
 import com.example.tenant_care.model.tenant.LoginTenantResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRequestBody
@@ -111,6 +112,8 @@ interface ApiRepository {
         paidLate: Boolean?,
         tenantActive: Boolean?
     ): Response<ResponseBody>
+
+    suspend fun loginAsCaretaker(caretaker: CaretakerLoginRequestBody): Response<CaretakerLoginResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -254,6 +257,10 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         rentPaymentStatus = rentPaymentStatus,
         paidLate = paidLate,
         tenantActive = tenantActive
+    )
+
+    override suspend fun loginAsCaretaker(caretaker: CaretakerLoginRequestBody): Response<CaretakerLoginResponseBody> = apiService.loginAsCaretaker(
+        caretaker = caretaker
     )
 
 

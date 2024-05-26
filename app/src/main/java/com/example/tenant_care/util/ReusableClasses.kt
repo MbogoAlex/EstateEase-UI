@@ -21,6 +21,11 @@ enum class TenantViewSidebarMenuScreen {
     LOGIN_SCREEN
 }
 
+enum class CaretakerViewUnitsBottomBarScreen {
+    OCCUPIED_UNITS,
+    UNOCCUPIED_UNITS
+}
+
 enum class CaretakerViewSidebarMenuScreen {
     UNITS_SCREEN,
     METER_READING_SCREEN,
@@ -31,6 +36,13 @@ data class TenantSideBarMenuItem(
     val title: String,
     val icon: Int,
     val screen: TenantViewSidebarMenuScreen,
+    val color: Color
+)
+
+data class CaretakerUnitsBottomBarMenuItem(
+    val title: String,
+    val icon: Int,
+    val screen: CaretakerViewUnitsBottomBarScreen,
     val color: Color
 )
 
