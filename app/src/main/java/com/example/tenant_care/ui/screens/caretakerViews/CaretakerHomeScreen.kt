@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tenant_care.R
+import com.example.tenant_care.ui.screens.caretakerViews.meterReading.MeterReadingHomeScreenComposable
 import com.example.tenant_care.ui.screens.caretakerViews.units.UnitsScreenComposable
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 import com.example.tenant_care.util.CaretakerSideBarMenuItem
@@ -143,7 +144,6 @@ fun CaretakerHomeScreen(
                                     drawerState.close()
                                     onChangeScreen(menuItem.screen)
                                 }
-
                             }
                         )
                     }
@@ -170,7 +170,12 @@ fun CaretakerHomeScreen(
                 CaretakerViewSidebarMenuScreen.UNITS_SCREEN -> {
                     UnitsScreenComposable()
                 }
-                CaretakerViewSidebarMenuScreen.METER_READING_SCREEN -> {}
+                CaretakerViewSidebarMenuScreen.METER_READING_SCREEN -> {
+                    MeterReadingHomeScreenComposable(
+                        navigateToUploadMeterReadingScreen = {},
+                        navigateToUpdateMeterReadingScreen = {},
+                    )
+                }
                 CaretakerViewSidebarMenuScreen.LOGOUT -> {}
             }
         }

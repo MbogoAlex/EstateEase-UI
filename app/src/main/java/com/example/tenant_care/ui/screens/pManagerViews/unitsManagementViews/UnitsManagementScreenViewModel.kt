@@ -2,19 +2,14 @@ package com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.tenant_care.container.ApiRepository
+import com.example.tenant_care.network.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
 import com.example.tenant_care.model.property.PropertyUnit
-import com.example.tenant_care.model.property.PropertyUnitData
 import com.example.tenant_care.util.ReusableFunctions
-import com.example.tenant_care.util.ReusableFunctions.toUserDetails
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 enum class Screen {
     OCCUPIED_UNITS,

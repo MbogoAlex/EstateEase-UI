@@ -3,7 +3,7 @@ package com.example.tenant_care.ui.screens.tenantViews.rentPayment
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tenant_care.container.ApiRepository
+import com.example.tenant_care.network.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
 import com.example.tenant_care.model.tenant.RentPayment
 import com.example.tenant_care.util.ReusableFunctions

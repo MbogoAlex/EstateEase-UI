@@ -2,11 +2,10 @@ package com.example.tenant_care.ui.screens.caretakerViews.units
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tenant_care.container.ApiRepository
+import com.example.tenant_care.network.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
 import com.example.tenant_care.model.property.PropertyTenant
 import com.example.tenant_care.model.property.PropertyUnit
-import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.FetchingUnOccupiedUnitsStatus
 import com.example.tenant_care.util.LoadingStatus
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.ReusableFunctions.toUserDetails

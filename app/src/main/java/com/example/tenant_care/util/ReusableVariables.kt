@@ -1,5 +1,7 @@
 package com.example.tenant_care.util
 
+import com.example.tenant_care.model.caretaker.PreviousWaterMeterData
+import com.example.tenant_care.model.caretaker.WaterMeterDt
 import com.example.tenant_care.model.property.PropertyTenant
 import com.example.tenant_care.model.property.PropertyUnit
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.tenantData
@@ -59,3 +61,226 @@ val tenant = PropertyTenant(
     tenantAddedAt = "2024-05-22T11:14:57.236022",
     tenantActive = true
 )
+
+val previousWaterMeterData: PreviousWaterMeterData = PreviousWaterMeterData(
+    propertyName = "Col A4",
+    tenantName = "Alex Mbogo",
+    waterUnits = 3.00,
+    pricePerUnit = 150.00,
+    meterReadingDate = "2024-04-15T19:36:38.168224",
+    month = "MAY",
+    year = "2024",
+    imageName = "image",
+)
+
+val waterMeterData: WaterMeterDt = WaterMeterDt(
+    id = 1,
+    propertyName = "Col A4",
+    tenantName = "Alex Mbogo",
+    waterUnits = 3.00,
+    pricePerUnit = 150.00,
+    meterReadingDate = "2024-04-15T19:36:38.168224",
+    month = "MAY",
+    year = "2024",
+    imageName = null,
+    previousWaterMeterData = previousWaterMeterData
+)
+
+val waterMeterReadings: List<WaterMeterDt> = listOf(
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = 3.00,
+        pricePerUnit = 150.00,
+        meterReadingDate = "2024-04-15T19:36:38.168224",
+        month = "MAY",
+        year = "2024",
+        imageName = "image",
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = 3.00,
+        pricePerUnit = 150.00,
+        meterReadingDate = "2024-04-15T19:36:38.168224",
+        month = "MAY",
+        year = "2024",
+        imageName = "image",
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = 3.00,
+        pricePerUnit = 150.00,
+        meterReadingDate = "2024-04-15T19:36:38.168224",
+        month = "MAY",
+        year = "2024",
+        imageName = "image",
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = 3.00,
+        pricePerUnit = 150.00,
+        meterReadingDate = "2024-04-15T19:36:38.168224",
+        month = "MAY",
+        year = "2024",
+        imageName = "image",
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = 3.00,
+        pricePerUnit = 150.00,
+        meterReadingDate = "2024-04-15T19:36:38.168224",
+        month = "MAY",
+        year = "2024",
+        imageName = "image",
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = 3.00,
+        pricePerUnit = 150.00,
+        meterReadingDate = "2024-04-15T19:36:38.168224",
+        month = "MAY",
+        year = "2024",
+        imageName = "image",
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = 3.00,
+        pricePerUnit = 150.00,
+        meterReadingDate = "2024-04-15T19:36:38.168224",
+        month = "MAY",
+        year = "2024",
+        imageName = "image",
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = 3.00,
+        pricePerUnit = 150.00,
+        meterReadingDate = "2024-04-15T19:36:38.168224",
+        month = "MAY",
+        year = "2024",
+        imageName = "image",
+        previousWaterMeterData = previousWaterMeterData
+    ),
+)
+
+val unreadWaterMeterReadings: List<WaterMeterDt> = listOf(
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = null,
+        pricePerUnit = null,
+        meterReadingDate = null,
+        month = "MAY",
+        year = "2024",
+        imageName = null,
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = null,
+        pricePerUnit = null,
+        meterReadingDate = null,
+        month = "MAY",
+        year = "2024",
+        imageName = null,
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = null,
+        pricePerUnit = null,
+        meterReadingDate = null,
+        month = "MAY",
+        year = "2024",
+        imageName = null,
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = null,
+        pricePerUnit = null,
+        meterReadingDate = null,
+        month = "MAY",
+        year = "2024",
+        imageName = null,
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = null,
+        pricePerUnit = null,
+        meterReadingDate = null,
+        month = "MAY",
+        year = "2024",
+        imageName = null,
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = null,
+        pricePerUnit = null,
+        meterReadingDate = null,
+        month = "MAY",
+        year = "2024",
+        imageName = null,
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = null,
+        pricePerUnit = null,
+        meterReadingDate = null,
+        month = "MAY",
+        year = "2024",
+        imageName = null,
+        previousWaterMeterData = previousWaterMeterData
+    ),
+    WaterMeterDt(
+        id = 1,
+        propertyName = "Col A4",
+        tenantName = "Alex Mbogo",
+        waterUnits = null,
+        pricePerUnit = null,
+        meterReadingDate = null,
+        month = "MAY",
+        year = "2024",
+        imageName = null,
+        previousWaterMeterData = previousWaterMeterData
+    ),
+)
+

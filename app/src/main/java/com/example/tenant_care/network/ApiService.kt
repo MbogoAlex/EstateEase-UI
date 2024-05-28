@@ -2,6 +2,9 @@ package com.example.tenant_care.network
 
 import com.example.tenant_care.model.caretaker.CaretakerLoginRequestBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginResponseBody
+import com.example.tenant_care.model.caretaker.MeterReadingRequestBody
+import com.example.tenant_care.model.caretaker.MeterReadingResponseBody
+import com.example.tenant_care.model.caretaker.MeterReadingsResponseBody
 import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.model.pManager.PManagerResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
@@ -21,12 +24,15 @@ import com.example.tenant_care.model.tenant.RentPaymentResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRowsResponse
 import com.example.tenant_care.model.tenant.UnitAssignmentRequestBody
 import com.example.tenant_care.model.tenant.UnitAssignmentResponseBody
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -174,5 +180,23 @@ interface ApiService {
     suspend fun loginAsCaretaker(
         @Body caretaker: CaretakerLoginRequestBody,
     ): Response<CaretakerLoginResponseBody>
+
+    // get meter readings
+    @GET("meterreading/all")
+    suspend fun getMeterReadings(
+        @Query("month") month: String,
+        @Query("year") year: String,
+        @Query("meterReadingTaken") meterReadingTaken: Boolean,
+        @Query("tenantName") tenantName: String?,
+        @Query("propertyName") propertyName: String?
+    ): Response<MeterReadingsResponseBody>
+
+    // upload meterreading
+    @Multipart
+    @PUT("meterreading")
+    suspend fun uploadMeterReading(
+        @Part("data") meterReadingRequestBody: MeterReadingRequestBody,
+        @Part("image") image: MultipartBody.Part
+    ): Response<MeterReadingResponseBody>
 
 }

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.tenant_care.R
+import com.example.tenant_care.model.caretaker.WaterMeterDt
 import com.example.tenant_care.model.property.PropertyTenant
 import com.example.tenant_care.model.property.PropertyUnit
 
@@ -290,6 +292,61 @@ fun HouseUnitItem(
                         fontStyle = FontStyle.Italic,
                         fontWeight = FontWeight.Light
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PropertyDataCell(
+    waterMeterData: WaterMeterDt,
+    navigateToUploadMeterReadingScreen: () -> Unit,
+    navigateToUpdateMeterReadingScreen: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ElevatedCard(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(20.dp)
+        ) {
+            Row {
+                Text(text = "Property name: ")
+                Text(text = waterMeterData.propertyName)
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row {
+                Text(text = "Tenant name: ")
+                Text(text = waterMeterData.tenantName)
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            if(waterMeterData.waterUnits != null) {
+                Row {
+                    Text(text = "Water units: ")
+                    Text(text = waterMeterData.waterUnits.toString())
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(text = "${ReusableFunctions.formatMoneyValue(waterMeterData.pricePerUnit!!)}/unit")
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onClick = navigateToUpdateMeterReadingScreen
+                ) {
+                    Text(text = "UPDATE")
+                }
+
+            } else {
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onClick = navigateToUploadMeterReadingScreen
+                ) {
+                    Text(text = "UPLOAD")
                 }
             }
         }

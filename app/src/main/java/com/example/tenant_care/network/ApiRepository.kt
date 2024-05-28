@@ -1,7 +1,10 @@
-package com.example.tenant_care.container
+package com.example.tenant_care.network
 
 import com.example.tenant_care.model.caretaker.CaretakerLoginRequestBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginResponseBody
+import com.example.tenant_care.model.caretaker.MeterReadingRequestBody
+import com.example.tenant_care.model.caretaker.MeterReadingResponseBody
+import com.example.tenant_care.model.caretaker.MeterReadingsResponseBody
 import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.model.pManager.PManagerResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
@@ -21,7 +24,7 @@ import com.example.tenant_care.model.tenant.RentPaymentResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRowsResponse
 import com.example.tenant_care.model.tenant.UnitAssignmentRequestBody
 import com.example.tenant_care.model.tenant.UnitAssignmentResponseBody
-import com.example.tenant_care.network.ApiService
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 
@@ -114,6 +117,9 @@ interface ApiRepository {
     ): Response<ResponseBody>
 
     suspend fun loginAsCaretaker(caretaker: CaretakerLoginRequestBody): Response<CaretakerLoginResponseBody>
+    suspend fun getMeterReadings(month: String, year: String, meterReadingTaken: Boolean, tenantName: String?, propertyName: String?): Response<MeterReadingsResponseBody>
+
+    suspend fun uploadMeterReading(meterReadingRequestBody: MeterReadingRequestBody, image: MultipartBody.Part): Response<MeterReadingResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -261,6 +267,28 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
 
     override suspend fun loginAsCaretaker(caretaker: CaretakerLoginRequestBody): Response<CaretakerLoginResponseBody> = apiService.loginAsCaretaker(
         caretaker = caretaker
+    )
+
+    override suspend fun getMeterReadings(
+        month: String,
+        year: String,
+        meterReadingTaken: Boolean,
+        tenantName: String?,
+        propertyName: String?
+    ): Response<MeterReadingsResponseBody> = apiService.getMeterReadings(
+        month = month,
+        year = year,
+        meterReadingTaken = meterReadingTaken,
+        tenantName = tenantName,
+        propertyName = propertyName
+    )
+
+    override suspend fun uploadMeterReading(
+        meterReadingRequestBody: MeterReadingRequestBody,
+        image: MultipartBody.Part
+    ): Response<MeterReadingResponseBody> = apiService.uploadMeterReading(
+        meterReadingRequestBody = meterReadingRequestBody,
+        image = image
     )
 
 

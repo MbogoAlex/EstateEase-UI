@@ -11,6 +11,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.tenant_care.ui.screens.account.LoginScreenComposable
 import com.example.tenant_care.ui.screens.caretakerViews.CaretakerHomeScreenComposable
+import com.example.tenant_care.ui.screens.caretakerViews.meterReading.EditMeterReadingScreenComposable
 import com.example.tenant_care.ui.screens.caretakerViews.units.OccupiedUnitsScreenComposable
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 
@@ -28,7 +29,8 @@ class MainActivity : ComponentActivity() {
 //                    TenantHomeScreen()
 //                    PManagerLoginScreen()
 //                    EstateEaseApp()
-                    CaretakerHomeScreenComposable()
+//                    CaretakerHomeScreenComposable()
+                    EditMeterReadingScreenComposable()
 //                    OccupiedUnitsScreenComposable()
 //                    LoginScreenComposable()
 //                 a   TenantsManagementScreen()

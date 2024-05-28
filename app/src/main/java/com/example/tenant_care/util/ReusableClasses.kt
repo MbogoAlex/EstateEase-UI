@@ -26,6 +26,10 @@ enum class CaretakerViewUnitsBottomBarScreen {
     UNOCCUPIED_UNITS
 }
 
+enum class CaretakerViewMeterReadingBottomBarScreen {
+    UPLOADED,
+    NOT_UPLOADED
+}
 enum class CaretakerViewSidebarMenuScreen {
     UNITS_SCREEN,
     METER_READING_SCREEN,
@@ -50,5 +54,12 @@ data class CaretakerSideBarMenuItem(
     val title: String,
     val icon: Int,
     val screen: CaretakerViewSidebarMenuScreen,
+    val color: Color
+)
+
+data class CaretakerMeterReadingBottomBarMenuItem(
+    val title: String,
+    val icon: Int,
+    val screen: CaretakerViewMeterReadingBottomBarScreen,
     val color: Color
 )

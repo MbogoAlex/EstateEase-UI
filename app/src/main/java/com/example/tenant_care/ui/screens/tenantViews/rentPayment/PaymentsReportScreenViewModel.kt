@@ -5,24 +5,15 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Paint
-import android.graphics.Typeface
-import android.graphics.pdf.PdfDocument
-import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.compose.ui.graphics.Color
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tenant_care.R
-import com.example.tenant_care.container.ApiRepository
+import com.example.tenant_care.network.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
 import com.example.tenant_care.model.tenant.RentPayment
 import com.example.tenant_care.util.DownloadingStatus
@@ -35,7 +26,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
-import java.time.LocalDateTime
 
 enum class FetchingReportStatus{
     INITIAL,
