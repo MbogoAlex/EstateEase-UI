@@ -24,6 +24,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,14 +38,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
+import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.screens.caretakerViews.meterReading.MeterReadingHomeScreenComposable
 import com.example.tenant_care.ui.screens.caretakerViews.units.UnitsScreenComposable
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 import com.example.tenant_care.util.CaretakerSideBarMenuItem
 import com.example.tenant_care.util.CaretakerViewSidebarMenuScreen
 import kotlinx.coroutines.launch
-
+object CaretakerHomeScreenDestination: AppNavigation {
+    override val title: String = "Caretaker home screen"
+    override val route: String = "caretaker-home-screen"
+    val childScreen: String = "childScreen"
+    val routeWithArgs: String = "$route/{$childScreen}"
+}
 val sideBarMenuItems = listOf<CaretakerSideBarMenuItem>(
     CaretakerSideBarMenuItem(
         title = "All houses",
@@ -68,10 +77,19 @@ val sideBarMenuItems = listOf<CaretakerSideBarMenuItem>(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CaretakerHomeScreenComposable(
+    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val viewModel: CaretakerHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
+    val uiState by viewModel.uiState.collectAsState()
+
     var currentScreen by rememberSaveable {
         mutableStateOf(CaretakerViewSidebarMenuScreen.UNITS_SCREEN)
+    }
+
+    if(uiState.childScreen == "meter-reading") {
+        currentScreen = CaretakerViewSidebarMenuScreen.METER_READING_SCREEN
+        viewModel.resetChildScreen()
     }
 
     Box {
@@ -79,7 +97,8 @@ fun CaretakerHomeScreenComposable(
             currentScreen = currentScreen,
             onChangeScreen = {
                 currentScreen = it
-            }
+            },
+            navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen
         )
     }
 }
@@ -89,6 +108,7 @@ fun CaretakerHomeScreenComposable(
 fun CaretakerHomeScreen(
     currentScreen: CaretakerViewSidebarMenuScreen,
     onChangeScreen: (screen: CaretakerViewSidebarMenuScreen) -> Unit,
+    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -172,8 +192,7 @@ fun CaretakerHomeScreen(
                 }
                 CaretakerViewSidebarMenuScreen.METER_READING_SCREEN -> {
                     MeterReadingHomeScreenComposable(
-                        navigateToUploadMeterReadingScreen = {},
-                        navigateToUpdateMeterReadingScreen = {},
+                        navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen,
                     )
                 }
                 CaretakerViewSidebarMenuScreen.LOGOUT -> {}
@@ -190,7 +209,8 @@ fun CaretakerHomeScreenPreview() {
     Tenant_careTheme {
         CaretakerHomeScreen(
             currentScreen = CaretakerViewSidebarMenuScreen.UNITS_SCREEN,
-            onChangeScreen = {}
+            onChangeScreen = {},
+            navigateToEditMeterReadingScreen = {meterTableId, childScreen ->  }
         )
     }
 }

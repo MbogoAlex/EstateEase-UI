@@ -301,8 +301,7 @@ fun HouseUnitItem(
 @Composable
 fun PropertyDataCell(
     waterMeterData: WaterMeterDt,
-    navigateToUploadMeterReadingScreen: () -> Unit,
-    navigateToUpdateMeterReadingScreen: () -> Unit,
+    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -334,7 +333,9 @@ fun PropertyDataCell(
                 Button(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    onClick = navigateToUpdateMeterReadingScreen
+                    onClick = {
+                        navigateToEditMeterReadingScreen(waterMeterData.id.toString(),"update-screen")
+                    }
                 ) {
                     Text(text = "UPDATE")
                 }
@@ -344,7 +345,9 @@ fun PropertyDataCell(
                 Button(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    onClick = navigateToUploadMeterReadingScreen
+                    onClick = {
+                        navigateToEditMeterReadingScreen(waterMeterData.id.toString(),"upload-screen")
+                    }
                 ) {
                     Text(text = "UPLOAD")
                 }

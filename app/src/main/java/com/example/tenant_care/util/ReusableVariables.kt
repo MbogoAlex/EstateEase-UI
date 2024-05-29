@@ -71,6 +71,7 @@ val previousWaterMeterData: PreviousWaterMeterData = PreviousWaterMeterData(
     month = "MAY",
     year = "2024",
     imageName = "image",
+    imageId = 1
 )
 
 val waterMeterData: WaterMeterDt = WaterMeterDt(
@@ -83,6 +84,7 @@ val waterMeterData: WaterMeterDt = WaterMeterDt(
     month = "MAY",
     year = "2024",
     imageName = null,
+    imageId = 1,
     previousWaterMeterData = previousWaterMeterData
 )
 
@@ -97,6 +99,7 @@ val waterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = "image",
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -109,6 +112,7 @@ val waterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = "image",
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -121,6 +125,7 @@ val waterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = "image",
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -133,6 +138,7 @@ val waterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = "image",
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -145,6 +151,7 @@ val waterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = "image",
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -157,6 +164,7 @@ val waterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = "image",
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -169,6 +177,7 @@ val waterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = "image",
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -181,6 +190,7 @@ val waterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = "image",
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
 )
@@ -196,6 +206,7 @@ val unreadWaterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = null,
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -208,6 +219,7 @@ val unreadWaterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = null,
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -220,6 +232,7 @@ val unreadWaterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = null,
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -232,6 +245,7 @@ val unreadWaterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = null,
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -244,6 +258,7 @@ val unreadWaterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = null,
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -256,6 +271,7 @@ val unreadWaterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = null,
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -268,6 +284,7 @@ val unreadWaterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = null,
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
     WaterMeterDt(
@@ -280,6 +297,7 @@ val unreadWaterMeterReadings: List<WaterMeterDt> = listOf(
         month = "MAY",
         year = "2024",
         imageName = null,
+        imageId = 1,
         previousWaterMeterData = previousWaterMeterData
     ),
 )

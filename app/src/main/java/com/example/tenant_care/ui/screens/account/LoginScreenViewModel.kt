@@ -199,6 +199,7 @@ class LoginScreenViewModel(
                         room = "",
                         password = uiState.value.password
                     )
+                    dsRepository.saveUserDetails(userDSDetails)
                     _uiState.update {
                         it.copy(
                             loadingStatus = LoadingStatus.SUCCESS

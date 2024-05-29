@@ -28,9 +28,9 @@ class MainActivity : ComponentActivity() {
                 ) {
 //                    TenantHomeScreen()
 //                    PManagerLoginScreen()
-//                    EstateEaseApp()
+                    EstateEaseApp()
 //                    CaretakerHomeScreenComposable()
-                    EditMeterReadingScreenComposable()
+//                    EditMeterReadingScreenComposable()
 //                    OccupiedUnitsScreenComposable()
 //                    LoginScreenComposable()
 //                 a   TenantsManagementScreen()

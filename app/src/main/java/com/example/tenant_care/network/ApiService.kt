@@ -196,7 +196,23 @@ interface ApiService {
     @PUT("meterreading")
     suspend fun uploadMeterReading(
         @Part("data") meterReadingRequestBody: MeterReadingRequestBody,
-        @Part("image") image: MultipartBody.Part
+        @Part image: MultipartBody.Part
+    ): Response<MeterReadingResponseBody>
+
+    // get specific meter reading
+    @GET("meterreading/id={id}")
+    suspend fun getMeterReadingDataById(
+        @Path("id") id: Int
+    ): Response<MeterReadingResponseBody>
+
+    // update meterreading
+    @Multipart
+    @PUT("meterreading/oldImageId={oldImageId}/meterReadingDataTableId={meterReadingDataTableId}")
+    suspend fun updateMeterReading(
+        @Path("oldImageId") oldImageId: Int,
+        @Path("meterReadingDataTableId") meterReadingDataTableId: Int,
+        @Part("data") meterReadingRequestBody: MeterReadingRequestBody,
+        @Part image: MultipartBody.Part
     ): Response<MeterReadingResponseBody>
 
 }

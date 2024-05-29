@@ -120,6 +120,15 @@ interface ApiRepository {
     suspend fun getMeterReadings(month: String, year: String, meterReadingTaken: Boolean, tenantName: String?, propertyName: String?): Response<MeterReadingsResponseBody>
 
     suspend fun uploadMeterReading(meterReadingRequestBody: MeterReadingRequestBody, image: MultipartBody.Part): Response<MeterReadingResponseBody>
+
+    suspend fun getMeterReadingDataById(id: Int): Response<MeterReadingResponseBody>
+
+    suspend fun updateMeterReading(
+        oldImageId: Int,
+        meterReadingDataTableId: Int,
+        meterReadingRequestBody: MeterReadingRequestBody,
+        image: MultipartBody.Part
+    ): Response<MeterReadingResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -287,6 +296,19 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         meterReadingRequestBody: MeterReadingRequestBody,
         image: MultipartBody.Part
     ): Response<MeterReadingResponseBody> = apiService.uploadMeterReading(
+        meterReadingRequestBody = meterReadingRequestBody,
+        image = image
+    )
+
+    override suspend fun getMeterReadingDataById(id: Int): Response<MeterReadingResponseBody> = apiService.getMeterReadingDataById(id)
+    override suspend fun updateMeterReading(
+        oldImageId: Int,
+        meterReadingDataTableId: Int,
+        meterReadingRequestBody: MeterReadingRequestBody,
+        image: MultipartBody.Part
+    ): Response<MeterReadingResponseBody> = apiService.updateMeterReading(
+        oldImageId = oldImageId,
+        meterReadingDataTableId = meterReadingDataTableId,
         meterReadingRequestBody = meterReadingRequestBody,
         image = image
     )

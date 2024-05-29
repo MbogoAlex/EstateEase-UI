@@ -1,5 +1,7 @@
 package com.example.tenant_care.ui.screens.caretakerViews.meterReading
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,10 +25,10 @@ import com.example.tenant_care.util.CaretakerMeterReadingBottomBarMenuItem
 import com.example.tenant_care.util.CaretakerViewMeterReadingBottomBarScreen
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MeterReadingHomeScreenComposable(
-    navigateToUploadMeterReadingScreen: () -> Unit,
-    navigateToUpdateMeterReadingScreen: () -> Unit,
+    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val menuItems: List<CaretakerMeterReadingBottomBarMenuItem> = listOf(
@@ -55,19 +57,18 @@ fun MeterReadingHomeScreenComposable(
             onChangeTab = {
                 currentTab = it
             },
-            navigateToUpdateMeterReadingScreen = navigateToUpdateMeterReadingScreen,
-            navigateToUploadMeterReadingScreen = navigateToUploadMeterReadingScreen
+            navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen,
         )
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MeterReadingHomeScreen(
     currentTab: CaretakerViewMeterReadingBottomBarScreen,
     menuItems: List<CaretakerMeterReadingBottomBarMenuItem>,
     onChangeTab: (tab: CaretakerViewMeterReadingBottomBarScreen) -> Unit,
-    navigateToUploadMeterReadingScreen: () -> Unit,
-    navigateToUpdateMeterReadingScreen: () -> Unit,
+    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -77,14 +78,14 @@ fun MeterReadingHomeScreen(
         when(currentTab) {
             CaretakerViewMeterReadingBottomBarScreen.UPLOADED -> {
                 UploadedScreenComposable(
-                    navigateToUpdateMeterReadingScreen = navigateToUpdateMeterReadingScreen,
+                    navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen,
                     modifier = Modifier
                         .weight(1f)
                 )
             }
             CaretakerViewMeterReadingBottomBarScreen.NOT_UPLOADED -> {
                 NotUploadedScreenComposable(
-                    navigateToUploadMeterReadingScreen = navigateToUploadMeterReadingScreen,
+                    navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen,
                     modifier = Modifier
                         .weight(1f)
                 )
@@ -128,6 +129,7 @@ fun BottomBar(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun MeterReadingHomeScreenPreview() {
@@ -155,8 +157,7 @@ fun MeterReadingHomeScreenPreview() {
             onChangeTab = {
                 currentTab = it
             },
-            navigateToUploadMeterReadingScreen = {},
-            navigateToUpdateMeterReadingScreen = {}
+            navigateToEditMeterReadingScreen = {meterTableId, childScreen ->  },
         )
     }
 }

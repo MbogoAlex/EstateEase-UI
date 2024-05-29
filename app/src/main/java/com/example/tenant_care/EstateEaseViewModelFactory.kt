@@ -8,6 +8,10 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.tenant_care.ui.screens.account.LoginScreenViewModel
+import com.example.tenant_care.ui.screens.caretakerViews.CaretakerHomeScreenViewModel
+import com.example.tenant_care.ui.screens.caretakerViews.meterReading.EditMeterReadingScreenViewModel
+import com.example.tenant_care.ui.screens.caretakerViews.meterReading.NotUploadedScreenViewModel
+import com.example.tenant_care.ui.screens.caretakerViews.meterReading.UploadedScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerLoginScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.AllTenantsPaymentsScreenViewModel
@@ -270,6 +274,48 @@ object EstateEaseViewModelFactory {
             UnoccupiedUnitsScreenViewModelCaretakerView(
                 apiRepository =  apiRepository,
                 dsRepository = dsRepository
+            )
+        }
+
+        //initialize UploadedScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            UploadedScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        //initialize NotUploadedScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            NotUploadedScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository
+            )
+        }
+
+        //initialize EditMeterReadingScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            EditMeterReadingScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = this.createSavedStateHandle()
+            )
+        }
+
+        //initialize CaretakerHomeScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            CaretakerHomeScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = this.createSavedStateHandle()
             )
         }
     }

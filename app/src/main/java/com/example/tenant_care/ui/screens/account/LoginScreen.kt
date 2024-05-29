@@ -63,6 +63,9 @@ object LoginScreenDestination: AppNavigation {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun LoginScreenComposable(
+    navigateToPManagerHomeScreen: () -> Unit,
+    navigateToCaretakerHomeScreen: () -> Unit,
+    navigateToTenantHomeScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val activity = (LocalContext.current as? Activity)
@@ -79,6 +82,13 @@ fun LoginScreenComposable(
     }
 
     if(uiState.loadingStatus == LoadingStatus.SUCCESS) {
+        if(uiState.role.lowercase() == "tenant") {
+            navigateToTenantHomeScreen()
+        } else if(uiState.role.lowercase() == "property manager") {
+            navigateToPManagerHomeScreen()
+        } else if(uiState.role.lowercase() == "caretaker") {
+            navigateToCaretakerHomeScreen()
+        }
         Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
         viewModel.resetLoadingStatus()
     } else if(uiState.loadingStatus == LoadingStatus.FAILURE) {

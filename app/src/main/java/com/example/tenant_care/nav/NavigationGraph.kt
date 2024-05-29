@@ -13,6 +13,12 @@ import com.example.tenant_care.HomeScreen
 import com.example.tenant_care.HomeScreenDestination
 import com.example.tenant_care.SplashScreen
 import com.example.tenant_care.SplashScreenDestination
+import com.example.tenant_care.ui.screens.account.LoginScreenComposable
+import com.example.tenant_care.ui.screens.account.LoginScreenDestination
+import com.example.tenant_care.ui.screens.caretakerViews.CaretakerHomeScreenComposable
+import com.example.tenant_care.ui.screens.caretakerViews.CaretakerHomeScreenDestination
+import com.example.tenant_care.ui.screens.caretakerViews.meterReading.EditMeterReadingScreenComposable
+import com.example.tenant_care.ui.screens.caretakerViews.meterReading.EditMeterReadingScreenDestination
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeComposable
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeScreenDestination
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerLoginScreen
@@ -49,9 +55,9 @@ fun NavigationGraph(
     ) {
         composable(SplashScreenDestination.route) {
             SplashScreen(
-                navigateToHomeScreen = {
+                navigateToLoginScreen = {
                     navController.popBackStack(SplashScreenDestination.route, true)
-                    navController.navigate(HomeScreenDestination.route)
+                    navController.navigate(LoginScreenDestination.route)
                 },
                 navigateToPManagerHomeScreen = {
                     navController.popBackStack(SplashScreenDestination.route, true)
@@ -59,6 +65,26 @@ fun NavigationGraph(
                 },
                 navigateToTenantHomeScreen = {
                     navController.popBackStack(SplashScreenDestination.route, true)
+                    navController.navigate(TenantHomeScreenDestination.route)
+                },
+                navigateToCaretakerHomeScreen = {
+                    navController.popBackStack(SplashScreenDestination.route, true)
+                    navController.navigate(CaretakerHomeScreenDestination.route)
+                }
+            )
+        }
+        composable(LoginScreenDestination.route) {
+            LoginScreenComposable(
+                navigateToPManagerHomeScreen = {
+                    navController.popBackStack(LoginScreenDestination.route, true)
+                    navController.navigate(PManagerHomeScreenDestination.route)
+                },
+                navigateToCaretakerHomeScreen = {
+                    navController.popBackStack(LoginScreenDestination.route, true)
+                    navController.navigate(CaretakerHomeScreenDestination.route)
+                },
+                navigateToTenantHomeScreen = {
+                    navController.popBackStack(LoginScreenDestination.route, true)
                     navController.navigate(TenantHomeScreenDestination.route)
                 }
             )
@@ -256,6 +282,47 @@ fun NavigationGraph(
             PaymentsReportScreenComposable(
                 navigateToRentInvoiceScreen = {tenantId, month, year ->
                     navController.navigate("${RentInvoiceScreenDestination.route}/${tenantId}/${month}/${year}")
+                }
+            )
+        }
+        composable(CaretakerHomeScreenDestination.route) {
+            CaretakerHomeScreenComposable(
+                navigateToEditMeterReadingScreen = {meterTableId, childScreen ->
+                    navController.navigate("${EditMeterReadingScreenDestination.route}/${meterTableId}/${childScreen}")
+                }
+            )
+        }
+        composable(
+            EditMeterReadingScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(EditMeterReadingScreenDestination.meterTableId) {
+                    type = NavType.StringType
+                },
+                navArgument(EditMeterReadingScreenDestination.childScreen) {
+                    type = NavType.StringType
+                },
+            )
+        ) {
+            EditMeterReadingScreenComposable(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                },
+                navigateToCaretakerHomeScreenWithArgs = {
+                    navController.navigate("${CaretakerHomeScreenDestination.route}/${it}")
+                }
+            )
+        }
+        composable(
+            CaretakerHomeScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(CaretakerHomeScreenDestination.childScreen) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            CaretakerHomeScreenComposable(
+                navigateToEditMeterReadingScreen = {meterTableId, childScreen ->
+                    navController.navigate("${EditMeterReadingScreenDestination.route}/${meterTableId}/${childScreen}")
                 }
             )
         }

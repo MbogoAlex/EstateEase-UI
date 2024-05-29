@@ -39,16 +39,18 @@ data class WaterMeterDt(
     val month: String,
     val year: String,
     val imageName: String?,
+    val imageId: Int?,
     val previousWaterMeterData: PreviousWaterMeterData?
 )
 @Serializable
 data class PreviousWaterMeterData(
-    val propertyName: String,
-    val tenantName: String,
+    val propertyName: String?,
+    val tenantName: String?,
     val waterUnits: Double?,
     val pricePerUnit: Double?,
     val meterReadingDate: String?,
-    val month: String,
-    val year: String,
+    val month: String?,
+    val year: String?,
     val imageName: String?,
+    val imageId: Int?
 )

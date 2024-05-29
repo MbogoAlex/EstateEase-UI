@@ -14,7 +14,10 @@ interface AppContainer {
 }
 
 class DefaultContainer(context: Context): AppContainer {
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
     private val baseUrl = "http://192.168.80.6:8080/api/"
     private val retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
