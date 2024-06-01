@@ -25,8 +25,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.model.caretaker.WaterMeterDt
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.FilterByMonthBox
 import com.example.tenant_care.util.FilterByNumOfRoomsBox
 import com.example.tenant_care.util.FilterByRoomNameBox
+import com.example.tenant_care.util.FilterByYearBox
 import com.example.tenant_care.util.PropertyDataCell
 import com.example.tenant_care.util.SearchFieldForTenants
 import com.example.tenant_care.util.UndoFilteringBox
@@ -54,6 +56,16 @@ fun UploadedScreenComposable(
             onChangeSelectedUnitName = {
                 viewModel.updateRoomName(it)
             },
+            years = uiState.years,
+            selectedYear = uiState.year,
+            onChangeSelectedYear = {
+                viewModel.updateYear(it)
+            },
+            months = uiState.months,
+            selectedMonth = uiState.month,
+            onChangeSelectedMonth = {
+                viewModel.updateMonth(it)
+            },
             unfilterUnits = { viewModel.unfilter() },
             numberOfUnits = uiState.meterReadings.size,
             meterReadings = uiState.meterReadings,
@@ -71,6 +83,12 @@ fun UploadedScreen(
     onChangeSelectedUnitName: (name: String) -> Unit,
     unfilterUnits: () -> Unit,
     numberOfUnits: Int,
+    years: List<String>,
+    selectedYear: String,
+    onChangeSelectedYear: (year: String) -> Unit,
+    months: List<String>,
+    selectedMonth: String,
+    onChangeSelectedMonth: (month: String) -> Unit,
     meterReadings: List<WaterMeterDt>,
     navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
@@ -100,6 +118,20 @@ fun UploadedScreen(
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
+        Row {
+            FilterByYearBox(
+                years = years,
+                selectedYear = selectedYear,
+                onChangeSelectedYear = onChangeSelectedYear
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            FilterByMonthBox(
+                months = months,
+                selectedMonth = selectedMonth,
+                onChangeSelectedMonth = onChangeSelectedMonth
+            )
+        }
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = "$numberOfUnits units occupied",
             fontWeight = FontWeight.Bold
@@ -125,6 +157,12 @@ fun UploadedScreenPreview() {
             searchText = "",
             onSearchTextChanged = {},
             rooms = emptyList(),
+            years = emptyList(),
+            selectedYear = "",
+            onChangeSelectedYear = {},
+            months = emptyList(),
+            selectedMonth = "",
+            onChangeSelectedMonth = {},
             selectedUnitName = "",
             onChangeSelectedUnitName = {},
             unfilterUnits = { /*TODO*/ },

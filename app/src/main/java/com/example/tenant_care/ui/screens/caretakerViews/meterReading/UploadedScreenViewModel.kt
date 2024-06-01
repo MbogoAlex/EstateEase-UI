@@ -23,6 +23,8 @@ data class UploadedScreenUiState(
     val meterReadings: List<WaterMeterDt> = emptyList(),
     val month: String = "",
     val year: String = "",
+    val months: List<String> = emptyList(),
+    val years: List<String> = emptyList(),
     val roomName: String = "",
     val tenantName: String = "",
     val selectableRooms: List<String> = emptyList(),
@@ -40,17 +42,42 @@ class UploadedScreenViewModel(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun loadStartupData() {
+        val months = listOf<String>(
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        )
+        var currentYear = LocalDateTime.now().year
+        val years = mutableListOf<String>()
+        var i = 10
+        do {
+            years.add(currentYear.toString())
+            currentYear--
+            i--
+        } while (i > 0)
         viewModelScope.launch {
             dsRepository.userDSDetails.collect() {dsUserModel ->
                 _uiState.update {
                     it.copy(
                         userDetails = dsUserModel.toUserDetails(),
                         year = LocalDateTime.now().year.toString(),
-                        month = LocalDateTime.now().month.toString()
+                        month = LocalDateTime.now().month.toString(),
+                        months = months,
+                        years = years
                     )
                 }
             }
         }
+
         fetchMeterReadings()
     }
 

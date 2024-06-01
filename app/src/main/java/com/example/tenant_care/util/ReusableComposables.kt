@@ -184,6 +184,138 @@ fun FilterByRoomNameBox(
 }
 
 @Composable
+fun FilterByMonthBox(
+    months: List<String>,
+    selectedMonth: String?,
+    onChangeSelectedMonth: (name: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    var icon: ImageVector
+    if(expanded) {
+        icon = Icons.Default.KeyboardArrowUp
+    } else {
+        icon = Icons.Default.KeyboardArrowDown
+    }
+    Card(
+        modifier = Modifier
+            .clickable {
+                expanded = !expanded
+            }
+            .widthIn(min = 100.dp)
+    ) {
+        Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Room name".takeIf { selectedMonth.isNullOrEmpty() } ?: "$selectedMonth",
+                    modifier = Modifier
+                        .padding(10.dp)
+                )
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = !expanded }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 250.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    months.forEachIndexed { index, i ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = i
+                                )
+                            },
+                            onClick = {
+                                onChangeSelectedMonth(i)
+                                expanded = false
+                            }
+                        )
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FilterByYearBox(
+    years: List<String>,
+    selectedYear: String?,
+    onChangeSelectedYear: (name: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    var icon: ImageVector
+    if(expanded) {
+        icon = Icons.Default.KeyboardArrowUp
+    } else {
+        icon = Icons.Default.KeyboardArrowDown
+    }
+    Card(
+        modifier = Modifier
+            .clickable {
+                expanded = !expanded
+            }
+            .widthIn(min = 100.dp)
+    ) {
+        Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Year".takeIf { selectedYear.isNullOrEmpty() } ?: "$selectedYear",
+                    modifier = Modifier
+                        .padding(10.dp)
+                )
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = !expanded }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 250.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    years.forEachIndexed { index, i ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = i
+                                )
+                            },
+                            onClick = {
+                                onChangeSelectedYear(i)
+                                expanded = false
+                            }
+                        )
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun UndoFilteringBox(
     unfilterUnits: () -> Unit,
     modifier: Modifier = Modifier
