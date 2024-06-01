@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
 
 data class CaretakerHomeScreenUiState(
     val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
+    val phoneNumber: String = "",
+    val password: String = "",
     val childScreen: String = "",
 )
 class CaretakerHomeScreenViewModel(
@@ -33,7 +35,9 @@ class CaretakerHomeScreenViewModel(
             dsRepository.userDSDetails.collect() {dsUserDetails ->
                 _uiState.update {
                     it.copy(
-                        userDetails = dsUserDetails.toUserDetails()
+                        userDetails = dsUserDetails.toUserDetails(),
+                        phoneNumber = dsUserDetails.phoneNumber,
+                        password = dsUserDetails.password
                     )
                 }
             }
@@ -45,6 +49,12 @@ class CaretakerHomeScreenViewModel(
             it.copy(
                 childScreen = ""
             )
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            dsRepository.deleteAllPreferences()
         }
     }
 

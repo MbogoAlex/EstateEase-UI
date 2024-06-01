@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
@@ -22,8 +24,10 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +51,7 @@ import com.example.tenant_care.ui.screens.caretakerViews.units.UnitsScreenCompos
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 import com.example.tenant_care.util.CaretakerSideBarMenuItem
 import com.example.tenant_care.util.CaretakerViewSidebarMenuScreen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 object CaretakerHomeScreenDestination: AppNavigation {
     override val title: String = "Caretaker home screen"
@@ -78,6 +83,7 @@ val sideBarMenuItems = listOf<CaretakerSideBarMenuItem>(
 @Composable
 fun CaretakerHomeScreenComposable(
     navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    navigateToLoginScreenWithArgs: (phoneNumber: String, password: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: CaretakerHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -92,6 +98,25 @@ fun CaretakerHomeScreenComposable(
         viewModel.resetChildScreen()
     }
 
+    var showLogoutDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    val scope = rememberCoroutineScope()
+
+    if(showLogoutDialog) {
+        LogoutDialog(
+            onLogout = {
+                scope.launch {
+                    navigateToLoginScreenWithArgs(uiState.phoneNumber, uiState.password)
+                    viewModel.logout()
+//                    delay(2000L)
+                }
+            },
+            onDismiss = { showLogoutDialog = !showLogoutDialog }
+        )
+    }
+
     Box {
         CaretakerHomeScreen(
             tenantName = uiState.userDetails.fullName,
@@ -99,7 +124,11 @@ fun CaretakerHomeScreenComposable(
             onChangeScreen = {
                 currentScreen = it
             },
-            navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen
+            navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen,
+            onLogout = {
+                showLogoutDialog = !showLogoutDialog
+                currentScreen = CaretakerViewSidebarMenuScreen.UNITS_SCREEN
+            }
         )
     }
 }
@@ -111,6 +140,7 @@ fun CaretakerHomeScreen(
     onChangeScreen: (screen: CaretakerViewSidebarMenuScreen) -> Unit,
     navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
     tenantName: String,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -205,11 +235,37 @@ fun CaretakerHomeScreen(
                         navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen,
                     )
                 }
-                CaretakerViewSidebarMenuScreen.LOGOUT -> {}
+                CaretakerViewSidebarMenuScreen.LOGOUT -> {
+                    onLogout()
+                }
             }
         }
 
     }
+}
+
+@Composable
+fun LogoutDialog(
+    onLogout: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        title = {
+            Text(text = "Log out confirmation")
+        },
+        onDismissRequest = onDismiss,
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Cancel")
+            }
+        },
+        confirmButton = {
+            Button(onClick = onLogout) {
+                Text(text = "Logout")
+            }
+        }
+    )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -221,7 +277,8 @@ fun CaretakerHomeScreenPreview() {
             tenantName = "Alex Mbogo",
             currentScreen = CaretakerViewSidebarMenuScreen.UNITS_SCREEN,
             onChangeScreen = {},
-            navigateToEditMeterReadingScreen = {meterTableId, childScreen ->  }
+            navigateToEditMeterReadingScreen = {meterTableId, childScreen ->  },
+            onLogout = {}
         )
     }
 }

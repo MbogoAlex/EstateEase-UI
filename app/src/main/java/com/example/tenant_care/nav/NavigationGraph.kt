@@ -289,6 +289,10 @@ fun NavigationGraph(
             CaretakerHomeScreenComposable(
                 navigateToEditMeterReadingScreen = {meterTableId, childScreen ->
                     navController.navigate("${EditMeterReadingScreenDestination.route}/${meterTableId}/${childScreen}")
+                },
+                navigateToLoginScreenWithArgs = {phoneNumber, password ->
+                    navController.popBackStack(CaretakerHomeScreenDestination.route, true)
+                    navController.navigate("${LoginScreenDestination.route}/${phoneNumber}/${password}")
                 }
             )
         }
@@ -323,6 +327,36 @@ fun NavigationGraph(
             CaretakerHomeScreenComposable(
                 navigateToEditMeterReadingScreen = {meterTableId, childScreen ->
                     navController.navigate("${EditMeterReadingScreenDestination.route}/${meterTableId}/${childScreen}")
+                },
+                navigateToLoginScreenWithArgs = {phoneNumber, password ->
+                    navController.popBackStack(CaretakerHomeScreenDestination.routeWithArgs, true)
+                    navController.navigate("${LoginScreenDestination.route}/${phoneNumber}/${password}")
+                }
+            )
+        }
+        composable(
+            LoginScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(LoginScreenDestination.phoneNumber) {
+                    type = NavType.StringType
+                },
+                navArgument(LoginScreenDestination.password) {
+                    type = NavType.StringType
+                },
+            )
+        ) {
+            LoginScreenComposable(
+                navigateToPManagerHomeScreen = {
+                    navController.popBackStack(LoginScreenDestination.route, true)
+                    navController.navigate(PManagerHomeScreenDestination.route)
+                },
+                navigateToCaretakerHomeScreen = {
+                    navController.popBackStack(LoginScreenDestination.route, true)
+                    navController.navigate(CaretakerHomeScreenDestination.route)
+                },
+                navigateToTenantHomeScreen = {
+                    navController.popBackStack(LoginScreenDestination.route, true)
+                    navController.navigate(TenantHomeScreenDestination.route)
                 }
             )
         }
