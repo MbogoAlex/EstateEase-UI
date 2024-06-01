@@ -17,16 +17,20 @@ import com.example.tenant_care.util.LoadingStatus
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.ReusableFunctions.toUserDetails
 import com.example.tenant_care.util.waterMeterData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
+import okhttp3.*
 import okhttp3.RequestBody
 import java.io.ByteArrayOutputStream
 import java.io.FileInputStream
+import java.io.IOException
+import java.net.URL
 import java.time.LocalDateTime
 
 data class EditMeterReadingScreenUiState(
@@ -174,37 +178,60 @@ class EditMeterReadingScreenViewModel(
             month = LocalDateTime.now().month.toString(),
             year = LocalDateTime.now().year.toString()
         )
-        val uploadedImage = if(uiState.value.capturedImageUri != null) uiState.value.capturedImageUri else uiState.value.uploadedImage
+        val uploadedImage = if (uiState.value.capturedImageUri != null) uiState.value.capturedImageUri else uiState.value.uploadedImage
         var meterImage: MultipartBody.Part? = null
-        val parcelFileDescriptor = context.contentResolver.openFileDescriptor(uploadedImage as Uri, "r", null)
-        parcelFileDescriptor?.let { pfd ->
-            val inputStream = FileInputStream(pfd.fileDescriptor)
-            val byteArrayOutputStream = ByteArrayOutputStream()
-            val buffer = ByteArray(1024)
-            var length: Int
-            while(inputStream.read(buffer).also { length = it } != -1) {
-                byteArrayOutputStream.write(buffer, 0, length)
-            }
-            val byteArray = byteArrayOutputStream.toByteArray()
-
-            //Get the MIME type of the file
-
-            val mimeType = context.contentResolver.getType(uploadedImage)
-            val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
-            val requestFile = RequestBody.create(mimeType?.toMediaTypeOrNull(), byteArray)
-            val imagePart = MultipartBody.Part.createFormData("image", "upload.$extension", requestFile)
-            meterImage = imagePart
-        }
 
         viewModelScope.launch {
             try {
+                val byteArray = withContext(Dispatchers.IO) {
+                    when (uploadedImage) {
+                        is Uri -> {
+                            val parcelFileDescriptor = context.contentResolver.openFileDescriptor(uploadedImage, "r", null)
+                            parcelFileDescriptor?.let { pfd ->
+                                val inputStream = FileInputStream(pfd.fileDescriptor)
+                                val byteArrayOutputStream = ByteArrayOutputStream()
+                                val buffer = ByteArray(1024)
+                                var length: Int
+                                while (inputStream.read(buffer).also { length = it } != -1) {
+                                    byteArrayOutputStream.write(buffer, 0, length)
+                                }
+                                byteArrayOutputStream.toByteArray()
+                            }
+                        }
+                        is String -> {
+                            if (uploadedImage.startsWith("http://") || uploadedImage.startsWith("https://")) {
+                                try {
+                                    URL(uploadedImage).openStream().use { it.readBytes() }
+                                } catch (e: IOException) {
+                                    null
+                                }
+                            } else {
+                                null
+                            }
+                        }
+                        else -> null
+                    }
+                }
+
+                byteArray?.let {
+                    val mimeType = when (uploadedImage) {
+                        is Uri -> context.contentResolver.getType(uploadedImage)
+                        is String -> "image/jpeg"
+                        else -> null
+                    } ?: "image/jpeg"
+
+                    val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+                    val requestFile = RequestBody.create(mimeType.toMediaTypeOrNull(), it)
+                    meterImage = MultipartBody.Part.createFormData("image", "upload.$extension", requestFile)
+                }
+
                 val response = apiRepository.updateMeterReading(
                     oldImageId = uiState.value.uploadedImageId!!,
                     meterReadingDataTableId = meterTableId.toInt(),
                     meterReadingRequestBody = meterReadingRequest,
                     image = meterImage!!
                 )
-                if(response.isSuccessful) {
+                if (response.isSuccessful) {
                     _uiState.update {
                         it.copy(
                             loadingStatus = LoadingStatus.SUCCESS
@@ -218,7 +245,7 @@ class EditMeterReadingScreenViewModel(
                     }
                     Log.e("UPDATE_METER_READING_ERROR_RESPONSE", response.toString())
                 }
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         loadingStatus = LoadingStatus.FAILURE
@@ -228,6 +255,7 @@ class EditMeterReadingScreenViewModel(
             }
         }
     }
+
 
     fun updateMeterReadingText(meterReading: String) {
         _uiState.update {

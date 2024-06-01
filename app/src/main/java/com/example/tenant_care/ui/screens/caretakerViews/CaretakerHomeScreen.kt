@@ -94,6 +94,7 @@ fun CaretakerHomeScreenComposable(
 
     Box {
         CaretakerHomeScreen(
+            tenantName = uiState.userDetails.fullName,
             currentScreen = currentScreen,
             onChangeScreen = {
                 currentScreen = it
@@ -109,6 +110,7 @@ fun CaretakerHomeScreen(
     currentScreen: CaretakerViewSidebarMenuScreen,
     onChangeScreen: (screen: CaretakerViewSidebarMenuScreen) -> Unit,
     navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    tenantName: String,
     modifier: Modifier = Modifier
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -175,16 +177,24 @@ fun CaretakerHomeScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            IconButton(onClick = {
-                scope.launch {
-                    if(drawerState.isClosed) drawerState.open() else drawerState.close()
-                }
-            }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.menu),
-                    contentDescription = "Navigation menu"
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {
+                    scope.launch {
+                        if(drawerState.isClosed) drawerState.open() else drawerState.close()
+                    }
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.menu),
+                        contentDescription = "Navigation menu"
+                    )
 
+                }
+                Text(
+                    text = tenantName,
+                    fontWeight = FontWeight.Bold
+                )
             }
             when(currentScreen) {
                 CaretakerViewSidebarMenuScreen.UNITS_SCREEN -> {
@@ -208,6 +218,7 @@ fun CaretakerHomeScreen(
 fun CaretakerHomeScreenPreview() {
     Tenant_careTheme {
         CaretakerHomeScreen(
+            tenantName = "Alex Mbogo",
             currentScreen = CaretakerViewSidebarMenuScreen.UNITS_SCREEN,
             onChangeScreen = {},
             navigateToEditMeterReadingScreen = {meterTableId, childScreen ->  }

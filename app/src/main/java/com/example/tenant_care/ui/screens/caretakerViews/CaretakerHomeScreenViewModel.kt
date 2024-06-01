@@ -1,5 +1,6 @@
 package com.example.tenant_care.ui.screens.caretakerViews
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -54,7 +55,7 @@ class CaretakerHomeScreenViewModel(
                     childScreen = childScreen
                 )
             }
-            loadStartupData()
         }
+        loadStartupData()
     }
 }

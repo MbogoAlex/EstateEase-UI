@@ -23,9 +23,11 @@ data class UploadedScreenUiState(
     val meterReadings: List<WaterMeterDt> = emptyList(),
     val month: String = "",
     val year: String = "",
+    val roomName: String = "",
+    val tenantName: String = "",
+    val selectableRooms: List<String> = emptyList(),
+    val filteringOn: Boolean = false,
     val meterReadingTaken: Boolean = true,
-    val tenantName: String? = null,
-    val propertyName: String? = null,
     val loadingStatus: LoadingStatus = LoadingStatus.INITIAL,
 )
 @RequiresApi(Build.VERSION_CODES.O)
@@ -65,12 +67,17 @@ class UploadedScreenViewModel(
                     year = uiState.value.year,
                     meterReadingTaken = uiState.value.meterReadingTaken,
                     tenantName = uiState.value.tenantName,
-                    propertyName = uiState.value.propertyName
+                    propertyName = uiState.value.roomName
                 )
                 if(response.isSuccessful) {
+                    val rooms = mutableListOf<String>()
+                    for(reading in response.body()?.data?.waterMeter!!) {
+                        rooms.add(reading.propertyName)
+                    }
                     _uiState.update {
                         it.copy(
                             meterReadings = response.body()?.data?.waterMeter!!,
+                            selectableRooms = rooms,
                             loadingStatus = LoadingStatus.SUCCESS
                         )
                     }
@@ -94,6 +101,37 @@ class UploadedScreenViewModel(
         }
     }
 
+    fun updateRoomName(roomName: String) {
+        _uiState.update {
+            it.copy(
+                roomName = roomName,
+                filteringOn = true
+            )
+        }
+        fetchMeterReadings()
+    }
+
+    fun updateTenantName(tenantName: String) {
+        _uiState.update {
+            it.copy(
+                tenantName = tenantName,
+                filteringOn = true
+            )
+        }
+        fetchMeterReadings()
+    }
+
+    fun unfilter() {
+        _uiState.update {
+            it.copy(
+                tenantName = "",
+                roomName = "",
+                filteringOn = false
+            )
+        }
+        fetchMeterReadings()
+    }
+
     fun updateMonth(month: String) {
         _uiState.update {
             it.copy(
@@ -112,36 +150,7 @@ class UploadedScreenViewModel(
         fetchMeterReadings()
     }
 
-    fun updateTenantName(tenantName: String) {
-        _uiState.update {
-            it.copy(
-                tenantName = tenantName
-            )
-        }
-        fetchMeterReadings()
-    }
 
-    fun updatePropertyName(propertyName: String) {
-        _uiState.update {
-            it.copy(
-                propertyName = propertyName
-            )
-        }
-        fetchMeterReadings()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun unfilter() {
-        _uiState.update {
-            it.copy(
-                month = LocalDateTime.now().month.toString(),
-                year = LocalDateTime.now().year.toString(),
-                tenantName = null,
-                propertyName = null
-            )
-        }
-        fetchMeterReadings()
-    }
 
     init {
         loadStartupData()
