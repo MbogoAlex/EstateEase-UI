@@ -35,5 +35,9 @@ data class RentPayment(
     val nationalIdOrPassport: String,
     val phoneNumber: String,
     val tenantAddedAt: String,
-    val tenantActive: Boolean
+    val tenantActive: Boolean,
+    val waterUnits: Double?,
+    val pricePerUnit: Double?,
+    val meterReadingDate: String?,
+    val imageFile: String?
 )

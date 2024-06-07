@@ -54,7 +54,7 @@ object UnitsManagementComposableDestination: AppNavigation {
 @Composable
 fun UnitsManagementComposable(
     navigateToPreviousScreen: () -> Unit,
-    navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
+    navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -92,7 +92,7 @@ fun UnitsManagementComposable(
     UnitsManagementScreen(
         currentScreen = uiState.currentScreen,
         navigationItems = navigationItems,
-        navigateToUnoccupiedPropertyDetailsScreen = navigateToUnoccupiedPropertyDetailsScreen,
+        navigateToUnoccupiedUnitDetailsScreen = navigateToUnoccupiedUnitDetailsScreen,
         navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen,
         onChangeTab = {
             viewModel.changeScreen(it)
@@ -106,7 +106,7 @@ fun UnitsManagementScreen(
     currentScreen: Screen,
     navigationItems: List<NavigationItem>,
     onChangeTab: (newScreen: Screen) -> Unit,
-    navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
+    navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -124,7 +124,7 @@ fun UnitsManagementScreen(
             }
             Screen.UNOCCUPIED_UNITS -> {
                 UnoccupiedUnitsComposable(
-                    navigateToUnoccupiedPropertyDetailsScreen = navigateToUnoccupiedPropertyDetailsScreen,
+                    navigateToUnoccupiedUnitDetailsScreen = navigateToUnoccupiedUnitDetailsScreen,
                     modifier = Modifier
                         .weight(1f)
                 )
@@ -184,7 +184,7 @@ fun UnitsManagementComposablePreview() {
     Tenant_careTheme {
         UnitsManagementComposable(
             navigateToPreviousScreen = {},
-            navigateToUnoccupiedPropertyDetailsScreen = {},
+            navigateToUnoccupiedUnitDetailsScreen = {},
             navigateToOccupiedUnitDetailsScreen = {},
         )
     }

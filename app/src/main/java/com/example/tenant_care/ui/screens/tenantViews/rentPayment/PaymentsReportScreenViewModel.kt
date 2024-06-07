@@ -255,7 +255,7 @@ class PaymentsReportScreenViewModel(
             roomName = null,
             rooms = null,
             tenantName = null,
-            rentPaymentStatus = null,
+            rentPaymentStatus = true,
             paidLate = null,
             tenantActive = null
         )

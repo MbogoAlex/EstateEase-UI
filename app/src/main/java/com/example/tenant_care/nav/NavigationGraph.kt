@@ -120,6 +120,15 @@ fun NavigationGraph(
                 },
                 navigateToRentPaymentsScreen = {
                     navController.navigate(RentPaymentsComposableDestination.route)
+                },
+                navigateToUnoccupiedUnitDetailsScreen = {
+                    navController.navigate("${UnOccupiedUnitDetailsComposableDestination.route}/${it}")
+                },
+                navigateToOccupiedUnitDetailsScreen = {
+                    navController.navigate("${OccupiedUnitDetailsComposableDestination.route}/${it}")
+                },
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
                 }
             )
         }
@@ -128,7 +137,7 @@ fun NavigationGraph(
                 navigateToPreviousScreen = {
                     navController.navigateUp()
                 },
-                navigateToUnoccupiedPropertyDetailsScreen = {
+                navigateToUnoccupiedUnitDetailsScreen = {
                     navController.navigate("${UnOccupiedUnitDetailsComposableDestination.route}/${it}")
                 },
                 navigateToOccupiedUnitDetailsScreen = {
@@ -183,7 +192,7 @@ fun NavigationGraph(
                 navigateToPreviousScreen = {
                     navController.navigateUp()
                 },
-                navigateToUnoccupiedPropertyDetailsScreen = {
+                navigateToUnoccupiedUnitDetailsScreen = {
                     navController.navigate("${UnOccupiedUnitDetailsComposableDestination.route}/${it}")
                 },
                 navigateToOccupiedUnitDetailsScreen = {
@@ -246,12 +255,9 @@ fun NavigationGraph(
                 navigateToTenantReportScreen = {
                     navController.navigate(PaymentsReportScreenDestination.route)
                 },
-                navigateToLoginScreenWithArgs = {phoneNumber, password ->
-                    navController.navigate("${TenantLoginScreenDestination.route}/${phoneNumber}/${password}")
+                navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->
+                    navController.navigate("${LoginScreenDestination.route}/${roleId}/${phoneNumber}/${password}")
                 },
-                navigateToHomeScreen = {
-                    navController.navigate(HomeScreenDestination.route)
-                }
             )
         }
         composable(
@@ -290,9 +296,9 @@ fun NavigationGraph(
                 navigateToEditMeterReadingScreen = {meterTableId, childScreen ->
                     navController.navigate("${EditMeterReadingScreenDestination.route}/${meterTableId}/${childScreen}")
                 },
-                navigateToLoginScreenWithArgs = {phoneNumber, password ->
+                navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->
                     navController.popBackStack(CaretakerHomeScreenDestination.route, true)
-                    navController.navigate("${LoginScreenDestination.route}/${phoneNumber}/${password}")
+                    navController.navigate("${LoginScreenDestination.route}/${roleId}/${phoneNumber}/${password}")
                 }
             )
         }
@@ -328,15 +334,18 @@ fun NavigationGraph(
                 navigateToEditMeterReadingScreen = {meterTableId, childScreen ->
                     navController.navigate("${EditMeterReadingScreenDestination.route}/${meterTableId}/${childScreen}")
                 },
-                navigateToLoginScreenWithArgs = {phoneNumber, password ->
+                navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->
                     navController.popBackStack(CaretakerHomeScreenDestination.routeWithArgs, true)
-                    navController.navigate("${LoginScreenDestination.route}/${phoneNumber}/${password}")
+                    navController.navigate("${LoginScreenDestination.route}/${roleId}/${phoneNumber}/${password}")
                 }
             )
         }
         composable(
             LoginScreenDestination.routeWithArgs,
             arguments = listOf(
+                navArgument(LoginScreenDestination.roleId) {
+                    type = NavType.StringType
+                },
                 navArgument(LoginScreenDestination.phoneNumber) {
                     type = NavType.StringType
                 },

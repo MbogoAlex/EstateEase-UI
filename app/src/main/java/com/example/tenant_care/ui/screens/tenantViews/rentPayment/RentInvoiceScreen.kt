@@ -3,6 +3,8 @@ package com.example.tenant_care.ui.screens.tenantViews.rentPayment
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -24,19 +30,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.tenant_care.EstateEaseViewModelFactory
+import com.example.tenant_care.R
+import com.example.tenant_care.model.caretaker.WaterMeterDt
 import com.example.tenant_care.model.tenant.RentPayment
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 import com.example.tenant_care.util.ReusableFunctions
+import com.example.tenant_care.util.waterMeterData
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.Year
@@ -75,8 +90,19 @@ fun RentInvoiceScreenComposable(
     } else {
         penaltyAccrued = 0.0
     }
+
+
+    var waterUnits = uiState.rentPayment.waterUnits
+    var totalWaterPrice = 0.0
+    var formattedTotalWaterPrice = ""
+
+    if(waterUnits != null) {
+        totalWaterPrice = waterUnits * uiState.rentPayment.pricePerUnit!!
+        formattedTotalWaterPrice = ReusableFunctions.formatMoneyValue(totalWaterPrice)
+    }
+
     val formattedPenaltyAccrued = ReusableFunctions.formatMoneyValue(penaltyAccrued)
-    val totalPayable = uiState.rentPayment.monthlyRent + penaltyAccrued
+    val totalPayable = uiState.rentPayment.monthlyRent + penaltyAccrued + totalWaterPrice
     val formattedTotalPayable = ReusableFunctions.formatMoneyValue(totalPayable)
 
 
@@ -105,6 +131,9 @@ fun RentInvoiceScreenComposable(
             payRentStatus = uiState.payRentStatus,
             rentPaid = uiState.rentPayment.rentPaymentStatus,
             paidAt = uiState.paidAt,
+            waterUnits = waterUnits,
+            formattedTotalWaterPrice = formattedTotalWaterPrice,
+            waterMeterDt = uiState.waterMeterDt,
             navigateToPreviousScreen = navigateToPreviousScreen
         )
     }
@@ -125,6 +154,9 @@ fun RentInvoiceScreen(
     paidAt: String,
     payRent: () -> Unit,
     payRentStatus: PayRentStatus,
+    waterUnits: Double?,
+    formattedTotalWaterPrice: String?,
+    waterMeterDt: WaterMeterDt,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -157,8 +189,12 @@ fun RentInvoiceScreen(
             formattedPenaltyAccrued = formattedPenaltyAccrued,
             formattedTotalPayable = formattedTotalPayable,
             paidAt = paidAt,
-            rentPayment = rentPayment
+            rentPayment = rentPayment,
+            waterUnits = waterUnits,
+            formattedTotalWaterPrice = formattedTotalWaterPrice
         )
+        Spacer(modifier = Modifier.height(10.dp))
+        WaterMeterImages(waterMeterDt = waterMeterDt)
         Spacer(modifier = Modifier.weight(1f))
         PayRentButton(
             payRent = payRent,
@@ -179,11 +215,10 @@ fun PaymentInvoice(
     formattedPenaltyAccrued: String,
     formattedTotalPayable: String,
     paidAt: String,
+    waterUnits: Double?,
+    formattedTotalWaterPrice: String?,
     modifier: Modifier = Modifier
 ) {
-
-
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -231,7 +266,21 @@ fun PaymentInvoice(
                 )
                 Text(text = formattedMonthlyRent)
             }
+            if(waterUnits != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Water units: ",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(text = waterUnits.toString())
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(text = formattedTotalWaterPrice!!)
+                }
 
+            }
             Spacer(modifier = Modifier.height(10.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -362,6 +411,105 @@ fun PaymentInvoice(
 }
 
 @Composable
+fun WaterMeterImages(
+    waterMeterDt: WaterMeterDt,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+//            .weight(10f)
+            .horizontalScroll(rememberScrollState())
+    ) {
+        Column {
+            Text(
+                text = "Current meter reading:",
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            if(waterMeterDt.imageName != null) {
+                AsyncImage(
+                    model = ImageRequest.Builder(context = LocalContext.current)
+                        .data(waterMeterDt.imageName)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(id = R.drawable.loading_img),
+                    error = painterResource(id = R.drawable.ic_broken_image),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = "Current meter reading",
+                    modifier = Modifier
+                        .height(250.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                )
+            } else {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .alpha(0.5f)
+                        .height(250.dp)
+                        .width(250.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .padding(5.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Color.LightGray,
+                            shape = RoundedCornerShape(5.dp)
+                        )
+                ) {
+                    Text(text = "No image")
+                }
+            }
+
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Column {
+
+            Text(
+                text = "Previous meter reading:",
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            if(waterMeterDt.previousWaterMeterData?.imageName != null) {
+                AsyncImage(
+                    model = ImageRequest.Builder(context = LocalContext.current)
+                        .data(waterMeterDt.previousWaterMeterData.imageName)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(id = R.drawable.loading_img),
+                    error = painterResource(id = R.drawable.ic_broken_image),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = "Previous meter reading",
+                    modifier = Modifier
+                        .height(250.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                )
+            } else {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .alpha(0.5f)
+                        .height(250.dp)
+                        .width(250.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .padding(5.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Color.LightGray,
+                            shape = RoundedCornerShape(5.dp)
+                        )
+                ) {
+                    Text(text = "No image")
+                }
+            }
+        }
+
+
+    }
+}
+
+@Composable
 fun PayRentButton(
     payRent: () -> Unit,
     payRentStatus: PayRentStatus,
@@ -380,6 +528,16 @@ fun PayRentButton(
             Text(text = "Pay rent")
         }
 
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WaterMeterImagesPreview() {
+    Tenant_careTheme {
+        WaterMeterImages(
+            waterMeterDt = waterMeterData
+        )
     }
 }
 
@@ -409,6 +567,10 @@ fun PaymentScreenPreview() {
         nationalIdOrPassport = "234543234",
         phoneNumber = "0119987282",
         tenantAddedAt = "2023-09-23 10:32",
+        waterUnits = 2.0,
+        pricePerUnit = 200.0,
+        imageFile = "",
+        meterReadingDate = "2024-04-02T17:42:24.352844",
         tenantActive = true
     )
     Tenant_careTheme {
@@ -424,6 +586,9 @@ fun PaymentScreenPreview() {
             payRentStatus = PayRentStatus.INITIAL,
             navigateToPreviousScreen = {},
             paidAt = "2024-03-04",
+            waterUnits = 2.0,
+            formattedTotalWaterPrice = ReusableFunctions.formatMoneyValue(300.0),
+            waterMeterDt = waterMeterData,
             rentPaid = false
         )
     }

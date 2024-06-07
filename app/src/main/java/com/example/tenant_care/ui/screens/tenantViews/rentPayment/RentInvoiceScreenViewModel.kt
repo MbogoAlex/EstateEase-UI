@@ -1,16 +1,19 @@
 package com.example.tenant_care.ui.screens.tenantViews.rentPayment
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.network.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
+import com.example.tenant_care.model.caretaker.WaterMeterDt
 import com.example.tenant_care.model.tenant.RentPayment
 import com.example.tenant_care.model.tenant.RentPaymentRequestBody
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.ReusableFunctions.toUserDetails
+import com.example.tenant_care.util.waterMeterData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -53,13 +56,18 @@ val rentPaymentPlaceHolder = RentPayment(
     nationalIdOrPassport = "234543234",
     phoneNumber = "0119987282",
     tenantAddedAt = "2023-09-23 10:32",
-    tenantActive = true
+    tenantActive = true,
+    waterUnits = 2.0,
+    meterReadingDate = "2024-04-02T17:42:24.352844",
+    imageFile = "",
+    pricePerUnit = 150.0
 )
 
 data class RentInvoiceScreenUiState(
     val rentPayment: RentPayment = rentPaymentPlaceHolder,
     val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
     val paidAt: String = "",
+    val waterMeterDt: WaterMeterDt = waterMeterData,
     val payRentStatus: PayRentStatus = PayRentStatus.INITIAL,
     val fetchingInvoiceStatus: FetchingInvoiceStatus = FetchingInvoiceStatus.INITIAL
 )
@@ -83,6 +91,32 @@ class RentInvoiceScreenViewModel(
                         userDetails = dsUserDetails.toUserDetails()
                     )
                 }
+            }
+        }
+    }
+
+    fun getMeterReadings() {
+        viewModelScope.launch {
+            try {
+                val response = apiRepository.getMeterReadings(
+                    month = month!!,
+                    year = year!!,
+                    meterReadingTaken = true,
+                    tenantName = null,
+                    propertyName = uiState.value.userDetails.room
+                )
+                if (response.isSuccessful) {
+                    _uiState.update {
+                        it.copy(
+                            waterMeterDt = response.body()?.data?.waterMeter!![0]
+                        )
+                    }
+                    Log.i("METER_READING_FETCH", "SUCCESS")
+                } else {
+                    Log.e("METER_READING_FETCH_ERROR_RESPONSE", response.toString())
+                }
+            } catch (e: Exception) {
+                Log.e("METER_READING_FETCH_ERROR_EXCEPTION", e.toString())
             }
         }
     }
@@ -124,6 +158,7 @@ class RentInvoiceScreenViewModel(
                             )
                         }
                     }
+                    getMeterReadings()
 
                 } else {
                     _uiState.update {

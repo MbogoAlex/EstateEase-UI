@@ -63,3 +63,17 @@ data class CaretakerMeterReadingBottomBarMenuItem(
     val screen: CaretakerViewMeterReadingBottomBarScreen,
     val color: Color
 )
+
+enum class PManagerViewSideBarMenuScreen {
+    RENT_PAYMENTS_INFO,
+    UNITS_MANAGEMENT,
+    NOTIFICATIONS,
+    AMENITIES
+}
+
+data class PManagerViewSideBarMenuItem(
+    val title: String,
+    val icon: Int,
+    val screen: PManagerViewSideBarMenuScreen,
+    val color: Color
+)

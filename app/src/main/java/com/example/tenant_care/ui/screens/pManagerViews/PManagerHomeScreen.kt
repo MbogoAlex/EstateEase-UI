@@ -2,6 +2,7 @@ package com.example.tenant_care.ui.screens.pManagerViews
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,21 +17,34 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -43,8 +57,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
 import com.example.tenant_care.nav.AppNavigation
+import com.example.tenant_care.ui.screens.caretakerViews.sideBarMenuItems
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsInfoHomeScreenComposable
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnitsManagementComposable
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.PManagerViewSideBarMenuItem
+import com.example.tenant_care.util.PManagerViewSideBarMenuScreen
 import com.example.tenant_care.util.ReusableFunctions
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 object PManagerHomeScreenDestination: AppNavigation {
@@ -57,325 +77,221 @@ object PManagerHomeScreenDestination: AppNavigation {
 fun PManagerHomeComposable(
     navigateToUnitsManagementScreen: () -> Unit,
     navigateToRentPaymentsScreen: () -> Unit,
+    navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
+    navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
+    navigateToPreviousScreen: () -> Unit,
 ) {
     val viewModel: PManagerHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
 
+    val menuItems = listOf(
+        PManagerViewSideBarMenuItem(
+            title = "Rent Payments Info",
+            icon = R.drawable.paymets,
+            screen = PManagerViewSideBarMenuScreen.RENT_PAYMENTS_INFO,
+            color = Color.Gray
+        ),
+        PManagerViewSideBarMenuItem(
+            title = "Units Management",
+            icon = R.drawable.apartment,
+            screen = PManagerViewSideBarMenuScreen.UNITS_MANAGEMENT,
+            color = Color.Gray
+        ),
+        PManagerViewSideBarMenuItem(
+            title = "Notifications",
+            icon = R.drawable.message,
+            screen = PManagerViewSideBarMenuScreen.NOTIFICATIONS,
+            color = Color.Gray
+        ),
+        PManagerViewSideBarMenuItem(
+            title = "Amenities",
+            icon = R.drawable.amenity,
+            screen = PManagerViewSideBarMenuScreen.NOTIFICATIONS,
+            color = Color.Gray
+        ),
+    )
+
+    var currentScreen by rememberSaveable {
+        mutableStateOf(PManagerViewSideBarMenuScreen.RENT_PAYMENTS_INFO)
+    }
+
     Box {
         PManagerHomeScreen(
+            pManagerName = uiState.userDSDetails.fullName,
+            menuItems = menuItems,
+            currentScreen = currentScreen,
             uiState = uiState,
+            onChangeScreen = {
+                currentScreen = it
+            },
             navigateToUnitsManagementScreen = navigateToUnitsManagementScreen,
             navigateToRentPaymentsScreen = navigateToRentPaymentsScreen,
+            navigateToUnoccupiedUnitDetailsScreen = navigateToUnoccupiedUnitDetailsScreen,
+            navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen,
+            navigateToPreviousScreen = navigateToPreviousScreen
         )
     }
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PManagerHomeScreen(
+    pManagerName: String,
+    menuItems: List<PManagerViewSideBarMenuItem>,
+    currentScreen: PManagerViewSideBarMenuScreen,
     uiState: PManagerHomeScreenUiState,
+    onChangeScreen: (screen: PManagerViewSideBarMenuScreen) -> Unit,
     navigateToUnitsManagementScreen: () -> Unit,
     navigateToRentPaymentsScreen: () -> Unit,
+    navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
+    navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
+    navigateToPreviousScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    Scaffold(
-        topBar = {
-            PManagerHomeTopBar(
-                uiState = uiState
-            )
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(it)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(20.dp)
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxSize()
-            ) {
-                RentPaymentCard(
-                    uiState = uiState,
-                    navigateToRentPaymentsScreen = navigateToRentPaymentsScreen
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                PManagerUnitsHomeScreenBody(
-                    navigateToAddUnitScreen = navigateToUnitsManagementScreen
-                )
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = 8.dp,
+                                top = 16.dp
+                            )
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.pmanager_house_background),
+                            contentDescription = "Profile picture",
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(90.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "EstateEase",
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Divider()
+                    for(menuItem in menuItems) {
+                        NavigationDrawerItem(
+                            modifier = Modifier
+                                .padding(8.dp),
+                            label = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = menuItem.icon),
+                                        contentDescription = menuItem.title
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(text = menuItem.title)
+                                }
+                            },
+                            selected = currentScreen == menuItem.screen,
+                            onClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                    onChangeScreen(menuItem.screen)
+                                }
+                            }
+                        )
+                    }
+                }
             }
         }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun RentPaymentCard(
-    uiState: PManagerHomeScreenUiState,
-    navigateToRentPaymentsScreen: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth()
-        ) {
+        Column {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "${LocalDateTime.now().month}, ${LocalDateTime.now().year}",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                TextButton(onClick = { /*TODO*/ }) {
-                    Text(text = "Change month")
+                IconButton(onClick = {
+                    scope.launch {
+                        if(drawerState.isClosed) drawerState.open() else drawerState.close()
+                    }
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.menu),
+                        contentDescription = "Navigation menu"
+                    )
+
                 }
-            }
-            Row {
-                Text(text = "Occupied units: ${uiState.estateEaseRentOverview.totalUnits}")
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-            Row {
                 Text(
-                    text = "RENT:",
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "UNITS:",
+                    text = pManagerName,
                     fontWeight = FontWeight.Bold
                 )
             }
-
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = "Expected:",
-                fontWeight = FontWeight.Bold
-            )
-            Row(
-                modifier = Modifier
-                    .clickable {  }
-            ) {
-
-                Text(
-                    text = ReusableFunctions.formatMoneyValue(uiState.estateEaseRentOverview.totalExpectedRent),
-                    style = TextStyle(
-                        color = Color.Green
+            when(currentScreen) {
+                PManagerViewSideBarMenuScreen.RENT_PAYMENTS_INFO -> {
+                    RentPaymentsInfoHomeScreenComposable(
+                        navigateToRentPaymentsScreen = navigateToRentPaymentsScreen
                     )
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(text = "${uiState.estateEaseRentOverview.totalUnits} units")
-                Icon(
-                    painter = painterResource(id = R.drawable.navigate_next),
-                    contentDescription = null
-                )
-            }
-            Spacer(modifier = Modifier.height(5.dp))
-            Text(
-                text = "Paid:",
-                fontWeight = FontWeight.Bold
-            )
-            Row(
-                modifier = Modifier
-                    .clickable {  }
-            ) {
-                Text(
-                    text = ReusableFunctions.formatMoneyValue(uiState.estateEaseRentOverview.paidAmount),
-                    style = TextStyle(
-                        color = Color.Blue
+                }
+                PManagerViewSideBarMenuScreen.UNITS_MANAGEMENT -> {
+                    UnitsManagementComposable(
+                        navigateToPreviousScreen = navigateToPreviousScreen,
+                        navigateToUnoccupiedUnitDetailsScreen = navigateToUnoccupiedUnitDetailsScreen,
+                        navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen
                     )
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(text = "${uiState.estateEaseRentOverview.clearedUnits} units")
-                Icon(
-                    painter = painterResource(id = R.drawable.navigate_next),
-                    contentDescription = null
-                )
-            }
-            Spacer(modifier = Modifier.height(5.dp))
-            Text(
-                text = "Deficit:",
-                fontWeight = FontWeight.Bold
-            )
-            Row(
-                modifier = Modifier
-                    .clickable {  }
-            ) {
-                Text(
-                    text = ReusableFunctions.formatMoneyValue(uiState.estateEaseRentOverview.deficit),
-                    style = TextStyle(
-                        color = Color.Red
-                    )
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(text = "${uiState.estateEaseRentOverview.unclearedUnits} units")
-                Icon(
-                    painter = painterResource(id = R.drawable.navigate_next),
-                    contentDescription = null
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-            Button(
-                onClick = { navigateToRentPaymentsScreen() },
-                modifier = Modifier
-                    .widthIn(250.dp)
-                    .align(Alignment.CenterHorizontally)
-            ) {
-                Text(text = "More Details")
+                }
+                PManagerViewSideBarMenuScreen.NOTIFICATIONS -> {}
+                PManagerViewSideBarMenuScreen.AMENITIES -> {}
             }
         }
     }
 }
 
-@Composable
-fun PManagerUnitsHomeScreenBody(
-    navigateToAddUnitScreen: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column {
-        Row {
-            ElevatedCard(
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable { navigateToAddUnitScreen() }
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .size(150.dp)
-                ) {
-                    Text(
-                        text = "Units Management",
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(10.dp))
-            Card(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .size(150.dp)
-                ) {
-                    Text(
-                        text = "Tenants Management",
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        ElevatedCard(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(20.dp)
-            ) {
-                Text(
-                    text = "Units Info",
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    painter = painterResource(id = R.drawable.info),
-                    contentDescription = null
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(20.dp)
-            ) {
-                Text(
-                    text = "Notifications Management",
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    painter = painterResource(id = R.drawable.notifications),
-                    contentDescription = null
-                )
-            }
-        }
-    }
 
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun PManagerHomeTopBar(
-    uiState: PManagerHomeScreenUiState,
-    modifier: Modifier = Modifier
-) {
-    TopAppBar(
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(10.dp)
-            ) {
-                Text(
-                    text = "PropEase",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "PManager: ${uiState.userDSDetails.fullName}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                )
-            }
-        }
-    )
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun RentPaymentCardPreview() {
-    Tenant_careTheme {
-        RentPaymentCard(
-            uiState = PManagerHomeScreenUiState(),
-            navigateToRentPaymentsScreen = {}
-        )
-    }
-}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun PManagerHomeScreenPreview() {
+    val menuItems = listOf(
+        PManagerViewSideBarMenuItem(
+            title = "Rent Payments Info",
+            icon = R.drawable.paymets,
+            screen = PManagerViewSideBarMenuScreen.RENT_PAYMENTS_INFO,
+            color = Color.Gray
+        ),
+        PManagerViewSideBarMenuItem(
+            title = "Units Management",
+            icon = R.drawable.apartment,
+            screen = PManagerViewSideBarMenuScreen.UNITS_MANAGEMENT,
+            color = Color.Gray
+        ),
+        PManagerViewSideBarMenuItem(
+            title = "Notifications",
+            icon = R.drawable.message,
+            screen = PManagerViewSideBarMenuScreen.NOTIFICATIONS,
+            color = Color.Gray
+        ),
+        PManagerViewSideBarMenuItem(
+            title = "Amenities",
+            icon = R.drawable.amenity,
+            screen = PManagerViewSideBarMenuScreen.NOTIFICATIONS,
+            color = Color.Gray
+        ),
+    )
     Tenant_careTheme {
         PManagerHomeScreen(
+            pManagerName = "Alex M",
+            menuItems = menuItems,
+            currentScreen = PManagerViewSideBarMenuScreen.RENT_PAYMENTS_INFO,
+            onChangeScreen = {},
             navigateToUnitsManagementScreen = {},
             uiState = PManagerHomeScreenUiState(),
-            navigateToRentPaymentsScreen = {}
+            navigateToUnoccupiedUnitDetailsScreen = {},
+            navigateToRentPaymentsScreen = {},
+            navigateToOccupiedUnitDetailsScreen = {},
+            navigateToPreviousScreen = {}
         )
     }
 }

@@ -78,7 +78,7 @@ class PaymentHomeScreenViewModel(
                 if(response.isSuccessful) {
                     _uiState.update {
                         it.copy(
-                            rentPayments = response.body()?.data?.rentpayment!!,
+                            rentPayments = response.body()?.data?.rentpayment!!.reversed(),
                             roomName = response.body()?.data?.rentpayment!![0].propertyNumberOrName,
                             fetchingStatus = FetchingStatus.SUCCESS
                         )

@@ -83,7 +83,7 @@ val sideBarMenuItems = listOf<CaretakerSideBarMenuItem>(
 @Composable
 fun CaretakerHomeScreenComposable(
     navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
-    navigateToLoginScreenWithArgs: (phoneNumber: String, password: String) -> Unit,
+    navigateToLoginScreenWithArgs: (roleId: String, phoneNumber: String, password: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: CaretakerHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -108,7 +108,7 @@ fun CaretakerHomeScreenComposable(
         LogoutDialog(
             onLogout = {
                 scope.launch {
-                    navigateToLoginScreenWithArgs(uiState.phoneNumber, uiState.password)
+                    navigateToLoginScreenWithArgs(uiState.userDetails.roleId.toString(), uiState.phoneNumber, uiState.password)
                     viewModel.logout()
 //                    delay(2000L)
                 }

@@ -55,7 +55,7 @@ import com.example.tenant_care.util.ReusableFunctions
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UnoccupiedUnitsComposable(
-    navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
+    navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: UnoccupiedUnitsScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -78,7 +78,7 @@ fun UnoccupiedUnitsComposable(
             },
             properties = uiState.properties,
             numberOfUnits = uiState.properties.size,
-            navigateToUnoccupiedPropertyDetailsScreen = navigateToUnoccupiedPropertyDetailsScreen
+            navigateToUnoccupiedUnitDetailsScreen = navigateToUnoccupiedUnitDetailsScreen
         )
     }
 
@@ -95,7 +95,7 @@ fun UnoccupiedUnitsScreen(
     undoFilter: () -> Unit,
     properties: List<PropertyUnit>,
     numberOfUnits: Int,
-    navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
+    navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -131,7 +131,7 @@ fun UnoccupiedUnitsScreen(
                 UnoccupiedUnitItem(
                     propertyUnit = properties[it],
                     propertyIndex = it,
-                    navigateToUnoccupiedPropertyDetailsScreen = navigateToUnoccupiedPropertyDetailsScreen,
+                    navigateToUnoccupiedUnitDetailsScreen = navigateToUnoccupiedUnitDetailsScreen,
                     modifier = Modifier
                         .padding(
                             top = 10.dp
@@ -148,14 +148,14 @@ fun UnoccupiedUnitsScreen(
 fun UnoccupiedUnitItem(
     propertyUnit: PropertyUnit,
     propertyIndex: Int,
-    navigateToUnoccupiedPropertyDetailsScreen: (propertyId: String) -> Unit,
+    navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
-                navigateToUnoccupiedPropertyDetailsScreen(propertyUnit.propertyUnitId.toString())
+                navigateToUnoccupiedUnitDetailsScreen(propertyUnit.propertyUnitId.toString())
             }
     ) {
         Row(
@@ -399,7 +399,7 @@ fun UnOccupiedUnitsScreenPreview() {
             undoFilter = { /*TODO*/ },
             properties = mutableListOf(),
             numberOfUnits = 5,
-            navigateToUnoccupiedPropertyDetailsScreen = {}
+            navigateToUnoccupiedUnitDetailsScreen = {}
         )
     }
 }

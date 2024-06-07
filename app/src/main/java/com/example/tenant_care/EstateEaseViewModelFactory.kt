@@ -15,6 +15,7 @@ import com.example.tenant_care.ui.screens.caretakerViews.meterReading.UploadedSc
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerLoginScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.AllTenantsPaymentsScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsInfoHomeScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.SingleTenantPaymentDataScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.TenantsNotPaidScreenViewModel
@@ -313,6 +314,17 @@ object EstateEaseViewModelFactory {
             val apiRepository = estateEaseApplication().container.apiRepository
             val dsRepository = estateEaseApplication().dsRepository
             CaretakerHomeScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = this.createSavedStateHandle()
+            )
+        }
+
+        //initialize RentPaymentsInfoHomeScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            RentPaymentsInfoHomeScreenViewModel(
                 apiRepository = apiRepository,
                 dsRepository = dsRepository,
                 savedStateHandle = this.createSavedStateHandle()

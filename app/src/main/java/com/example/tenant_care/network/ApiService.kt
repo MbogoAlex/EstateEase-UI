@@ -1,5 +1,10 @@
 package com.example.tenant_care.network
 
+import com.example.tenant_care.model.amenity.AmenitiesResponseBody
+import com.example.tenant_care.model.amenity.AmenityDeletionResponseBody
+import com.example.tenant_care.model.amenity.AmenityImage
+import com.example.tenant_care.model.amenity.AmenityRequestBody
+import com.example.tenant_care.model.amenity.AmenityResponseBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginRequestBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginResponseBody
 import com.example.tenant_care.model.caretaker.MeterReadingRequestBody
@@ -28,6 +33,7 @@ import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -215,4 +221,28 @@ interface ApiService {
         @Part image: MultipartBody.Part
     ): Response<MeterReadingResponseBody>
 
+    // add amenity
+    @Multipart
+    @POST("amenity")
+    suspend fun addAmenity(
+        @Part("data") amenityRequestBody: AmenityRequestBody,
+        @Part images: List<MultipartBody.Part>
+    ): Response<AmenityResponseBody>
+
+    @Multipart
+    @PUT("amenity/{id}")
+    suspend fun updateAmenity(
+        @Part("data") amenityRequestBody: AmenityRequestBody,
+        @Part("oldimages") images: List<AmenityImage>,
+        @Part newImages: List<MultipartBody.Part>,
+        @Path("id") amenityId: Int,
+    ): Response<AmenityResponseBody>
+
+    @DELETE("amenity/{id}")
+    suspend fun deleteAmenity(
+        @Path("id") amenityId: Int
+    ): Response<AmenityDeletionResponseBody>
+
+    @GET("amenity")
+    suspend fun fetchAmenities(): Response<AmenitiesResponseBody>
 }

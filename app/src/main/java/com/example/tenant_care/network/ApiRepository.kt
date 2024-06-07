@@ -1,5 +1,10 @@
 package com.example.tenant_care.network
 
+import com.example.tenant_care.model.amenity.AmenitiesResponseBody
+import com.example.tenant_care.model.amenity.AmenityDeletionResponseBody
+import com.example.tenant_care.model.amenity.AmenityImage
+import com.example.tenant_care.model.amenity.AmenityRequestBody
+import com.example.tenant_care.model.amenity.AmenityResponseBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginRequestBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginResponseBody
 import com.example.tenant_care.model.caretaker.MeterReadingRequestBody
@@ -129,6 +134,24 @@ interface ApiRepository {
         meterReadingRequestBody: MeterReadingRequestBody,
         image: MultipartBody.Part
     ): Response<MeterReadingResponseBody>
+
+    suspend fun addAmenity(
+        amenityRequestBody: AmenityRequestBody,
+        images: List<MultipartBody.Part>
+    ): Response<AmenityResponseBody>
+
+    suspend fun updateAmenity(
+        amenityRequestBody: AmenityRequestBody,
+        images: List<AmenityImage>,
+        newImages: List<MultipartBody.Part>,
+        amenityId: Int
+    ): Response<AmenityResponseBody>
+
+    suspend fun deleteAmenity(
+        amenityId: Int
+    ): Response<AmenityDeletionResponseBody>
+
+    suspend fun fetchAmenities(): Response<AmenitiesResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -312,6 +335,32 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         meterReadingRequestBody = meterReadingRequestBody,
         image = image
     )
+
+    override suspend fun addAmenity(
+        amenityRequestBody: AmenityRequestBody,
+        images: List<MultipartBody.Part>
+    ): Response<AmenityResponseBody> = apiService.addAmenity(
+        amenityRequestBody = amenityRequestBody,
+        images = images
+    )
+
+    override suspend fun updateAmenity(
+        amenityRequestBody: AmenityRequestBody,
+        images: List<AmenityImage>,
+        newImages: List<MultipartBody.Part>,
+        amenityId: Int
+    ): Response<AmenityResponseBody> = apiService.updateAmenity(
+        amenityRequestBody = amenityRequestBody,
+        images = images,
+        newImages = newImages,
+        amenityId = amenityId
+    )
+
+    override suspend fun deleteAmenity(amenityId: Int): Response<AmenityDeletionResponseBody> = apiService.deleteAmenity(
+        amenityId = amenityId
+    )
+
+    override suspend fun fetchAmenities(): Response<AmenitiesResponseBody> = apiService.fetchAmenities()
 
 
 }

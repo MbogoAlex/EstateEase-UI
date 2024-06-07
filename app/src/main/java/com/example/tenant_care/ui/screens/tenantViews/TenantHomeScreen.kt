@@ -87,8 +87,7 @@ val sideBarMenuItems = listOf<TenantSideBarMenuItem>(
 fun TenantHomeScreenComposable(
     navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
     navigateToTenantReportScreen: () -> Unit,
-    navigateToLoginScreenWithArgs: (phoneNumber: String, password: String) -> Unit,
-    navigateToHomeScreen: () -> Unit,
+    navigateToLoginScreenWithArgs: (roleId: String, phoneNumber: String, password: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -103,13 +102,7 @@ fun TenantHomeScreenComposable(
         LogoutAlert(
             onDismiss = { logoutAlert = !logoutAlert },
             onLogout = {
-
-                navigateToHomeScreen()
-//                navigateToTenantLoginScreenWithArgs(
-//                    uiState.userDetails.room,
-//                    uiState.userDetails.phoneNumber,
-//                    uiState.userDetails.password
-//                )
+                navigateToLoginScreenWithArgs(uiState.userDetails.roleId.toString(), uiState.userDetails.phoneNumber, uiState.userDetails.password)
                 logoutAlert = !logoutAlert
                 viewModel.logout()
             }
@@ -134,7 +127,7 @@ fun TenantHomeScreen(
     navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
     navigateToTenantReportScreen: () -> Unit,
     sideBarMenuItems: List<TenantSideBarMenuItem>,
-    navigateToLoginScreenWithArgs: (phoneNumber: String, password: String) -> Unit,
+    navigateToLoginScreenWithArgs: (roleId: String, phoneNumber: String, password: String) -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -408,7 +401,7 @@ fun TenantHomeScreenPreview(
             navigateToRentInvoiceScreen = {tenantId, month, year ->  },
             navigateToTenantReportScreen = {},
             sideBarMenuItems = sideBarMenuItems,
-            navigateToLoginScreenWithArgs = {phoneNumber, password ->  },
+            navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->  },
             onLogout = {}
         )
     }

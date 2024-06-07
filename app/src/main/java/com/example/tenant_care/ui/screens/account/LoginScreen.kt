@@ -56,9 +56,10 @@ import com.example.tenant_care.util.LoadingStatus
 object LoginScreenDestination: AppNavigation {
     override val title: String = "Login screen"
     override val route: String = "login-screen"
+    val roleId: String = "roleId"
     val phoneNumber: String = "phoneNumber"
     val password: String = "password"
-    val routeWithArgs: String = "$route/{$phoneNumber}/{$password}"
+    val routeWithArgs: String = "$route/{$roleId}/{$phoneNumber}/{$password}"
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

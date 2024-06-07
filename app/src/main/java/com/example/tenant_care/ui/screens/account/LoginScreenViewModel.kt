@@ -35,6 +35,7 @@ class LoginScreenViewModel(
 
     val phoneNumber: String? = savedStateHandle[LoginScreenDestination.phoneNumber]
     val password: String? = savedStateHandle[LoginScreenDestination.password]
+    val roleId: String? = savedStateHandle[LoginScreenDestination.roleId]
 
     fun updateRole(role: String) {
         _uiState.update {
@@ -246,11 +247,12 @@ class LoginScreenViewModel(
         }
     }
     init {
-        if(phoneNumber != null && password != null) {
+        if(phoneNumber != null && password != null && roleId != null) {
             _uiState.update {
                 it.copy(
                     phoneNumber = phoneNumber,
-                    password = password
+                    password = password,
+                    role = if(roleId.toInt() == 1) "Property manager" else if(roleId.toInt() == 2) "Caretaker" else "Tenant"
                 )
             }
         }

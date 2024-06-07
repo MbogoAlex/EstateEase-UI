@@ -260,7 +260,11 @@ fun TransactionItemPreview() {
         nationalIdOrPassport = "234543234",
         phoneNumber = "0119987282",
         tenantAddedAt = "2023-09-23 10:32",
-        tenantActive = true
+        tenantActive = true,
+        waterUnits = 2.0,
+        meterReadingDate = "2024-04-02T17:42:24.352844",
+        imageFile = "",
+        pricePerUnit = 150.0
     )
     Tenant_careTheme {
         TransactionItem(
@@ -297,7 +301,11 @@ fun TenantReportScreenPreview() {
             nationalIdOrPassport = "234543234",
             phoneNumber = "0119987282",
             tenantAddedAt = "2023-09-23 10:32",
-            tenantActive = true
+            tenantActive = true,
+            waterUnits = 2.0,
+            meterReadingDate = "2024-04-02T17:42:24.352844",
+            imageFile = "",
+            pricePerUnit = 150.0
         ),
         RentPayment(
             rentPaymentTblId = 1,
@@ -321,7 +329,11 @@ fun TenantReportScreenPreview() {
             nationalIdOrPassport = "234543234",
             phoneNumber = "0119987282",
             tenantAddedAt = "2023-09-23 10:32",
-            tenantActive = true
+            tenantActive = true,
+            waterUnits = 2.0,
+            meterReadingDate = "2024-04-02T17:42:24.352844",
+            imageFile = "",
+            pricePerUnit = 150.0
         ),
         RentPayment(
             rentPaymentTblId = 1,
@@ -345,7 +357,11 @@ fun TenantReportScreenPreview() {
             nationalIdOrPassport = "234543234",
             phoneNumber = "0119987282",
             tenantAddedAt = "2023-09-23 10:32",
-            tenantActive = true
+            tenantActive = true,
+            waterUnits = 2.0,
+            meterReadingDate = "2024-04-02T17:42:24.352844",
+            imageFile = "",
+            pricePerUnit = 150.0
         )
     )
     Tenant_careTheme {
