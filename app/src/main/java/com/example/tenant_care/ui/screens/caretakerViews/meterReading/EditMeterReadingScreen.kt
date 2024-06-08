@@ -244,7 +244,7 @@ fun EditMeterReadingScreen(
                 text = "ROOM: ",
                 fontWeight = FontWeight.Bold
             )
-            Text(text = waterMeterDt.propertyName)
+            Text(text = waterMeterDt.propertyName!!)
         }
         Spacer(modifier = Modifier.height(10.dp))
         Row(
@@ -254,7 +254,7 @@ fun EditMeterReadingScreen(
                 text = "Tenant: ",
                 fontWeight = FontWeight.Bold
             )
-            Text(text = waterMeterDt.tenantName)
+            Text(text = waterMeterDt.tenantName!!)
         }
         Column(
             modifier = Modifier

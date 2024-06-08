@@ -58,6 +58,7 @@ import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.screens.caretakerViews.sideBarMenuItems
+import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityScreenComposable
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsInfoHomeScreenComposable
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnitsManagementComposable
 import com.example.tenant_care.ui.theme.Tenant_careTheme
@@ -70,7 +71,8 @@ import java.time.LocalDateTime
 object PManagerHomeScreenDestination: AppNavigation {
     override val title: String = "PManager Home Screen"
     override val route: String = "pmanager-home-screen"
-
+    val childScreen: String = "childScreen"
+    val routeWithArgs: String = "$route/{$childScreen}"
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -80,6 +82,9 @@ fun PManagerHomeComposable(
     navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToPreviousScreen: () -> Unit,
+    navigateToAmenityDetailsScreen: (amenityId: String) -> Unit,
+    navigateToEditAmenityScreen: () -> Unit,
+    navigateToPmanagerHomeScreenWithArgs: (childScreen: String) -> Unit,
 ) {
     val viewModel: PManagerHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
@@ -106,13 +111,21 @@ fun PManagerHomeComposable(
         PManagerViewSideBarMenuItem(
             title = "Amenities",
             icon = R.drawable.amenity,
-            screen = PManagerViewSideBarMenuScreen.NOTIFICATIONS,
+            screen = PManagerViewSideBarMenuScreen.AMENITIES,
             color = Color.Gray
         ),
     )
 
     var currentScreen by rememberSaveable {
         mutableStateOf(PManagerViewSideBarMenuScreen.RENT_PAYMENTS_INFO)
+    }
+
+    if(uiState.childScreen == "amenities-screen") {
+        currentScreen = PManagerViewSideBarMenuScreen.AMENITIES
+        viewModel.resetChildScreen()
+    } else if(uiState.childScreen == "units-management-screen") {
+        currentScreen = PManagerViewSideBarMenuScreen.UNITS_MANAGEMENT
+        viewModel.resetChildScreen()
     }
 
     Box {
@@ -128,7 +141,10 @@ fun PManagerHomeComposable(
             navigateToRentPaymentsScreen = navigateToRentPaymentsScreen,
             navigateToUnoccupiedUnitDetailsScreen = navigateToUnoccupiedUnitDetailsScreen,
             navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen,
-            navigateToPreviousScreen = navigateToPreviousScreen
+            navigateToPreviousScreen = navigateToPreviousScreen,
+            navigateToAmenityDetailsScreen = navigateToAmenityDetailsScreen,
+            navigateToEditAmenityScreen = navigateToEditAmenityScreen,
+            navigateToPmanagerHomeScreenWithArgs = navigateToPmanagerHomeScreenWithArgs
         )
     }
 }
@@ -145,6 +161,9 @@ fun PManagerHomeScreen(
     navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToPreviousScreen: () -> Unit,
+    navigateToAmenityDetailsScreen: (amenityId: String) -> Unit,
+    navigateToEditAmenityScreen: () -> Unit,
+    navigateToPmanagerHomeScreenWithArgs: (childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -238,11 +257,25 @@ fun PManagerHomeScreen(
                     UnitsManagementComposable(
                         navigateToPreviousScreen = navigateToPreviousScreen,
                         navigateToUnoccupiedUnitDetailsScreen = navigateToUnoccupiedUnitDetailsScreen,
-                        navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen
+                        navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen,
+                        navigateToPmanagerHomeScreenWithArgs = navigateToPmanagerHomeScreenWithArgs
                     )
                 }
-                PManagerViewSideBarMenuScreen.NOTIFICATIONS -> {}
-                PManagerViewSideBarMenuScreen.AMENITIES -> {}
+                PManagerViewSideBarMenuScreen.NOTIFICATIONS -> {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        Text(text = "Hello")
+                    }
+                }
+                PManagerViewSideBarMenuScreen.AMENITIES -> {
+                    AmenityScreenComposable(
+                        navigateToAmenityDetailsScreen = navigateToAmenityDetailsScreen,
+                        navigateToEditAmenityScreen = navigateToEditAmenityScreen
+                    )
+                }
             }
         }
     }
@@ -291,7 +324,10 @@ fun PManagerHomeScreenPreview() {
             navigateToUnoccupiedUnitDetailsScreen = {},
             navigateToRentPaymentsScreen = {},
             navigateToOccupiedUnitDetailsScreen = {},
-            navigateToPreviousScreen = {}
+            navigateToPreviousScreen = {},
+            navigateToAmenityDetailsScreen = {},
+            navigateToEditAmenityScreen = {},
+            navigateToPmanagerHomeScreenWithArgs = {}
         )
     }
 }

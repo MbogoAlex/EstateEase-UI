@@ -16,6 +16,13 @@ enum class LoadingStatus {
     FAILURE
 }
 
+enum class ExecutionStatus {
+    INITIAL,
+    LOADING,
+    SUCCESS,
+    FAILURE
+}
+
 enum class TenantViewSidebarMenuScreen {
     HOME_SCREEN,
     LOGIN_SCREEN

@@ -27,7 +27,8 @@ data class EstateEaseRentOverview(
 
 data class RentPaymentsInfoHomeScreenUiState(
     val estateEaseRentOverview: EstateEaseRentOverview = EstateEaseRentOverview(),
-    val userDSDetails: UserDSDetails = UserDSDetails(0, 0, "", "", "", "", "", "")
+    val userDSDetails: UserDSDetails = UserDSDetails(0, 0, "", "", "", "", "", ""),
+    val penaltyStatus: Boolean = false
 )
 @RequiresApi(Build.VERSION_CODES.O)
 class RentPaymentsInfoHomeScreenViewModel(
@@ -50,6 +51,7 @@ class RentPaymentsInfoHomeScreenViewModel(
                 }
             }
         }
+        fetchPenalty()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -75,6 +77,49 @@ class RentPaymentsInfoHomeScreenViewModel(
                         )
                     }
                 }
+            } catch (e: Exception) {
+
+            }
+        }
+    }
+
+    fun fetchPenalty() {
+        viewModelScope.launch {
+            try {
+               val response = apiRepository.fetchPenalty(2)
+               if(response.isSuccessful) {
+                   _uiState.update {
+                       it.copy(
+                           penaltyStatus = response.body()?.data?.penalty?.status!!
+                       )
+                   }
+               }
+            } catch (e: Exception) {
+
+            }
+        }
+    }
+
+    fun activateLatePaymentPenalty() {
+        viewModelScope.launch {
+            try {
+                val response = apiRepository.activateLatePaymentPenalty(
+                    month = LocalDateTime.now().month.toString(),
+                    year = LocalDateTime.now().year.toString()
+                )
+            } catch (e: Exception) {
+
+            }
+        }
+    }
+
+    fun deActivateLatePaymentPenalty() {
+        viewModelScope.launch {
+            try {
+                val response = apiRepository.deActivateLatePaymentPenalty(
+                    month = LocalDateTime.now().month.toString(),
+                    year = LocalDateTime.now().year.toString()
+                )
             } catch (e: Exception) {
 
             }

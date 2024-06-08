@@ -1,5 +1,6 @@
 package com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.network.ApiRepository
@@ -76,6 +77,7 @@ class OccupiedUnitsScreenViewModel(
                             fetchingOccupiedUnitsStatus = FetchingOccupiedUnitsStatus.FAIL
                         )
                     }
+                    Log.e("FETCH_UNITS_ERROR_RESPONSE", response.toString())
                 }
             } catch (e: Exception) {
                 _uiState.update {
@@ -83,6 +85,7 @@ class OccupiedUnitsScreenViewModel(
                         fetchingOccupiedUnitsStatus = FetchingOccupiedUnitsStatus.FAIL
                     )
                 }
+                Log.e("FETCH_UNITS_ERROR_EXCEPTION", e.toString())
             }
         }
     }

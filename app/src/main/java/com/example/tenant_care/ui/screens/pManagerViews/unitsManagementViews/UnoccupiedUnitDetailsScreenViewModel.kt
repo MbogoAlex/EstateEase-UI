@@ -26,7 +26,8 @@ val propertyUnitData = PropertyUnit(
     propertyAddedAt = "",
     propertyAssignmentStatus = false,
     activeTenant = null,
-    tenants = emptyList()
+    tenants = emptyList(),
+    meterReadings = emptyList()
 )
 
 enum class AssignmentStatus {

@@ -23,12 +23,18 @@ import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeComposable
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeScreenDestination
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerLoginScreen
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerLoginScreenDestination
+import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityDetailsScreenComposable
+import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityDetailsScreenDestination
+import com.example.tenant_care.ui.screens.generalViews.amenity.EditAmenityComposable
+import com.example.tenant_care.ui.screens.generalViews.amenity.EditAmenityScreenDestination
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsComposable
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsComposableDestination
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.SingleTenantPaymentDetailsComposable
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.SingleTenantPaymentDetailsComposableDestination
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.OccupiedUnitDetailsComposable
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.OccupiedUnitDetailsComposableDestination
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.PManagerAddUnitComposable
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.PManagerAddUnitScreenDestination
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnOccupiedUnitDetailsComposableDestination
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnitsManagementComposable
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnitsManagementComposableDestination
@@ -129,6 +135,15 @@ fun NavigationGraph(
                 },
                 navigateToPreviousScreen = {
                     navController.navigateUp()
+                },
+                navigateToAmenityDetailsScreen = {
+                    navController.navigate("${AmenityDetailsScreenDestination.route}/${it}")
+                },
+                navigateToEditAmenityScreen = {
+                    navController.navigate(EditAmenityScreenDestination.route)
+                },
+                navigateToPmanagerHomeScreenWithArgs = {
+                    navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
                 }
             )
         }
@@ -142,6 +157,9 @@ fun NavigationGraph(
                 },
                 navigateToOccupiedUnitDetailsScreen = {
                     navController.navigate("${OccupiedUnitDetailsComposableDestination.route}/${it}")
+                },
+                navigateToPmanagerHomeScreenWithArgs = {
+                    navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
                 }
             )
         }
@@ -159,6 +177,9 @@ fun NavigationGraph(
                 },
                 navigateToOccupiedUnitsScreen = {
                     navController.navigate(UnitsManagementComposableDestination.route)
+                },
+                navigateToEditUnitScreen = {
+                    navController.navigate("${PManagerAddUnitScreenDestination.route}/${it}")
                 }
             )
         }
@@ -177,6 +198,9 @@ fun NavigationGraph(
                 navigateToUnoccupiedUnits = {
                     navController.popBackStack(OccupiedUnitDetailsComposableDestination.routeWithArgs, true)
                     navController.navigate("${UnitsManagementComposableDestination.route}/${it}")
+                },
+                navigateToEditUnitScreen = {
+                    navController.navigate("${PManagerAddUnitScreenDestination.route}/${it}")
                 }
             )
         }
@@ -197,6 +221,9 @@ fun NavigationGraph(
                 },
                 navigateToOccupiedUnitDetailsScreen = {
                     navController.navigate("${OccupiedUnitDetailsComposableDestination.route}/${it}")
+                },
+                navigateToPmanagerHomeScreenWithArgs = {
+                    navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
                 }
             )
         }
@@ -366,6 +393,105 @@ fun NavigationGraph(
                 navigateToTenantHomeScreen = {
                     navController.popBackStack(LoginScreenDestination.route, true)
                     navController.navigate(TenantHomeScreenDestination.route)
+                }
+            )
+        }
+        composable(
+            AmenityDetailsScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(AmenityDetailsScreenDestination.amenityId) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            AmenityDetailsScreenComposable(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                },
+                navigateToEditAmenityScreenWithArgs = {
+                    navController.navigate("${EditAmenityScreenDestination.route}/${it}")
+                },
+                navigateToPManagerHomeScreenWithArgs = {
+                    navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
+                }
+            )
+        }
+        composable(EditAmenityScreenDestination.route) {
+            EditAmenityComposable(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                },
+                navigateToPManagerHomeScreenWithArgs = {
+                    navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
+                }
+            )
+        }
+        composable(
+            EditAmenityScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(EditAmenityScreenDestination.amenityId) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            EditAmenityComposable(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                },
+                navigateToPManagerHomeScreenWithArgs = {
+                    navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
+                }
+            )
+        }
+        composable(
+            PManagerHomeScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(PManagerHomeScreenDestination.childScreen) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            PManagerHomeComposable(
+                navigateToUnitsManagementScreen = {
+                    navController.navigate(UnitsManagementComposableDestination.route)
+                },
+                navigateToRentPaymentsScreen = {
+                    navController.navigate(RentPaymentsComposableDestination.route)
+                },
+                navigateToUnoccupiedUnitDetailsScreen = {
+                    navController.navigate("${UnOccupiedUnitDetailsComposableDestination.route}/${it}")
+                },
+                navigateToOccupiedUnitDetailsScreen = {
+                    navController.navigate("${OccupiedUnitDetailsComposableDestination.route}/${it}")
+                },
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                },
+                navigateToAmenityDetailsScreen = {
+                    navController.navigate("${AmenityDetailsScreenDestination.route}/${it}")
+                },
+                navigateToEditAmenityScreen = {
+                    navController.navigate(EditAmenityScreenDestination.route)
+                },
+                navigateToPmanagerHomeScreenWithArgs = {
+                    navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
+                }
+            )
+        }
+        composable(
+            PManagerAddUnitScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(PManagerAddUnitScreenDestination.unitId) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            PManagerAddUnitComposable(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                },
+                navigateToPmanagerHomeScreenWithArgs = {
+                    navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
                 }
             )
         }

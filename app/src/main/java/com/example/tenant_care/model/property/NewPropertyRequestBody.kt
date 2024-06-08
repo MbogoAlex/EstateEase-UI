@@ -3,7 +3,7 @@ package com.example.tenant_care.model.property
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NewPropertyRequestBody(
+data class PropertyRequestBody(
     val numberOfRooms: Int,
     val propertyNumberOrName: String,
     val propertyDescription: String,
@@ -11,13 +11,13 @@ data class NewPropertyRequestBody(
     val propertyManagerId: Int
 )
 @Serializable
-data class NewPropertyResponseBody(
+data class PropertyResponseBody(
     val statusCode: Int,
     val message: String,
-    val data: NewPropertyRequestBodyData
+    val data: PropertyRequestBodyData
 )
 @Serializable
-data class NewPropertyRequestBodyData(
+data class PropertyRequestBodyData(
     val property: NewProperty
 )
 @Serializable

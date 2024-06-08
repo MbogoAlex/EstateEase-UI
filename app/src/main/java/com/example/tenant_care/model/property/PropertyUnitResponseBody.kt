@@ -1,5 +1,6 @@
 package com.example.tenant_care.model.property
 
+import com.example.tenant_care.model.caretaker.WaterMeterDt
 import kotlinx.serialization.Serializable
 
 // multiple properties
@@ -23,7 +24,8 @@ data class PropertyUnit (
     val propertyAddedAt: String,
     val propertyAssignmentStatus: Boolean,
     val activeTenant: PropertyTenant?,
-    val tenants: List<PropertyTenant>
+    val tenants: List<PropertyTenant>,
+    val meterReadings: List<WaterMeterDt>
 )
 @Serializable
 data class PropertyTenant (

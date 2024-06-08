@@ -56,6 +56,7 @@ fun UnitsManagementComposable(
     navigateToPreviousScreen: () -> Unit,
     navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
+    navigateToPmanagerHomeScreenWithArgs: (childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: UnitsManagementScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -96,7 +97,8 @@ fun UnitsManagementComposable(
         navigateToOccupiedUnitDetailsScreen = navigateToOccupiedUnitDetailsScreen,
         onChangeTab = {
             viewModel.changeScreen(it)
-        }
+        },
+        navigateToPmanagerHomeScreenWithArgs = navigateToPmanagerHomeScreenWithArgs
     )
 }
 
@@ -108,6 +110,7 @@ fun UnitsManagementScreen(
     onChangeTab: (newScreen: Screen) -> Unit,
     navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
+    navigateToPmanagerHomeScreenWithArgs: (childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -132,6 +135,7 @@ fun UnitsManagementScreen(
             Screen.ADD_UNIT -> {
                 PManagerAddUnitComposable(
                     navigateToPreviousScreen = { /*TODO*/ },
+                    navigateToPmanagerHomeScreenWithArgs = navigateToPmanagerHomeScreenWithArgs,
                     modifier = Modifier
                         .weight(1f)
                 )
@@ -182,10 +186,13 @@ fun BottomNavigationBar(
 @Composable
 fun UnitsManagementComposablePreview() {
     Tenant_careTheme {
-        UnitsManagementComposable(
-            navigateToPreviousScreen = {},
+        UnitsManagementScreen(
+            currentScreen = Screen.OCCUPIED_UNITS,
+            navigationItems = emptyList(),
+            onChangeTab = {},
             navigateToUnoccupiedUnitDetailsScreen = {},
             navigateToOccupiedUnitDetailsScreen = {},
+            navigateToPmanagerHomeScreenWithArgs = {}
         )
     }
 }

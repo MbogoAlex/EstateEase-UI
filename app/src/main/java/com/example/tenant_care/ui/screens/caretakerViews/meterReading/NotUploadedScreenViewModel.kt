@@ -98,7 +98,7 @@ class NotUploadedScreenViewModel(
                 if(response.isSuccessful) {
                     val rooms = mutableListOf<String>()
                     for(reading in response.body()?.data?.waterMeter!!) {
-                        rooms.add(reading.propertyName)
+                        rooms.add(reading.propertyName!!)
                     }
                     _uiState.update {
                         it.copy(

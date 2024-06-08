@@ -23,6 +23,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -57,6 +58,7 @@ fun RentPaymentsInfoHomeScreenComposable(
 
     Box {
         RentPaymentsInfoHomeScreen(
+            penaltyActive = uiState.penaltyStatus,
             pManagerName = uiState.userDSDetails.fullName,
             totalUnits = uiState.estateEaseRentOverview.totalUnits,
             expectedRent = uiState.estateEaseRentOverview.totalExpectedRent,
@@ -64,6 +66,7 @@ fun RentPaymentsInfoHomeScreenComposable(
             clearedUnits = uiState.estateEaseRentOverview.clearedUnits,
             deficit = uiState.estateEaseRentOverview.deficit,
             unclearedUnits = uiState.estateEaseRentOverview.unclearedUnits,
+            onPenaltyStatusChanged = {},
             navigateToRentPaymentsScreen = navigateToRentPaymentsScreen,
             navigateToAddUnitScreen = {}
         )
@@ -72,6 +75,7 @@ fun RentPaymentsInfoHomeScreenComposable(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RentPaymentsInfoHomeScreen(
+    penaltyActive: Boolean,
     pManagerName: String,
     totalUnits: Int,
     expectedRent: Double,
@@ -79,6 +83,7 @@ fun RentPaymentsInfoHomeScreen(
     clearedUnits: Int,
     deficit: Double,
     unclearedUnits: Int,
+    onPenaltyStatusChanged: (status: Boolean) -> Unit,
     navigateToRentPaymentsScreen: () -> Unit,
     navigateToAddUnitScreen: () -> Unit,
     modifier: Modifier = Modifier
@@ -99,9 +104,11 @@ fun RentPaymentsInfoHomeScreen(
             unclearedUnits = unclearedUnits,
             navigateToRentPaymentsScreen = navigateToRentPaymentsScreen)
         Spacer(modifier = Modifier.height(20.dp))
-        PManagerUnitsHomeScreenBody(
-            navigateToAddUnitScreen = navigateToAddUnitScreen
+        AdditionalPayments(
+            penaltyActive = penaltyActive,
+            onPenaltyStatusChanged = {}
         )
+
     }
 }
 
@@ -235,139 +242,44 @@ fun RentPaymentCard(
 }
 
 @Composable
-fun PManagerUnitsHomeScreenBody(
-    navigateToAddUnitScreen: () -> Unit,
+fun AdditionalPayments(
+    penaltyActive: Boolean,
+    onPenaltyStatusChanged: (status: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column {
-        Row {
-            ElevatedCard(
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable { navigateToAddUnitScreen() }
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .size(150.dp)
-                ) {
-                    Text(
-                        text = "Units Management",
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(10.dp))
-            Card(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .size(150.dp)
-                ) {
-                    Text(
-                        text = "Tenants Management",
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        ElevatedCard(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(20.dp)
-            ) {
-                Text(
-                    text = "Units Info",
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    painter = painterResource(id = R.drawable.info),
-                    contentDescription = null
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(20.dp))
         Card(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(20.dp)
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Notifications Management",
-                    fontWeight = FontWeight.Bold,
-                )
+                Text(text = "Penalty")
                 Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    painter = painterResource(id = R.drawable.notifications),
-                    contentDescription = null
-                )
+                Switch(checked = penaltyActive, onCheckedChange = onPenaltyStatusChanged)
             }
         }
     }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun PManagerHomeTopBar(
-    pManagerName: String,
-    modifier: Modifier = Modifier
-) {
-    TopAppBar(
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(10.dp)
-            ) {
-                Text(
-                    text = "PropEase",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "PManager: $pManagerName",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                )
-            }
-        }
-    )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
-fun RentPaymentCardPreview() {
+fun RentPaymentsInfoHomeScreenPreview() {
     Tenant_careTheme {
-        RentPaymentCard(
+        RentPaymentsInfoHomeScreen(
+            penaltyActive = true,
+            pManagerName = "Alex Mbogo",
             totalUnits = 10,
             expectedRent = 10000.0,
             paidAmount = 5000.0,
             clearedUnits = 5,
             deficit = 5000.0,
             unclearedUnits = 5,
-            navigateToRentPaymentsScreen = { /*TODO*/ })
+            onPenaltyStatusChanged = {},
+            navigateToRentPaymentsScreen = { /*TODO*/ },
+            navigateToAddUnitScreen = { /*TODO*/ }
+        )
     }
 }

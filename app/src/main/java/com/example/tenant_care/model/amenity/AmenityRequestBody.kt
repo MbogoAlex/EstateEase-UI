@@ -49,13 +49,13 @@ data class AmenitiesResponseBody(
 data class AmenitiesData(
     val amenities: List<Amenity>
 )
-
+@Serializable
 data class AmenityDeletionResponseBody(
     val statusCode: Int,
     val message: String,
     val data: DeletionData
 )
-
+@Serializable
 data class DeletionData(
     val amenity: String
 )

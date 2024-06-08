@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,14 +29,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,9 +50,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenant_care.EstateEaseViewModelFactory
+import com.example.tenant_care.R
 import com.example.tenant_care.model.property.PropertyUnit
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.EditAlertDialog
 import com.example.tenant_care.util.ReusableFunctions
 
 object UnOccupiedUnitDetailsComposableDestination: AppNavigation {
@@ -62,17 +70,38 @@ object UnOccupiedUnitDetailsComposableDestination: AppNavigation {
 fun UnoccupiedUnitDetailsComposable(
     navigateToPreviousScreen: () -> Unit,
     navigateToOccupiedUnitsScreen: () -> Unit,
+    navigateToEditUnitScreen: (unitId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 //    BackHandler(onBack = navigateToPreviousScreen)
     val context = LocalContext.current
     val viewModel: UnoccupiedUnitDetailsScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
+
+    var showAssignmentDialog by remember {
+        mutableStateOf(false)
+    }
+
     if(uiState.assignmentStatus == AssignmentStatus.SUCCESS) {
         Toast.makeText(context, "Unit assigned to tenant successfully", Toast.LENGTH_SHORT).show()
         navigateToOccupiedUnitsScreen()
         viewModel.resetAssignmentStatus()
+    } else if(uiState.assignmentStatus == AssignmentStatus.FAIL) {
+//        Toast.makeText(context, "Failed to assign unit. Check connection", Toast.LENGTH_SHORT).show()
+        viewModel.resetAssignmentStatus()
     }
+
+    if(showAssignmentDialog) {
+        EditAlertDialog(
+            title = "Archive unit",
+            onConfirm = {
+                showAssignmentDialog = !showAssignmentDialog
+                viewModel.assignUnitToTenant()
+            },
+            onDismissRequest = { showAssignmentDialog = !showAssignmentDialog }
+        )
+    }
+
     Box {
         if(uiState.showUnitAssignmentScreen) {
             UnitAssignmentScreen(
@@ -105,7 +134,7 @@ fun UnoccupiedUnitDetailsComposable(
                     viewModel.toggleScreen()
                 },
                 confirmUnitAssignment = {
-                    viewModel.assignUnitToTenant()
+                    showAssignmentDialog = !showAssignmentDialog
                 }
             )
         } else {
@@ -115,7 +144,8 @@ fun UnoccupiedUnitDetailsComposable(
                 navigateToPreviousScreen = navigateToPreviousScreen,
                 navigateToAssignmentScreen = {
                     viewModel.toggleScreen()
-                }
+                },
+                navigateToEditUnitScreen = navigateToEditUnitScreen
             )
         }
 
@@ -128,6 +158,7 @@ fun UnOccupiedUnitDetailsScreen(
     propertyAddedAt: String,
     navigateToPreviousScreen: () -> Unit,
     navigateToAssignmentScreen: () -> Unit,
+    navigateToEditUnitScreen: (unitId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -135,12 +166,27 @@ fun UnOccupiedUnitDetailsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Row {
-            IconButton(onClick = navigateToPreviousScreen) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { navigateToPreviousScreen() }) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Previous screen"
                 )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            TextButton(onClick = { navigateToEditUnitScreen(propertyUnit.propertyUnitId.toString()) }) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Edit")
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.edit),
+                        contentDescription = "Edit unit"
+                    )
+                }
             }
         }
         Card(

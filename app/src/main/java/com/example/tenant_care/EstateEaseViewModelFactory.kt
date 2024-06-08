@@ -14,6 +14,9 @@ import com.example.tenant_care.ui.screens.caretakerViews.meterReading.NotUploade
 import com.example.tenant_care.ui.screens.caretakerViews.meterReading.UploadedScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerHomeScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.PManagerLoginScreenViewModel
+import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityDetailsScreenViewModel
+import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityScreenViewModel
+import com.example.tenant_care.ui.screens.generalViews.amenity.EditAmenityScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.AllTenantsPaymentsScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsInfoHomeScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsScreenViewModel
@@ -22,6 +25,7 @@ import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.TenantsNotPa
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.TenantsPaidScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.OccupiedUnitDetailsScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.OccupiedUnitsScreenViewModel
+import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.PManagerAddUnitScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnitsManagementScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnoccupiedUnitDetailsScreenViewModel
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnoccupiedUnitsScreenViewModel
@@ -63,7 +67,8 @@ object EstateEaseViewModelFactory {
             val apiRepository = estateEaseApplication().container.apiRepository
             PManagerHomeScreenViewModel(
                 dsRepository = dsRepository,
-                apiRepository = apiRepository
+                apiRepository = apiRepository,
+                savedStateHandle = this.createSavedStateHandle()
             )
         }
 
@@ -72,9 +77,10 @@ object EstateEaseViewModelFactory {
         initializer {
             val apiRepository = estateEaseApplication().container.apiRepository
             val dsRepository = estateEaseApplication().dsRepository
-            com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenViewModel(
+            PManagerAddUnitScreenViewModel(
                 apiRepository = apiRepository,
-                dsRepository = dsRepository
+                dsRepository = dsRepository,
+                savedStateHandle = this.createSavedStateHandle()
             )
         }
 
@@ -325,6 +331,38 @@ object EstateEaseViewModelFactory {
             val apiRepository = estateEaseApplication().container.apiRepository
             val dsRepository = estateEaseApplication().dsRepository
             RentPaymentsInfoHomeScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = this.createSavedStateHandle()
+            )
+        }
+
+        //initialize AmenityDetailsScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            AmenityDetailsScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+                savedStateHandle = this.createSavedStateHandle()
+            )
+        }
+
+        //initialize AmenityScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            AmenityScreenViewModel(
+                apiRepository = apiRepository,
+                dsRepository = dsRepository,
+            )
+        }
+
+        //initialize EditAmenityScreenViewModel
+        initializer {
+            val apiRepository = estateEaseApplication().container.apiRepository
+            val dsRepository = estateEaseApplication().dsRepository
+            EditAmenityScreenViewModel(
                 apiRepository = apiRepository,
                 dsRepository = dsRepository,
                 savedStateHandle = this.createSavedStateHandle()

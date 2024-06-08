@@ -1,6 +1,8 @@
 package com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews
 
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -32,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,71 +51,139 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.nav.AppNavigation
-import com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenUiState
-import com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenViewModel
-import com.example.tenant_care.ui.screens.pManagerViews.UploadingStatus
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.EditAlertDialog
 
 object PManagerAddUnitScreenDestination: AppNavigation {
     override val title: String = "Add Unit Screen"
     override val route: String = "add-unit-screen"
+    val unitId: String = "unitId"
+    val routeWithArgs: String = "$route/{$unitId}"
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PManagerAddUnitComposable(
     navigateToPreviousScreen: () -> Unit,
+    navigateToPmanagerHomeScreenWithArgs: (childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val viewModel: com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
+    val viewModel: PManagerAddUnitScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
 
-    if(uiState.uploadingStatus == com.example.tenant_care.ui.screens.pManagerViews.UploadingStatus.SUCCESS) {
-        Toast.makeText(context, uiState.uploadingResponseMessage, Toast.LENGTH_SHORT).show()
+    viewModel.checkIfAllFieldsAreFilled()
+
+    var showEditDialog by remember {
+        mutableStateOf(false)
     }
+
+    if(uiState.uploadingStatus == UploadingStatus.SUCCESS) {
+        Toast.makeText(context, uiState.uploadingResponseMessage, Toast.LENGTH_SHORT).show()
+        navigateToPmanagerHomeScreenWithArgs("units-management-screen")
+        viewModel.resetUploadingStatus()
+    }
+
+    if(showEditDialog) {
+        if(uiState.propertyId == null) {
+            EditAlertDialog(
+                title = "Add unit",
+                onConfirm = {
+                    showEditDialog = !showEditDialog
+                    viewModel.uploadNewUnit() },
+                onDismissRequest = {
+                    showEditDialog = !showEditDialog
+                }
+            )
+        } else {
+            EditAlertDialog(
+                title = "Save edit",
+                onConfirm = {
+                    showEditDialog = !showEditDialog
+                    viewModel.updateUnit()
+                },
+                onDismissRequest = { showEditDialog = !showEditDialog }
+            )
+        }
+    }
+
+
     
     Box(modifier = modifier) {
         PManagerAddUnitScreen(
-            uiState = uiState,
+            unitID = uiState.propertyId,
+            numOfRooms = uiState.numOfRooms,
+            unitNameOrNumber = uiState.unitNameOrNumber,
+            unitDescription = uiState.unitDescription,
+            monthlyRent = uiState.monthlyRent,
+            showSaveButton = uiState.showSaveButton,
             updateNumOfRooms = {
                 viewModel.updateNumOfRooms(it)
+                viewModel.checkIfAllFieldsAreFilled()
             },
             updateUnitNameOrNumber = {
                 viewModel.updateUnitNameOrNumber(it)
+                viewModel.checkIfAllFieldsAreFilled()
             },
             updateUnitDescription = {
                 viewModel.updateUnitDescription(it)
+                viewModel.checkIfAllFieldsAreFilled()
             },
             updateUnitRent = {
                 viewModel.updateUnitRent(it)
+                viewModel.checkIfAllFieldsAreFilled()
             },
-            uploadNewUnit = { viewModel.uploadNewUnit() },
+            uploadingStatus = uiState.uploadingStatus,
             navigateToPreviousScreen = navigateToPreviousScreen,
+            saveUnit = {
+                showEditDialog = !showEditDialog
+            }
         )
     }
 }
 
 @Composable
 fun PManagerAddUnitScreen(
-    uiState: com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenUiState,
+    unitID: String?,
+    numOfRooms: Int,
+    unitNameOrNumber: String,
+    unitDescription: String,
+    monthlyRent: String,
+    showSaveButton: Boolean,
     updateNumOfRooms: (rooms: Int) -> Unit,
     updateUnitNameOrNumber: (name: String) -> Unit,
     updateUnitDescription: (description: String) -> Unit,
     updateUnitRent: (rent: String) -> Unit,
-    uploadNewUnit: () -> Unit,
+    uploadingStatus: UploadingStatus,
     navigateToPreviousScreen: () -> Unit,
+    saveUnit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
 
     Scaffold(
         topBar = {
-            PManagerAddUnitScreenTopBar()
+            PManagerAddUnitScreenTopBar(
+                unitID = unitID
+            )
         }
     ) {
         Column(
             modifier = Modifier.padding(it)
         ) {
+            if(unitID != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = navigateToPreviousScreen) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Navigate to previous screen"
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
             Column(
                 modifier = Modifier
                     .padding(
@@ -121,22 +193,20 @@ fun PManagerAddUnitScreen(
                     )
                     .fillMaxSize()
             ) {
-                Row {
-                    IconButton(onClick = { navigateToPreviousScreen() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Previous screen"
-                        )
-                    }
-                }
                 PManagerAddUnitForm(
-                    uiState = uiState,
+                    unitId = unitID,
+                    numOfRooms = numOfRooms,
+                    unitNameOrNumber = unitNameOrNumber,
+                    unitDescription = unitDescription,
+                    monthlyRent = monthlyRent,
+                    showSaveButton = showSaveButton,
                     updateNumOfRooms = updateNumOfRooms,
                     updateUnitNameOrNumber = updateUnitNameOrNumber,
                     updateUnitDescription = updateUnitDescription,
                     updateUnitRent = updateUnitRent,
-                    uploadNewUnit = uploadNewUnit,
-                    )
+                    uploadingStatus = uploadingStatus,
+                    saveUnit = saveUnit
+                )
             }
         }
     }
@@ -144,12 +214,18 @@ fun PManagerAddUnitScreen(
 
 @Composable
 fun PManagerAddUnitForm(
-    uiState: com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenUiState,
+    unitId: String?,
+    numOfRooms: Int,
+    unitNameOrNumber: String,
+    unitDescription: String,
+    monthlyRent: String,
+    showSaveButton: Boolean,
     updateNumOfRooms: (rooms: Int) -> Unit,
     updateUnitNameOrNumber: (unitName: String) -> Unit,
     updateUnitDescription: (unitDescription: String) -> Unit,
     updateUnitRent: (rent: String) -> Unit,
-    uploadNewUnit: () -> Unit,
+    uploadingStatus: UploadingStatus,
+    saveUnit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable {
@@ -168,10 +244,10 @@ fun PManagerAddUnitForm(
             ) {
                 Column {
                     TextButton(onClick = { expanded = true }) {
-                        if (uiState.unitDetails.numOfRooms == 0) {
+                        if (numOfRooms == 0) {
                             Text(text = "No. of rooms")
                         } else {
-                            Text(text = "${uiState.unitDetails.numOfRooms} rooms")
+                            Text(text = "$numOfRooms rooms")
                         }
 
                         Icon(
@@ -196,8 +272,7 @@ fun PManagerAddUnitForm(
                 //            Spacer(modifier = Modifier.height(20.dp))
                 PManagerAddUnitInputField(
                     label = "Unit name / number",
-                    value = uiState.unitDetails.unitNameOrNumber,
-                    maxLines = 1,
+                    value = unitNameOrNumber,
                     onValueChange = {
                         updateUnitNameOrNumber(it)
                     },
@@ -209,8 +284,7 @@ fun PManagerAddUnitForm(
                 Spacer(modifier = Modifier.height(10.dp))
                 PManagerAddUnitInputField(
                     label = "Unit description",
-                    value = uiState.unitDetails.unitDescription,
-                    maxLines = 3,
+                    value = unitDescription,
                     onValueChange = {
                         updateUnitDescription(it)
                     },
@@ -222,8 +296,7 @@ fun PManagerAddUnitForm(
                 Spacer(modifier = Modifier.height(10.dp))
                 PManagerAddUnitInputField(
                     label = "Monthly rent",
-                    value = uiState.unitDetails.monthlyRent.toString(),
-                    maxLines = 1,
+                    value = monthlyRent,
                     onValueChange = {
                         updateUnitRent(it)
                     },
@@ -238,9 +311,10 @@ fun PManagerAddUnitForm(
         }
         Spacer(modifier = Modifier.weight(1f))
         AddUnitButton(
-            uiState = uiState,
-            enabled = uiState.showSaveButton,
-            onSaveUnitButtonClicked = { uploadNewUnit() },
+            unitID = unitId,
+            enabled = showSaveButton,
+            onSaveUnitButtonClicked = { saveUnit() },
+            uploadingStatus = uploadingStatus,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .fillMaxWidth()
@@ -250,9 +324,10 @@ fun PManagerAddUnitForm(
 
 @Composable
 fun AddUnitButton(
-    uiState: com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenUiState,
+    unitID: String?,
     enabled: Boolean,
     onSaveUnitButtonClicked: () -> Unit,
+    uploadingStatus: UploadingStatus,
     modifier: Modifier = Modifier
 ) {
     Button(
@@ -260,11 +335,7 @@ fun AddUnitButton(
         onClick = onSaveUnitButtonClicked,
         modifier = modifier
     ) {
-        if(uiState.uploadingStatus == com.example.tenant_care.ui.screens.pManagerViews.UploadingStatus.UPLOADING) {
-            CircularProgressIndicator()
-        } else {
-            Text(text = "Save Unit")
-        }
+        Text(text = "Save Unit")
 
     }
 }
@@ -274,7 +345,6 @@ fun AddUnitButton(
 fun PManagerAddUnitInputField(
     label: String,
     value: String,
-    maxLines: Int,
     onValueChange: (value: String) -> Unit,
     keyboardOptions: KeyboardOptions,
     modifier: Modifier = Modifier
@@ -284,7 +354,6 @@ fun PManagerAddUnitInputField(
         label = {
             Text(text = label)
         },
-        maxLines = maxLines,
         onValueChange = onValueChange,
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
@@ -300,6 +369,7 @@ fun PManagerAddUnitInputField(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PManagerAddUnitScreenTopBar(
+    unitID: String?,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -315,29 +385,48 @@ fun PManagerAddUnitScreenTopBar(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "Add Unit",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                )
+                if(unitID == null) {
+                    Text(
+                        text = "Add Unit",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                    )
+                } else {
+                    Text(
+                        text = "Edit Unit",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                    )
+                }
+
             }
         }
     )
 }
 
+
+
 @Preview(showBackground = true)
 @Composable
 fun PManagerAddUnitFormPreview() {
-    val viewModel: com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenViewModel = viewModel()
+    val viewModel: PManagerAddUnitScreenViewModel = viewModel()
     Tenant_careTheme {
         PManagerAddUnitForm(
-            uiState = com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenUiState(),
+            unitId = null,
+            numOfRooms = 4,
+            unitNameOrNumber = "Col A2",
+            unitDescription = "New unit",
+            monthlyRent = "",
+            showSaveButton = false,
             updateNumOfRooms = {},
             updateUnitNameOrNumber = {},
             updateUnitDescription = {},
             updateUnitRent = {},
-            uploadNewUnit = { /*TODO*/ })
+            saveUnit = {},
+            uploadingStatus = UploadingStatus.INITIAL
+        )
     }
 }
 
@@ -347,12 +436,19 @@ fun PManagerAddUnitFormPreview() {
 fun PManagerAddUnitScreenPreview() {
     Tenant_careTheme {
         PManagerAddUnitScreen(
-            uiState = com.example.tenant_care.ui.screens.pManagerViews.PManagerAddUnitScreenUiState(),
+            unitID = null,
+            numOfRooms = 4,
+            unitNameOrNumber = "Col A2",
+            unitDescription = "New unit",
+            monthlyRent = "",
+            showSaveButton = false,
             updateNumOfRooms = {},
             updateUnitNameOrNumber = {},
             updateUnitDescription = {},
             updateUnitRent = {},
-            uploadNewUnit = { /*TODO*/ },
-            navigateToPreviousScreen = { /*TODO*/ })
+            uploadingStatus = UploadingStatus.INITIAL,
+            navigateToPreviousScreen = { /*TODO*/ },
+            saveUnit = {}
+        )
     }
 }

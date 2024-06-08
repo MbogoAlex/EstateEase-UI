@@ -2,7 +2,6 @@ package com.example.tenant_care.network
 
 import com.example.tenant_care.model.amenity.AmenitiesResponseBody
 import com.example.tenant_care.model.amenity.AmenityDeletionResponseBody
-import com.example.tenant_care.model.amenity.AmenityImage
 import com.example.tenant_care.model.amenity.AmenityRequestBody
 import com.example.tenant_care.model.amenity.AmenityResponseBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginRequestBody
@@ -13,15 +12,17 @@ import com.example.tenant_care.model.caretaker.MeterReadingsResponseBody
 import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.model.pManager.PManagerResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
-import com.example.tenant_care.model.property.PropertyUnitResponseBody
-import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
 import com.example.tenant_care.model.pManager.RentPaymentRowUpdateRequestBody
 import com.example.tenant_care.model.pManager.RentPaymentRowUpdateResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentRowsUpdateResponseBody
+import com.example.tenant_care.model.penalty.PenaltyResponseBody
+import com.example.tenant_care.model.penalty.PenaltyStatusChangeResponseBody
 import com.example.tenant_care.model.property.ArchiveUnitResponseBody
-import com.example.tenant_care.model.property.NewPropertyRequestBody
-import com.example.tenant_care.model.property.NewPropertyResponseBody
+import com.example.tenant_care.model.property.PropertyRequestBody
+import com.example.tenant_care.model.property.PropertyResponseBody
+import com.example.tenant_care.model.property.PropertyUnitResponseBody
+import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.tenant.LoginTenantRequestBody
 import com.example.tenant_care.model.tenant.LoginTenantResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRequestBody
@@ -76,8 +77,15 @@ interface ApiService {
     // Add a new unit
     @POST("propertyunit")
     suspend fun addNewUnit(
-        @Body propertyRequestBody: NewPropertyRequestBody
-    ): Response<NewPropertyResponseBody>
+        @Body propertyRequestBody: PropertyRequestBody
+    ): Response<PropertyResponseBody>
+
+    // Update unit
+    @PUT("propertyunit/{id}")
+    suspend fun updatePropertyUnit(
+        @Path("id") propertyId: Int,
+        @Body propertyRequestBody: PropertyRequestBody
+    ): Response<SinglePropertyUnitResponseBody>
 
     // fetch unoccupied properties
     @GET("propertyunit/unoccupied")
@@ -230,11 +238,17 @@ interface ApiService {
     ): Response<AmenityResponseBody>
 
     @Multipart
-    @PUT("amenity/{id}")
-    suspend fun updateAmenity(
+    @PUT("amenity/{id}/images")
+    suspend fun updateAmenityWithImages(
         @Part("data") amenityRequestBody: AmenityRequestBody,
-        @Part("oldimages") images: List<AmenityImage>,
-        @Part newImages: List<MultipartBody.Part>,
+        @Part newImages: List<MultipartBody.Part>?,
+        @Path("id") amenityId: Int,
+    ): Response<AmenityResponseBody>
+
+
+    @PUT("amenity/{id}")
+    suspend fun updateAmenityWithoutImages(
+        @Body amenityRequestBody: AmenityRequestBody,
         @Path("id") amenityId: Int,
     ): Response<AmenityResponseBody>
 
@@ -245,4 +259,28 @@ interface ApiService {
 
     @GET("amenity")
     suspend fun fetchAmenities(): Response<AmenitiesResponseBody>
+
+    @GET("amenity/{id}")
+    suspend fun fetchAmenity(@Path("id") id: Int): Response<AmenityResponseBody>
+
+    @GET("amenity/filtered")
+    suspend fun fetchFilteredAmenities(@Query("value") searchText: String?): Response<AmenitiesResponseBody>
+
+    @DELETE("amenity/{id}/image")
+    suspend fun deleteAmenityImage(@Path("id") id: Int): Response<AmenityDeletionResponseBody>
+
+    @GET("penalty/{id}")
+    suspend fun fetchPenalty(@Path("id") id: Int): Response<PenaltyResponseBody>
+
+    @PUT("tenant/penalty/activate/month={month}/year={year}")
+    suspend fun activateLatePaymentPenalty(
+        @Path("month") month: String,
+        @Path("year") year: String
+    ): Response<PenaltyStatusChangeResponseBody>
+
+    @PUT("tenant/penalty/deactivate/month={month}/year={year}")
+    suspend fun deActivateLatePaymentPenalty(
+        @Path("month") month: String,
+        @Path("year") year: String
+    ): Response<PenaltyStatusChangeResponseBody>
 }

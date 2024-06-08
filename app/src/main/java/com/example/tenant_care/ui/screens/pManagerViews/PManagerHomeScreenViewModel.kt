@@ -2,6 +2,7 @@ package com.example.tenant_care.ui.screens.pManagerViews
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.datastore.DSRepository
@@ -21,10 +22,13 @@ data class PManagerHomeScreenUiState(
 @RequiresApi(Build.VERSION_CODES.O)
 class PManagerHomeScreenViewModel(
     private val apiRepository: ApiRepository,
-    private val dsRepository: DSRepository
+    private val dsRepository: DSRepository,
+    private val savedStateHandle: SavedStateHandle,
 ): ViewModel() {
     private val _uiState = MutableStateFlow(value = PManagerHomeScreenUiState())
     val uiState: StateFlow<PManagerHomeScreenUiState> = _uiState.asStateFlow()
+
+    private val childScreen: String? = savedStateHandle[PManagerHomeScreenDestination.childScreen]
 
     // load user details
 
@@ -34,9 +38,18 @@ class PManagerHomeScreenViewModel(
                 _uiState.update {
                     it.copy(
                         userDSDetails = userDsDetails,
+                        childScreen = childScreen ?: ""
                     )
                 }
             }
+        }
+    }
+
+    fun resetChildScreen() {
+        _uiState.update {
+            it.copy(
+                childScreen = ""
+            )
         }
     }
 

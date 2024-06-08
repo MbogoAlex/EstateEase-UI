@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
@@ -26,6 +27,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -446,12 +448,12 @@ fun PropertyDataCell(
         ) {
             Row {
                 Text(text = "Property name: ")
-                Text(text = waterMeterData.propertyName)
+                Text(text = waterMeterData.propertyName!!)
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row {
                 Text(text = "Tenant name: ")
-                Text(text = waterMeterData.tenantName)
+                Text(text = waterMeterData.tenantName!!)
             }
             Spacer(modifier = Modifier.height(10.dp))
             if(waterMeterData.waterUnits != null) {
@@ -486,4 +488,29 @@ fun PropertyDataCell(
             }
         }
     }
+}
+
+@Composable
+fun EditAlertDialog(
+    title: String,
+    onConfirm: () -> Unit,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        title = {
+            Text(text = title)
+        },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text(text = "Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = "Cancel")
+            }
+        },
+        onDismissRequest = onDismissRequest
+    )
 }

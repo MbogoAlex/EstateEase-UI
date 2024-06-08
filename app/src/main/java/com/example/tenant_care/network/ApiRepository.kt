@@ -2,7 +2,6 @@ package com.example.tenant_care.network
 
 import com.example.tenant_care.model.amenity.AmenitiesResponseBody
 import com.example.tenant_care.model.amenity.AmenityDeletionResponseBody
-import com.example.tenant_care.model.amenity.AmenityImage
 import com.example.tenant_care.model.amenity.AmenityRequestBody
 import com.example.tenant_care.model.amenity.AmenityResponseBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginRequestBody
@@ -13,15 +12,17 @@ import com.example.tenant_care.model.caretaker.MeterReadingsResponseBody
 import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.model.pManager.PManagerResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
-import com.example.tenant_care.model.property.PropertyUnitResponseBody
-import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentOverView
 import com.example.tenant_care.model.pManager.RentPaymentRowUpdateRequestBody
 import com.example.tenant_care.model.pManager.RentPaymentRowUpdateResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentRowsUpdateResponseBody
+import com.example.tenant_care.model.penalty.PenaltyResponseBody
+import com.example.tenant_care.model.penalty.PenaltyStatusChangeResponseBody
 import com.example.tenant_care.model.property.ArchiveUnitResponseBody
-import com.example.tenant_care.model.property.NewPropertyRequestBody
-import com.example.tenant_care.model.property.NewPropertyResponseBody
+import com.example.tenant_care.model.property.PropertyRequestBody
+import com.example.tenant_care.model.property.PropertyResponseBody
+import com.example.tenant_care.model.property.PropertyUnitResponseBody
+import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.tenant.LoginTenantRequestBody
 import com.example.tenant_care.model.tenant.LoginTenantResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRequestBody
@@ -46,7 +47,9 @@ interface ApiRepository {
 
     suspend fun fetchRentPaymentOverview(month: String, year: String): Response<RentPaymentOverView>
 
-    suspend fun addNewUnit(propertyRequestBody: NewPropertyRequestBody): Response<NewPropertyResponseBody>
+    suspend fun addNewUnit(propertyRequestBody: PropertyRequestBody): Response<PropertyResponseBody>
+
+    suspend fun updatePropertyUnit(propertyRequestBody: PropertyRequestBody, propertyId: Int): Response<SinglePropertyUnitResponseBody>
     suspend fun assignPropertyUnit(assignmentDetails: UnitAssignmentRequestBody): Response<UnitAssignmentResponseBody>
 
     suspend fun archiveUnit(
@@ -140,11 +143,15 @@ interface ApiRepository {
         images: List<MultipartBody.Part>
     ): Response<AmenityResponseBody>
 
-    suspend fun updateAmenity(
+    suspend fun updateAmenityWithImages(
         amenityRequestBody: AmenityRequestBody,
-        images: List<AmenityImage>,
-        newImages: List<MultipartBody.Part>,
+        newImages: List<MultipartBody.Part>?,
         amenityId: Int
+    ): Response<AmenityResponseBody>
+
+    suspend fun updateAmenityWithoutImages(
+        amenityRequestBody: AmenityRequestBody,
+        amenityId: Int,
     ): Response<AmenityResponseBody>
 
     suspend fun deleteAmenity(
@@ -152,6 +159,17 @@ interface ApiRepository {
     ): Response<AmenityDeletionResponseBody>
 
     suspend fun fetchAmenities(): Response<AmenitiesResponseBody>
+
+    suspend fun fetchAmenity(id: Int): Response<AmenityResponseBody>
+
+    suspend fun fetchFilteredAmenities(searchText: String?): Response<AmenitiesResponseBody>
+
+    suspend fun deleteAmenityImage(id: Int): Response<AmenityDeletionResponseBody>
+
+    suspend fun fetchPenalty(id: Int): Response<PenaltyResponseBody>
+
+    suspend fun activateLatePaymentPenalty(month: String, year: String): Response<PenaltyStatusChangeResponseBody>
+    suspend fun deActivateLatePaymentPenalty(month: String, year: String): Response<PenaltyStatusChangeResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -176,8 +194,16 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         year = year
     )
 
-    override suspend fun addNewUnit(propertyRequestBody: NewPropertyRequestBody): Response<NewPropertyResponseBody> = apiService.addNewUnit(
+    override suspend fun addNewUnit(propertyRequestBody: PropertyRequestBody): Response<PropertyResponseBody> = apiService.addNewUnit(
         propertyRequestBody = propertyRequestBody
+    )
+
+    override suspend fun updatePropertyUnit(
+        propertyRequestBody: PropertyRequestBody,
+        propertyId: Int
+    ): Response<SinglePropertyUnitResponseBody> = apiService.updatePropertyUnit(
+        propertyRequestBody = propertyRequestBody,
+        propertyId = propertyId
     )
 
     override suspend fun assignPropertyUnit(assignmentDetails: UnitAssignmentRequestBody): Response<UnitAssignmentResponseBody> = apiService.assignPropertyUnit(assignmentDetails)
@@ -344,15 +370,21 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         images = images
     )
 
-    override suspend fun updateAmenity(
+    override suspend fun updateAmenityWithImages(
         amenityRequestBody: AmenityRequestBody,
-        images: List<AmenityImage>,
-        newImages: List<MultipartBody.Part>,
+        newImages: List<MultipartBody.Part>?,
         amenityId: Int
-    ): Response<AmenityResponseBody> = apiService.updateAmenity(
+    ): Response<AmenityResponseBody> = apiService.updateAmenityWithImages(
         amenityRequestBody = amenityRequestBody,
-        images = images,
         newImages = newImages,
+        amenityId = amenityId
+    )
+
+    override suspend fun updateAmenityWithoutImages(
+        amenityRequestBody: AmenityRequestBody,
+        amenityId: Int
+    ): Response<AmenityResponseBody> = apiService.updateAmenityWithoutImages(
+        amenityRequestBody = amenityRequestBody,
         amenityId = amenityId
     )
 
@@ -361,6 +393,34 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
     )
 
     override suspend fun fetchAmenities(): Response<AmenitiesResponseBody> = apiService.fetchAmenities()
+    override suspend fun fetchAmenity(id: Int): Response<AmenityResponseBody> = apiService.fetchAmenity(id)
+    override suspend fun fetchFilteredAmenities(searchText: String?): Response<AmenitiesResponseBody> = apiService.fetchFilteredAmenities(
+        searchText = searchText
+    )
+
+    override suspend fun deleteAmenityImage(id: Int): Response<AmenityDeletionResponseBody> = apiService.deleteAmenityImage(
+        id = id
+    )
+
+    override suspend fun fetchPenalty(id: Int): Response<PenaltyResponseBody> = apiService.fetchPenalty(
+        id = id
+    )
+
+    override suspend fun activateLatePaymentPenalty(
+        month: String,
+        year: String
+    ): Response<PenaltyStatusChangeResponseBody> = apiService.activateLatePaymentPenalty(
+        month = month,
+        year = year
+    )
+
+    override suspend fun deActivateLatePaymentPenalty(
+        month: String,
+        year: String
+    ): Response<PenaltyStatusChangeResponseBody> = apiService.deActivateLatePaymentPenalty(
+        month = month,
+        year = year
+    )
 
 
 }

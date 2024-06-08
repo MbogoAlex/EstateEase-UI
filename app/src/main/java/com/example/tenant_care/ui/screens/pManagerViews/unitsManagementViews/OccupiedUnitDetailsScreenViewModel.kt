@@ -34,7 +34,8 @@ val occupiedPropertyUnitData = PropertyUnit(
     propertyAddedAt = "",
     propertyAssignmentStatus = false,
     activeTenant = tenant,
-    tenants = emptyList()
+    tenants = emptyList(),
+    meterReadings = emptyList()
 )
 
 

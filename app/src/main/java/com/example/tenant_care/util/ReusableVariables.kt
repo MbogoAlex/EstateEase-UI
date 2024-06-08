@@ -1,10 +1,13 @@
 package com.example.tenant_care.util
 
+import com.example.tenant_care.model.amenity.Amenity
+import com.example.tenant_care.model.amenity.AmenityImage
 import com.example.tenant_care.model.caretaker.PreviousWaterMeterData
 import com.example.tenant_care.model.caretaker.WaterMeterDt
 import com.example.tenant_care.model.property.PropertyTenant
 import com.example.tenant_care.model.property.PropertyUnit
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.tenantData
+import kotlinx.serialization.Serializable
 
 val properties = listOf<PropertyUnit>(
     PropertyUnit(
@@ -16,7 +19,8 @@ val properties = listOf<PropertyUnit>(
         propertyAddedAt = "2024-02-03 14:44",
         propertyAssignmentStatus = true,
         activeTenant = tenantData,
-        tenants = emptyList()
+        tenants = emptyList(),
+        meterReadings = emptyList()
     ),
     PropertyUnit(
         propertyUnitId = 1,
@@ -27,7 +31,8 @@ val properties = listOf<PropertyUnit>(
         propertyAddedAt = "2024-02-03 14:44",
         propertyAssignmentStatus = true,
         activeTenant = tenantData,
-        tenants = emptyList()
+        tenants = emptyList(),
+        meterReadings = emptyList()
     ),
     PropertyUnit(
         propertyUnitId = 1,
@@ -38,7 +43,8 @@ val properties = listOf<PropertyUnit>(
         propertyAddedAt = "2024-02-03 14:44",
         propertyAssignmentStatus = true,
         activeTenant = tenantData,
-        tenants = emptyList()
+        tenants = emptyList(),
+        meterReadings = emptyList()
     ),
     PropertyUnit(
         propertyUnitId = 1,
@@ -49,7 +55,8 @@ val properties = listOf<PropertyUnit>(
         propertyAddedAt = "2024-05-22T11:14:57.236022",
         propertyAssignmentStatus = true,
         activeTenant = tenantData,
-        tenants = emptyList()
+        tenants = emptyList(),
+        meterReadings = emptyList()
     ),
 )
 
@@ -303,4 +310,26 @@ val unreadWaterMeterReadings: List<WaterMeterDt> = listOf(
 )
 
 
+val sampleAmenityImages = listOf<AmenityImage>(
+    AmenityImage(
+        id = 1,
+        name = ""
+    ),
+    AmenityImage(
+        id = 2,
+        name = ""
+    ),
+)
+
+val sampleAmenity = Amenity(
+    amenityId = 1,
+    amenityName = "Cake bakery",
+    amenityDescription = "Delver cakes of various size to your door",
+    providerName = "Jane Gakii",
+    providerPhoneNumber = "0786552621",
+    providerEmail = "jane@gmail.com",
+    addedBy = "Alex Mbogo",
+    images = sampleAmenityImages,
+    pmanagerId = 1,
+)
 

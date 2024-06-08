@@ -344,7 +344,8 @@ fun OccupiedUnitItemPreview() {
         propertyAddedAt = "20/08/2023 18:06",
         propertyAssignmentStatus = false,
         activeTenant = tenant,
-        tenants = emptyList()
+        tenants = emptyList(),
+        meterReadings = emptyList(),
     )
     Tenant_careTheme {
         OccupiedUnitItem(
