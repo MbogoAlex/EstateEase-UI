@@ -2,8 +2,18 @@ package com.example.tenant_care.model.penalty
 
 import com.example.tenant_care.model.caretaker.WaterMeterDt
 import com.example.tenant_care.model.tenant.TenantData
+import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
+@Serializable
+data class PenaltyRequestBody(
+    val penaltyPerDay: Double
+)
+@Serializable
+data class PenaltyUpdateRequestBody(
+    val name: String,
+    val cost: Double
+)
 @Serializable
 data class PenaltyResponseBody(
     val statusCode: Int,

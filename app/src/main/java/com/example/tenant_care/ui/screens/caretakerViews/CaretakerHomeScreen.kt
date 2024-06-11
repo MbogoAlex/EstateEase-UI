@@ -48,9 +48,11 @@ import com.example.tenant_care.R
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.screens.caretakerViews.meterReading.MeterReadingHomeScreenComposable
 import com.example.tenant_care.ui.screens.caretakerViews.units.UnitsScreenComposable
+import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityScreenComposable
 import com.example.tenant_care.ui.theme.Tenant_careTheme
 import com.example.tenant_care.util.CaretakerSideBarMenuItem
 import com.example.tenant_care.util.CaretakerViewSidebarMenuScreen
+import com.example.tenant_care.util.LogoutDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 object CaretakerHomeScreenDestination: AppNavigation {
@@ -73,6 +75,12 @@ val sideBarMenuItems = listOf<CaretakerSideBarMenuItem>(
         icon = R.drawable.meter_reading
     ),
     CaretakerSideBarMenuItem(
+        title = "Amenities",
+        screen = CaretakerViewSidebarMenuScreen.AMENITIES,
+        color = Color.Gray,
+        icon = R.drawable.amenity
+    ),
+    CaretakerSideBarMenuItem(
         title = "Log out",
         screen = CaretakerViewSidebarMenuScreen.LOGOUT,
         color = Color.Gray,
@@ -82,7 +90,7 @@ val sideBarMenuItems = listOf<CaretakerSideBarMenuItem>(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CaretakerHomeScreenComposable(
-    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    navigateToEditMeterReadingScreen: (month: String, year: String, propertyName: String, meterTableId: String, childScreen: String) -> Unit,
     navigateToLoginScreenWithArgs: (roleId: String, phoneNumber: String, password: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -138,7 +146,7 @@ fun CaretakerHomeScreenComposable(
 fun CaretakerHomeScreen(
     currentScreen: CaretakerViewSidebarMenuScreen,
     onChangeScreen: (screen: CaretakerViewSidebarMenuScreen) -> Unit,
-    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    navigateToEditMeterReadingScreen: (month: String, year: String, propertyName: String, meterTableId: String, childScreen: String) -> Unit,
     tenantName: String,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
@@ -235,6 +243,12 @@ fun CaretakerHomeScreen(
                         navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen,
                     )
                 }
+                CaretakerViewSidebarMenuScreen.AMENITIES -> {
+                    AmenityScreenComposable(
+                        navigateToEditAmenityScreen = { /*TODO*/ },
+                        navigateToAmenityDetailsScreen = {}
+                    )
+                }
                 CaretakerViewSidebarMenuScreen.LOGOUT -> {
                     onLogout()
                 }
@@ -244,29 +258,7 @@ fun CaretakerHomeScreen(
     }
 }
 
-@Composable
-fun LogoutDialog(
-    onLogout: () -> Unit,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    AlertDialog(
-        title = {
-            Text(text = "Log out confirmation")
-        },
-        onDismissRequest = onDismiss,
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = "Cancel")
-            }
-        },
-        confirmButton = {
-            Button(onClick = onLogout) {
-                Text(text = "Logout")
-            }
-        }
-    )
-}
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
@@ -277,7 +269,7 @@ fun CaretakerHomeScreenPreview() {
             tenantName = "Alex Mbogo",
             currentScreen = CaretakerViewSidebarMenuScreen.UNITS_SCREEN,
             onChangeScreen = {},
-            navigateToEditMeterReadingScreen = {meterTableId, childScreen ->  },
+            navigateToEditMeterReadingScreen = {month, year, propertyName, meterTableId, childScreen ->  },
             onLogout = {}
         )
     }

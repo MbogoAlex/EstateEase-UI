@@ -124,8 +124,8 @@ fun NavigationGraph(
                 navigateToUnitsManagementScreen = {
                     navController.navigate(UnitsManagementComposableDestination.route)
                 },
-                navigateToRentPaymentsScreen = {
-                    navController.navigate(RentPaymentsComposableDestination.route)
+                navigateToRentPaymentsScreen = { month, year ->
+                    navController.navigate("${RentPaymentsComposableDestination.route}/${month}/${year}")
                 },
                 navigateToUnoccupiedUnitDetailsScreen = {
                     navController.navigate("${UnOccupiedUnitDetailsComposableDestination.route}/${it}")
@@ -144,7 +144,10 @@ fun NavigationGraph(
                 },
                 navigateToPmanagerHomeScreenWithArgs = {
                     navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
-                }
+                },
+                navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->
+                    navController.navigate("${LoginScreenDestination.route}/${roleId}/${phoneNumber}/${password}")
+                },
             )
         }
         composable(UnitsManagementComposableDestination.route) {
@@ -227,19 +230,41 @@ fun NavigationGraph(
                 }
             )
         }
-        composable(RentPaymentsComposableDestination.route) {
+        composable(
+            RentPaymentsComposableDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(RentPaymentsComposableDestination.month) {
+                    type = NavType.StringType
+                },
+                navArgument(RentPaymentsComposableDestination.year) {
+                    type = NavType.StringType
+                },
+                navArgument(RentPaymentsComposableDestination.roomName) {
+                    type = NavType.StringType
+                },
+            )
+        ) {
             RentPaymentsComposable(
-                navigateToSingleTenantPaymentDetails = {
-                    navController.navigate("${SingleTenantPaymentDetailsComposableDestination.route}/${it}")
+                navigateToSingleTenantPaymentDetails = {month, year, tenantId, roomName ->
+                    navController.navigate("${SingleTenantPaymentDetailsComposableDestination.route}/${month}/${year}/${tenantId}/${roomName}")
                 }
             )
         }
         composable(
             SingleTenantPaymentDetailsComposableDestination.routeWithArgs,
             arguments = listOf(
+                navArgument(SingleTenantPaymentDetailsComposableDestination.month) {
+                    type = NavType.StringType
+                },
+                navArgument(SingleTenantPaymentDetailsComposableDestination.year) {
+                    type = NavType.StringType
+                },
                 navArgument(SingleTenantPaymentDetailsComposableDestination.tenantId) {
                     type = NavType.StringType
-                }
+                },
+                navArgument(SingleTenantPaymentDetailsComposableDestination.roomName) {
+                    type = NavType.StringType
+                },
             )
         ) {
             SingleTenantPaymentDetailsComposable(
@@ -285,6 +310,12 @@ fun NavigationGraph(
                 navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->
                     navController.navigate("${LoginScreenDestination.route}/${roleId}/${phoneNumber}/${password}")
                 },
+                navigateToAmenityDetailsScreen = {
+                    navController.navigate("${AmenityDetailsScreenDestination.route}/${it}")
+                },
+                navigateToEditAmenityScreen = {
+                    navController.navigate(EditAmenityScreenDestination.route)
+                },
             )
         }
         composable(
@@ -320,8 +351,8 @@ fun NavigationGraph(
         }
         composable(CaretakerHomeScreenDestination.route) {
             CaretakerHomeScreenComposable(
-                navigateToEditMeterReadingScreen = {meterTableId, childScreen ->
-                    navController.navigate("${EditMeterReadingScreenDestination.route}/${meterTableId}/${childScreen}")
+                navigateToEditMeterReadingScreen = {month, year, propertyName, meterTableId, childScreen ->
+                    navController.navigate("${EditMeterReadingScreenDestination.route}/${month}/${year}/${propertyName}/${meterTableId}/${childScreen}")
                 },
                 navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->
                     navController.popBackStack(CaretakerHomeScreenDestination.route, true)
@@ -332,6 +363,9 @@ fun NavigationGraph(
         composable(
             EditMeterReadingScreenDestination.routeWithArgs,
             arguments = listOf(
+                navArgument(EditMeterReadingScreenDestination.propertyName) {
+                    type = NavType.StringType
+                },
                 navArgument(EditMeterReadingScreenDestination.meterTableId) {
                     type = NavType.StringType
                 },
@@ -358,8 +392,8 @@ fun NavigationGraph(
             )
         ) {
             CaretakerHomeScreenComposable(
-                navigateToEditMeterReadingScreen = {meterTableId, childScreen ->
-                    navController.navigate("${EditMeterReadingScreenDestination.route}/${meterTableId}/${childScreen}")
+                navigateToEditMeterReadingScreen = {month, year, propertyName, meterTableId, childScreen ->
+                    navController.navigate("${EditMeterReadingScreenDestination.route}/${month}/${year}/${propertyName}/${meterTableId}/${childScreen}")
                 },
                 navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->
                     navController.popBackStack(CaretakerHomeScreenDestination.routeWithArgs, true)
@@ -455,8 +489,8 @@ fun NavigationGraph(
                 navigateToUnitsManagementScreen = {
                     navController.navigate(UnitsManagementComposableDestination.route)
                 },
-                navigateToRentPaymentsScreen = {
-                    navController.navigate(RentPaymentsComposableDestination.route)
+                navigateToRentPaymentsScreen = { month, year ->
+                    navController.navigate("${RentPaymentsComposableDestination.route}/${month}/${year}")
                 },
                 navigateToUnoccupiedUnitDetailsScreen = {
                     navController.navigate("${UnOccupiedUnitDetailsComposableDestination.route}/${it}")
@@ -475,7 +509,10 @@ fun NavigationGraph(
                 },
                 navigateToPmanagerHomeScreenWithArgs = {
                     navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
-                }
+                },
+                navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->
+                    navController.navigate("${LoginScreenDestination.route}/${roleId}/${phoneNumber}/${password}")
+                },
             )
         }
         composable(

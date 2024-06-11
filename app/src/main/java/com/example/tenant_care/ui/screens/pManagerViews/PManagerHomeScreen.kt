@@ -1,6 +1,8 @@
 package com.example.tenant_care.ui.screens.pManagerViews
 
+import android.app.Activity
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -39,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -46,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -62,6 +66,7 @@ import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityScreenComp
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsInfoHomeScreenComposable
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnitsManagementComposable
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.LogoutDialog
 import com.example.tenant_care.util.PManagerViewSideBarMenuItem
 import com.example.tenant_care.util.PManagerViewSideBarMenuScreen
 import com.example.tenant_care.util.ReusableFunctions
@@ -78,16 +83,20 @@ object PManagerHomeScreenDestination: AppNavigation {
 @Composable
 fun PManagerHomeComposable(
     navigateToUnitsManagementScreen: () -> Unit,
-    navigateToRentPaymentsScreen: () -> Unit,
+    navigateToRentPaymentsScreen: (month: String, year: String) -> Unit,
     navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToPreviousScreen: () -> Unit,
     navigateToAmenityDetailsScreen: (amenityId: String) -> Unit,
     navigateToEditAmenityScreen: () -> Unit,
     navigateToPmanagerHomeScreenWithArgs: (childScreen: String) -> Unit,
+    navigateToLoginScreenWithArgs: (roleId: String, phoneNumber: String, password: String) -> Unit,
 ) {
+    val activity = (LocalContext.current as? Activity)
     val viewModel: PManagerHomeScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
+
+    BackHandler(onBack = {activity?.finish()})
 
     val menuItems = listOf(
         PManagerViewSideBarMenuItem(
@@ -114,7 +123,17 @@ fun PManagerHomeComposable(
             screen = PManagerViewSideBarMenuScreen.AMENITIES,
             color = Color.Gray
         ),
+        PManagerViewSideBarMenuItem(
+            title = "Log out",
+            icon = R.drawable.logout,
+            screen = PManagerViewSideBarMenuScreen.LOGOUT,
+            color = Color.Gray
+        ),
     )
+
+    var showLogoutDialog by remember {
+        mutableStateOf(false)
+    }
 
     var currentScreen by rememberSaveable {
         mutableStateOf(PManagerViewSideBarMenuScreen.RENT_PAYMENTS_INFO)
@@ -128,6 +147,19 @@ fun PManagerHomeComposable(
         viewModel.resetChildScreen()
     }
 
+    if(showLogoutDialog) {
+        LogoutDialog(
+            onLogout = {
+                showLogoutDialog = !showLogoutDialog
+                navigateToLoginScreenWithArgs(uiState.userDSDetails.roleId.toString(), uiState.userDSDetails.phoneNumber, uiState.userDSDetails.password)
+                viewModel.logout()
+            },
+            onDismiss = {
+                showLogoutDialog = !showLogoutDialog
+            }
+        )
+    }
+
     Box {
         PManagerHomeScreen(
             pManagerName = uiState.userDSDetails.fullName,
@@ -136,6 +168,10 @@ fun PManagerHomeComposable(
             uiState = uiState,
             onChangeScreen = {
                 currentScreen = it
+            },
+            onLogout = {
+                showLogoutDialog = !showLogoutDialog
+                currentScreen = PManagerViewSideBarMenuScreen.RENT_PAYMENTS_INFO
             },
             navigateToUnitsManagementScreen = navigateToUnitsManagementScreen,
             navigateToRentPaymentsScreen = navigateToRentPaymentsScreen,
@@ -157,13 +193,14 @@ fun PManagerHomeScreen(
     uiState: PManagerHomeScreenUiState,
     onChangeScreen: (screen: PManagerViewSideBarMenuScreen) -> Unit,
     navigateToUnitsManagementScreen: () -> Unit,
-    navigateToRentPaymentsScreen: () -> Unit,
+    navigateToRentPaymentsScreen: (month: String, year: String) -> Unit,
     navigateToUnoccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToOccupiedUnitDetailsScreen: (propertyId: String) -> Unit,
     navigateToPreviousScreen: () -> Unit,
     navigateToAmenityDetailsScreen: (amenityId: String) -> Unit,
     navigateToEditAmenityScreen: () -> Unit,
     navigateToPmanagerHomeScreenWithArgs: (childScreen: String) -> Unit,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -276,6 +313,9 @@ fun PManagerHomeScreen(
                         navigateToEditAmenityScreen = navigateToEditAmenityScreen
                     )
                 }
+                PManagerViewSideBarMenuScreen.LOGOUT -> {
+                    onLogout()
+                }
             }
         }
     }
@@ -322,12 +362,13 @@ fun PManagerHomeScreenPreview() {
             navigateToUnitsManagementScreen = {},
             uiState = PManagerHomeScreenUiState(),
             navigateToUnoccupiedUnitDetailsScreen = {},
-            navigateToRentPaymentsScreen = {},
+            navigateToRentPaymentsScreen = {month, year ->  },
             navigateToOccupiedUnitDetailsScreen = {},
             navigateToPreviousScreen = {},
             navigateToAmenityDetailsScreen = {},
             navigateToEditAmenityScreen = {},
-            navigateToPmanagerHomeScreenWithArgs = {}
+            navigateToPmanagerHomeScreenWithArgs = {},
+            onLogout = {}
         )
     }
 }

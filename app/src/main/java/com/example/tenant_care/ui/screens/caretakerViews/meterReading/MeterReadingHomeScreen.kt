@@ -28,7 +28,7 @@ import com.example.tenant_care.util.CaretakerViewMeterReadingBottomBarScreen
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MeterReadingHomeScreenComposable(
-    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    navigateToEditMeterReadingScreen: (month: String, year: String, propertyName: String, meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val menuItems: List<CaretakerMeterReadingBottomBarMenuItem> = listOf(
@@ -68,7 +68,7 @@ fun MeterReadingHomeScreen(
     currentTab: CaretakerViewMeterReadingBottomBarScreen,
     menuItems: List<CaretakerMeterReadingBottomBarMenuItem>,
     onChangeTab: (tab: CaretakerViewMeterReadingBottomBarScreen) -> Unit,
-    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    navigateToEditMeterReadingScreen: (month: String, year: String, propertyName: String, meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -157,7 +157,7 @@ fun MeterReadingHomeScreenPreview() {
             onChangeTab = {
                 currentTab = it
             },
-            navigateToEditMeterReadingScreen = {meterTableId, childScreen ->  },
+            navigateToEditMeterReadingScreen = {month, year, propertyName, meterTableId, childScreen ->  },
         )
     }
 }

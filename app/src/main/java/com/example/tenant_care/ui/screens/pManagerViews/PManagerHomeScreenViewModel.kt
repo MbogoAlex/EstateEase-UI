@@ -45,6 +45,12 @@ class PManagerHomeScreenViewModel(
         }
     }
 
+    fun logout() {
+        viewModelScope.launch {
+            dsRepository.deleteAllPreferences()
+        }
+    }
+
     fun resetChildScreen() {
         _uiState.update {
             it.copy(

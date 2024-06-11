@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 enum class FetchingInvoiceStatus {
     INITIAL,
@@ -67,6 +68,10 @@ data class RentInvoiceScreenUiState(
     val rentPayment: RentPayment = rentPaymentPlaceHolder,
     val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
     val paidAt: String = "",
+    val waterUnitsConsumed: Double? = null,
+    val totalWaterPrice: Double? = 0.0,
+    val waterUnitsCurrentMonth: String = "",
+    val waterUnitsPreviousMonth: String = "",
     val waterMeterDt: WaterMeterDt = waterMeterData,
     val payRentStatus: PayRentStatus = PayRentStatus.INITIAL,
     val fetchingInvoiceStatus: FetchingInvoiceStatus = FetchingInvoiceStatus.INITIAL
@@ -96,19 +101,40 @@ class RentInvoiceScreenViewModel(
     }
 
     fun getMeterReadings() {
+        Log.i("FETCHING", "$month, $year, ${uiState.value.userDetails.room}")
         viewModelScope.launch {
             try {
                 val response = apiRepository.getMeterReadings(
                     month = month!!,
                     year = year!!,
-                    meterReadingTaken = true,
+                    meterReadingTaken = null,
                     tenantName = null,
-                    propertyName = uiState.value.userDetails.room
+                    propertyName = uiState.value.userDetails.room,
+                    role = null
                 )
                 if (response.isSuccessful) {
+                    val meterData = response.body()?.data?.waterMeter!![0]
+                    var waterPrice: Double? = 0.0
+                    var unitsConsumed: Double? = 0.0
+                    unitsConsumed = if(meterData.waterUnitsReading != null && meterData.previousWaterMeterData?.waterUnitsReading != null) {
+                        abs(meterData.waterUnitsReading - meterData.previousWaterMeterData.waterUnitsReading)
+                    } else if(meterData.waterUnitsReading != null && meterData.previousWaterMeterData?.waterUnitsReading == null) {
+                        meterData.waterUnitsReading
+                    } else {
+                        null
+                    }
+                    if(unitsConsumed != 0.0 && unitsConsumed != null) {
+                        waterPrice = waterMeterData.pricePerUnit?.times(unitsConsumed)
+                    } else if(unitsConsumed == 0.0) {
+                        waterPrice = 0.0
+                    }
                     _uiState.update {
                         it.copy(
-                            waterMeterDt = response.body()?.data?.waterMeter!![0]
+                            waterMeterDt = response.body()?.data?.waterMeter!![0],
+                            waterUnitsConsumed = unitsConsumed,
+                            waterUnitsCurrentMonth = response.body()?.data?.waterMeter!![0].month!!,
+                            waterUnitsPreviousMonth = response.body()?.data?.waterMeter!![0].previousWaterMeterData?.month!!,
+                            totalWaterPrice = waterPrice
                         )
                     }
                     Log.i("METER_READING_FETCH", "SUCCESS")
@@ -123,6 +149,7 @@ class RentInvoiceScreenViewModel(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getUserInvoice() {
+
         _uiState.update {
             it.copy(
                 fetchingInvoiceStatus = FetchingInvoiceStatus.LOADING

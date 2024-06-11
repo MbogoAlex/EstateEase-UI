@@ -59,7 +59,10 @@ object SingleTenantPaymentDetailsComposableDestination: AppNavigation {
     override val title: String = "Single Tenant Payment Details"
     override val route: String = "single-tenant-payment-detail"
     val tenantId: String = "tenantId"
-    val routeWithArgs: String = "$route/{$tenantId}"
+    val month: String = "month"
+    val year: String = "year"
+    val roomName: String = "roomName"
+    val routeWithArgs: String = "$route/{$month}/{$year}/{$tenantId}/{$roomName}"
 
 }
 @RequiresApi(Build.VERSION_CODES.O)
@@ -107,6 +110,10 @@ fun SingleTenantPaymentDetailsComposable(
         Log.i("FORMATTED_DATE_IS", uiState.rentPaidOn)
         Box(modifier = modifier) {
             SingleTenantPaymentDetailsScreen(
+                currentWaterReadingMonth = uiState.waterUnitsCurrentMonth,
+                previousWaterReadingMonth = uiState.waterUnitsPreviousMonth,
+                totalWaterPrice = uiState.totalWaterPrice!!,
+                waterUnits = uiState.waterUnitsConsumed,
                 rentPaymentData = uiState.rentPaymentsData.rentpayment[0],
                 tenantSince = uiState.tenantAddedAt,
                 rentPaymentDueOn = uiState.rentPaymentDueOn,
@@ -154,6 +161,10 @@ fun SingleTenantPaymentDetailsComposable(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SingleTenantPaymentDetailsScreen(
+    currentWaterReadingMonth: String,
+    previousWaterReadingMonth: String,
+    totalWaterPrice: Double,
+    waterUnits: Double?,
     rentPaymentData: TenantRentPaymentData,
     rentPaid: Boolean,
     paidLate: Boolean,
@@ -191,6 +202,10 @@ fun SingleTenantPaymentDetailsScreen(
         }
         if(paidLate) {
             TenantPaidLate(
+                currentWaterReadingMonth = currentWaterReadingMonth,
+                previousWaterReadingMonth = previousWaterReadingMonth,
+                totalWaterPrice = totalWaterPrice,
+                waterUnits = waterUnits,
                 rentPaymentData = rentPaymentData,
                 rentPaymentDueOn = rentPaymentDueOn,
                 tenantSince = tenantSince,
@@ -198,12 +213,20 @@ fun SingleTenantPaymentDetailsScreen(
             )
         } else if(rentPaid && !paidLate) {
             TenantPaid(
+                currentWaterReadingMonth = currentWaterReadingMonth,
+                previousWaterReadingMonth = previousWaterReadingMonth,
+                waterUnits = waterUnits,
+                totalWaterPrice = totalWaterPrice,
                 rentPaymentData = rentPaymentData,
                 tenantSince = tenantSince,
                 rentPaidOn = paidOn
             )
         } else if(!rentPaid) {
             TenantNotPaid(
+                currentWaterReadingMonth = currentWaterReadingMonth,
+                previousWaterReadingMonth = previousWaterReadingMonth,
+                waterUnits = waterUnits,
+                totalWaterPrice = totalWaterPrice,
                 rentPaymentData = rentPaymentData,
                 rentPaymentDueOn = rentPaymentDueOn,
                 tenantSince = tenantSince,
@@ -222,6 +245,10 @@ fun SingleTenantPaymentDetailsScreen(
 
 @Composable
 fun TenantPaid(
+    currentWaterReadingMonth: String,
+    previousWaterReadingMonth: String,
+    totalWaterPrice: Double,
+    waterUnits: Double?,
     rentPaymentData: TenantRentPaymentData,
     tenantSince: String,
     rentPaidOn: String,
@@ -291,6 +318,19 @@ fun TenantPaid(
                     text = ReusableFunctions.formatMoneyValue(rentPaymentData.monthlyRent)
                 )
             }
+            if(waterUnits != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Row {
+                    Text(
+                        text = "Water units ($currentWaterReadingMonth): $waterUnits",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = ReusableFunctions.formatMoneyValue(totalWaterPrice)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(10.dp))
             Row {
                 Text(
@@ -321,6 +361,10 @@ fun TenantPaid(
 
 @Composable
 fun TenantNotPaid(
+    currentWaterReadingMonth: String,
+    previousWaterReadingMonth: String,
+    totalWaterPrice: Double,
+    waterUnits: Double?,
     rentPaymentData: TenantRentPaymentData,
     rentPaymentDueOn: String,
     tenantSince: String,
@@ -417,6 +461,19 @@ fun TenantNotPaid(
                 Text(
                     text = ReusableFunctions.formatMoneyValue(rentPaymentData.monthlyRent)
                 )
+            }
+            if(waterUnits != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Row {
+                    Text(
+                        text = "Water units ($currentWaterReadingMonth): $waterUnits",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = ReusableFunctions.formatMoneyValue(totalWaterPrice)
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row {
@@ -550,6 +607,10 @@ fun TenantNotPaid(
 
 @Composable
 fun TenantPaidLate(
+    currentWaterReadingMonth: String,
+    previousWaterReadingMonth: String,
+    totalWaterPrice: Double,
+    waterUnits: Double?,
     rentPaymentData: TenantRentPaymentData,
     rentPaymentDueOn: String,
     tenantSince: String,
@@ -629,6 +690,19 @@ fun TenantPaidLate(
                 Text(
                     text = ReusableFunctions.formatMoneyValue(rentPaymentData.monthlyRent)
                 )
+            }
+            if(waterUnits != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Row {
+                    Text(
+                        text = "Water units ($currentWaterReadingMonth): $waterUnits",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = ReusableFunctions.formatMoneyValue(totalWaterPrice)
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row {

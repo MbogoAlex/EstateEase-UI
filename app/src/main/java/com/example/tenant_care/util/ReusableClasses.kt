@@ -23,6 +23,20 @@ enum class ExecutionStatus {
     FAILURE
 }
 
+enum class PenaltyUpdateStatus {
+    INITIAL,
+    LOADING,
+    SUCCESS,
+    FAILURE
+}
+
+enum class ExpenseUpdateStatus {
+    INITIAL,
+    LOADING,
+    SUCCESS,
+    FAILURE
+}
+
 enum class TenantViewSidebarMenuScreen {
     HOME_SCREEN,
     LOGIN_SCREEN
@@ -40,6 +54,7 @@ enum class CaretakerViewMeterReadingBottomBarScreen {
 enum class CaretakerViewSidebarMenuScreen {
     UNITS_SCREEN,
     METER_READING_SCREEN,
+    AMENITIES,
     LOGOUT
 }
 
@@ -75,7 +90,8 @@ enum class PManagerViewSideBarMenuScreen {
     RENT_PAYMENTS_INFO,
     UNITS_MANAGEMENT,
     NOTIFICATIONS,
-    AMENITIES
+    AMENITIES,
+    LOGOUT
 }
 
 data class PManagerViewSideBarMenuItem(

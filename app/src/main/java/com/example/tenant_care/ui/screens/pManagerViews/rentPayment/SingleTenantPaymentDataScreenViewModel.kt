@@ -8,16 +8,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.network.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
+import com.example.tenant_care.model.caretaker.WaterMeterDt
 import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBodyData
 import com.example.tenant_care.model.pManager.RentPaymentRowUpdateRequestBody
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.ReusableFunctions.toUserDetails
+import com.example.tenant_care.util.waterMeterData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import kotlin.math.abs
 
 enum class FetchingSingleTenantPaymentStatus {
     INITIAL,
@@ -38,6 +41,13 @@ val paymentsDataInit = RentPaymentDetailsResponseBodyData(
 )
 
 data class SingleTenantPaymentScreenUiState(
+    val month: String? = "",
+    val year: String? = "",
+    val waterMeterDt: WaterMeterDt = waterMeterData,
+    val waterUnitsConsumed: Double? = 0.0,
+    val waterUnitsCurrentMonth: String = "",
+    val waterUnitsPreviousMonth: String = "",
+    val totalWaterPrice: Double? = 0.0,
     val rentPaymentsData: RentPaymentDetailsResponseBodyData = paymentsDataInit,
     val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
     val tenantId: String = "",
@@ -62,29 +72,73 @@ class SingleTenantPaymentDataScreenViewModel(
     private val _uiState = MutableStateFlow(SingleTenantPaymentScreenUiState())
     val uiState: StateFlow<SingleTenantPaymentScreenUiState> = _uiState.asStateFlow()
     private val tenantId: String? = savedStateHandle[SingleTenantPaymentDetailsComposableDestination.tenantId]
+    private val month: String? = savedStateHandle[SingleTenantPaymentDetailsComposableDestination.month]
+    private val year: String? = savedStateHandle[SingleTenantPaymentDetailsComposableDestination.year]
+    private val roomName: String? = savedStateHandle[SingleTenantPaymentDetailsComposableDestination.roomName]
     fun loadUserDetails() {
         viewModelScope.launch {
             dsRepository.userDSDetails.collect() {dsUserDetails->
                 _uiState.update {
                     it.copy(
+                        month = month,
+                        year = year,
                         userDetails = dsUserDetails.toUserDetails()
                     )
                 }
             }
         }
+        getMeterReadings()
+    }
+
+    fun getMeterReadings() {
+        Log.i("FETCHING", "$month, $year, ${uiState.value.userDetails.room}")
+        viewModelScope.launch {
+            try {
+                val response = apiRepository.getMeterReadings(
+                    month = month!!,
+                    year = year!!,
+                    meterReadingTaken = null,
+                    tenantName = null,
+                    propertyName = roomName!!,
+                    role = null
+                )
+                if (response.isSuccessful) {
+                    val meterData = response.body()?.data?.waterMeter!![0]
+                    var waterPrice: Double? = 0.0
+                    var unitsConsumed: Double? = 0.0
+                    unitsConsumed = if(meterData.waterUnitsReading != null && meterData.previousWaterMeterData?.waterUnitsReading != null) {
+                        abs(meterData.waterUnitsReading - meterData.previousWaterMeterData.waterUnitsReading)
+                    } else if(meterData.waterUnitsReading != null && meterData.previousWaterMeterData?.waterUnitsReading == null) {
+                        meterData.waterUnitsReading
+                    } else {
+                        null
+                    }
+                    if(unitsConsumed != 0.0 && unitsConsumed != null) {
+                        waterPrice = waterMeterData.pricePerUnit?.times(unitsConsumed)
+                    } else if(unitsConsumed == 0.0) {
+                        waterPrice = 0.0
+                    }
+                    _uiState.update {
+                        it.copy(
+                            waterMeterDt = response.body()?.data?.waterMeter!![0],
+                            waterUnitsConsumed = unitsConsumed,
+                            waterUnitsCurrentMonth = response.body()?.data?.waterMeter!![0].month!!,
+                            waterUnitsPreviousMonth = response.body()?.data?.waterMeter!![0].previousWaterMeterData?.month!!,
+                            totalWaterPrice = waterPrice
+                        )
+                    }
+                    Log.i("METER_READING_FETCH", "SUCCESS")
+                } else {
+                    Log.e("METER_READING_FETCH_ERROR_RESPONSE", response.toString())
+                }
+            } catch (e: Exception) {
+                Log.e("METER_READING_FETCH_ERROR_EXCEPTION", e.toString())
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun fetchRentPaymentsData(
-        month: String,
-        year: String,
-        roomName: String?,
-        rooms: Int?,
-        tenantName: String?,
-        tenantId: Int?,
-        rentPaymentStatus: Boolean?,
-        paidLate: Boolean?
-    ) {
+    fun fetchRentPaymentsData() {
         Log.i("FETCHING_WITH_TENANT_ID", tenantId.toString())
         _uiState.update {
             it.copy(
@@ -94,14 +148,14 @@ class SingleTenantPaymentDataScreenViewModel(
         viewModelScope.launch {
             try {
                 val response = apiRepository.fetchRentPaymentStatusForAllTenants(
-                    month = month,
-                    year = year,
-                    roomName = roomName,
-                    rooms = rooms,
-                    tenantName = tenantName,
-                    tenantId = tenantId,
-                    rentPaymentStatus = rentPaymentStatus,
-                    paidLate = paidLate,
+                    month = uiState.value.month!!,
+                    year = uiState.value.year!!,
+                    roomName = null,
+                    rooms = null,
+                    tenantName = null,
+                    tenantId = tenantId!!.toInt(),
+                    rentPaymentStatus = null,
+                    paidLate = null,
                     tenantActive = null
                 )
                 if(response.isSuccessful) {
@@ -277,15 +331,6 @@ class SingleTenantPaymentDataScreenViewModel(
 
     init {
         loadUserDetails()
-        fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
-            tenantName = null,
-            tenantId = tenantId!!.toInt(),
-            rooms = null,
-            roomName = null,
-            rentPaymentStatus = null,
-            paidLate = null
-        )
+        fetchRentPaymentsData()
     }
 }

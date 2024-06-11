@@ -37,7 +37,7 @@ import com.example.tenant_care.util.waterMeterReadings
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UploadedScreenComposable(
-    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    navigateToEditMeterReadingScreen: (month: String, year: String, propertyName: String, meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: UploadedScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -69,7 +69,9 @@ fun UploadedScreenComposable(
             unfilterUnits = { viewModel.unfilter() },
             numberOfUnits = uiState.meterReadings.size,
             meterReadings = uiState.meterReadings,
-            navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen
+            navigateToEditMeterReadingScreen = {propertyName, meterTableId, childScreen ->
+                navigateToEditMeterReadingScreen(uiState.month, uiState.year, propertyName, meterTableId, childScreen)
+            }
         )
     }
 }
@@ -90,7 +92,7 @@ fun UploadedScreen(
     selectedMonth: String,
     onChangeSelectedMonth: (month: String) -> Unit,
     meterReadings: List<WaterMeterDt>,
-    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    navigateToEditMeterReadingScreen: (propertyName: String, meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -133,7 +135,7 @@ fun UploadedScreen(
         }
         Spacer(modifier = Modifier.height(10.dp))
         Text(
-            text = "$numberOfUnits units occupied",
+            text = "$numberOfUnits units",
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -168,7 +170,7 @@ fun UploadedScreenPreview() {
             unfilterUnits = { /*TODO*/ },
             numberOfUnits = 4,
             meterReadings = waterMeterReadings,
-            navigateToEditMeterReadingScreen = {meterTableId, childScreen ->  }
+            navigateToEditMeterReadingScreen = {propertyName, meterTableId, childScreen ->  }
         )
     }
 }

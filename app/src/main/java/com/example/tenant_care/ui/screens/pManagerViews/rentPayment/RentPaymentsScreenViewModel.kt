@@ -35,11 +35,14 @@ val rentPaymentsDataInit = RentPaymentDetailsResponseBodyData(
 )
 
 data class RentPaymentsScreenUiState(
+    val month: String? = "",
+    val year: String? = "",
+    val roomName: String? = "",
     val rentPaymentsData: RentPaymentDetailsResponseBodyData = rentPaymentsDataInit,
     val singleTenantPaymentData: RentPaymentDetailsResponseBodyData = rentPaymentsDataInit,
     val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
     val rentPaymentsScreen: RentPaymentsScreen = RentPaymentsScreen.ALL_TENANTS,
-    val tenantId: String = "",
+    val tenantId: String? = "",
     val tenantAddedAt: String = "",
     val rentPaidOn: String = "",
     val rentPaymentDueOn: String = "",
@@ -55,16 +58,24 @@ class RentPaymentsScreenViewModel(
     val uiStatus: StateFlow<RentPaymentsScreenUiState> = _uiState.asStateFlow()
 
     private val tenantId: String? = savedStateHandle[SingleTenantPaymentDetailsComposableDestination.tenantId]
+    private val month: String? = savedStateHandle[SingleTenantPaymentDetailsComposableDestination.month]
+    private val year: String? = savedStateHandle[SingleTenantPaymentDetailsComposableDestination.year]
+    private val roomName: String? = savedStateHandle[SingleTenantPaymentDetailsComposableDestination.roomName]
     fun loadUserDetails() {
         viewModelScope.launch {
             dsRepository.userDSDetails.collect() {dsUserDetails->
                 _uiState.update {
                     it.copy(
+                        month = month,
+                        year = year,
+                        roomName = roomName,
+                        tenantId = tenantId,
                         userDetails = dsUserDetails.toUserDetails()
                     )
                 }
             }
         }
+        Log.i("NAVIGATION_DETAILS", "${month}, ${year}, ${roomName}, ${tenantId}")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

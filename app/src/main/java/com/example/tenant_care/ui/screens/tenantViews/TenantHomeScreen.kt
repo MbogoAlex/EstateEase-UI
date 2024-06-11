@@ -52,6 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
 import com.example.tenant_care.nav.AppNavigation
+import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityScreenComposable
 import com.example.tenant_care.ui.screens.tenantViews.amenity.AmenityComposable
 import com.example.tenant_care.ui.screens.tenantViews.model.BottomNavigationBar
 import com.example.tenant_care.ui.screens.tenantViews.rentPayment.PaymentHomeScreenComposable
@@ -88,6 +89,8 @@ fun TenantHomeScreenComposable(
     navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
     navigateToTenantReportScreen: () -> Unit,
     navigateToLoginScreenWithArgs: (roleId: String, phoneNumber: String, password: String) -> Unit,
+    navigateToEditAmenityScreen: () -> Unit,
+    navigateToAmenityDetailsScreen: (amenityId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -115,6 +118,8 @@ fun TenantHomeScreenComposable(
             navigateToRentInvoiceScreen = navigateToRentInvoiceScreen,
             navigateToTenantReportScreen = navigateToTenantReportScreen,
             navigateToLoginScreenWithArgs = navigateToLoginScreenWithArgs,
+            navigateToEditAmenityScreen = navigateToEditAmenityScreen,
+            navigateToAmenityDetailsScreen = navigateToAmenityDetailsScreen,
             onLogout = {
                 logoutAlert = true
             }
@@ -128,6 +133,8 @@ fun TenantHomeScreen(
     navigateToTenantReportScreen: () -> Unit,
     sideBarMenuItems: List<TenantSideBarMenuItem>,
     navigateToLoginScreenWithArgs: (roleId: String, phoneNumber: String, password: String) -> Unit,
+    navigateToEditAmenityScreen: () -> Unit,
+    navigateToAmenityDetailsScreen: (amenityId: String) -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -253,13 +260,10 @@ fun TenantHomeScreen(
                     navigateToTenantReportScreen = navigateToTenantReportScreen,
                     modifier = Modifier.weight(1f)
                 )
-                BottomNavigationBar.CHAT -> {
-//                TenantReportScreen(
-//                    modifier = Modifier.weight(1f)
-//                )
-                }
                 BottomNavigationBar.SERVICES -> {
-                    AmenityComposable(
+                    AmenityScreenComposable(
+                        navigateToAmenityDetailsScreen = navigateToAmenityDetailsScreen,
+                        navigateToEditAmenityScreen = navigateToEditAmenityScreen,
                         modifier = Modifier
                             .weight(1f)
                     )
@@ -295,12 +299,6 @@ fun TenantViewBottomNavigationBar(
             icon = painterResource(id = R.drawable.home),
             bottomNavigationBar = BottomNavigationBar.HOME,
             description = "Navigate to home"
-        ),
-        NavigationContentItem(
-            name = "Chat",
-            icon = painterResource(id = R.drawable.chat),
-            bottomNavigationBar = BottomNavigationBar.CHAT,
-            description = "Navigate to chat screen"
         ),
         NavigationContentItem(
             name = "Amenities",
@@ -402,6 +400,8 @@ fun TenantHomeScreenPreview(
             navigateToTenantReportScreen = {},
             sideBarMenuItems = sideBarMenuItems,
             navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->  },
+            navigateToAmenityDetailsScreen = {},
+            navigateToEditAmenityScreen = {},
             onLogout = {}
         )
     }

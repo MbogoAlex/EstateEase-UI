@@ -36,7 +36,7 @@ import com.example.tenant_care.util.unreadWaterMeterReadings
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NotUploadedScreenComposable(
-    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    navigateToEditMeterReadingScreen: (month: String, year: String, propertyName: String, meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: NotUploadedScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -65,7 +65,9 @@ fun NotUploadedScreenComposable(
             unfilterUnits = { viewModel.unfilter() },
             numberOfUnits = uiState.meterReadings.size,
             meterReadings = uiState.meterReadings,
-            navigateToEditMeterReadingScreen = navigateToEditMeterReadingScreen
+            navigateToEditMeterReadingScreen = {propertyName, meterTableId, childScreen ->
+                navigateToEditMeterReadingScreen(uiState.month, uiState.year, propertyName, meterTableId, childScreen)
+            }
         )
     }
 }
@@ -86,7 +88,7 @@ fun NotUploadedScreen(
     selectedMonth: String,
     onChangeSelectedMonth: (month: String) -> Unit,
     meterReadings: List<WaterMeterDt>,
-    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    navigateToEditMeterReadingScreen: (propertyName: String, meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -129,7 +131,7 @@ fun NotUploadedScreen(
         }
         Spacer(modifier = Modifier.height(10.dp))
         Text(
-            text = "$numberOfUnits units occupied",
+            text = "$numberOfUnits units",
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(10.dp))
@@ -165,7 +167,7 @@ fun NotUploadedScreenPreview() {
             unfilterUnits = { /*TODO*/ },
             numberOfUnits = 4,
             meterReadings = unreadWaterMeterReadings,
-            navigateToEditMeterReadingScreen = {meterTableId, childScreen ->  }
+            navigateToEditMeterReadingScreen = {propertyName, meterTableId, childScreen ->  }
         )
     }
 }

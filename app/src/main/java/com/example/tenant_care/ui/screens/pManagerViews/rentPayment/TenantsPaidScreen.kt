@@ -50,8 +50,7 @@ import com.example.tenant_care.util.UndoFilteringBox
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TenantsPaidScreenComposable(
-
-    navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
+    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: TenantsPaidScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -138,7 +137,7 @@ fun TenantsPaidScreen(
     numberOfUnits: Int?,
     paidAt: String,
     rentPayments: List<TenantRentPaymentData>,
-    navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
+    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String) -> Unit,
     onPopupMenuItemClicked: (item: String) -> Unit,
     onMenuButtonClicked: () -> Unit,
     showMenuPopup: Boolean,
@@ -149,7 +148,7 @@ fun TenantsPaidScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(10.dp)
     ) {
         SearchFieldForTenants(
             labelText = "Search Tenant name",
@@ -354,7 +353,7 @@ fun IndividualTenantPaidCell(
     paymentStatus: Boolean,
     paidLate: Boolean,
     paidAt: String,
-    navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
+    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -362,7 +361,7 @@ fun IndividualTenantPaidCell(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
-                navigateToSingleTenantPaymentDetails(rentPayment.tenantId!!.toString())
+                navigateToSingleTenantPaymentDetails(rentPayment.propertyNumberOrName, rentPayment.tenantId!!.toString())
             }
     ) {
         Column(
@@ -521,7 +520,7 @@ fun IndividualTenantPaidCell(
                 modifier = Modifier
                     .fillMaxWidth(),
                 onClick = {
-                    navigateToSingleTenantPaymentDetails(rentPayment.tenantId!!.toString())
+                    navigateToSingleTenantPaymentDetails(rentPayment.propertyNumberOrName, rentPayment.tenantId!!.toString())
                 }
             ) {
                 Row(
@@ -551,7 +550,7 @@ fun IndividualTenantPaidCellPreview() {
             paymentStatus = false,
             paidLate = true,
             paidAt = "",
-            navigateToSingleTenantPaymentDetails = {}
+            navigateToSingleTenantPaymentDetails = {roomName, tenantId ->  }
         )
     }
 }

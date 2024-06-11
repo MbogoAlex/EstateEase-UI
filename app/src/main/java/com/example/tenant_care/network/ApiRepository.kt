@@ -1,5 +1,7 @@
 package com.example.tenant_care.network
 
+import com.example.tenant_care.model.additionalExpense.AdditionalExpenseResponseBody
+import com.example.tenant_care.model.additionalExpense.AdditionalExpenseUpdateRequestBody
 import com.example.tenant_care.model.amenity.AmenitiesResponseBody
 import com.example.tenant_care.model.amenity.AmenityDeletionResponseBody
 import com.example.tenant_care.model.amenity.AmenityRequestBody
@@ -16,8 +18,10 @@ import com.example.tenant_care.model.pManager.RentPaymentOverView
 import com.example.tenant_care.model.pManager.RentPaymentRowUpdateRequestBody
 import com.example.tenant_care.model.pManager.RentPaymentRowUpdateResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentRowsUpdateResponseBody
+import com.example.tenant_care.model.penalty.PenaltyRequestBody
 import com.example.tenant_care.model.penalty.PenaltyResponseBody
 import com.example.tenant_care.model.penalty.PenaltyStatusChangeResponseBody
+import com.example.tenant_care.model.penalty.PenaltyUpdateRequestBody
 import com.example.tenant_care.model.property.ArchiveUnitResponseBody
 import com.example.tenant_care.model.property.PropertyRequestBody
 import com.example.tenant_care.model.property.PropertyResponseBody
@@ -125,7 +129,7 @@ interface ApiRepository {
     ): Response<ResponseBody>
 
     suspend fun loginAsCaretaker(caretaker: CaretakerLoginRequestBody): Response<CaretakerLoginResponseBody>
-    suspend fun getMeterReadings(month: String, year: String, meterReadingTaken: Boolean, tenantName: String?, propertyName: String?): Response<MeterReadingsResponseBody>
+    suspend fun getMeterReadings(month: String?, year: String?, meterReadingTaken: Boolean?, tenantName: String?, propertyName: String?, role: String?): Response<MeterReadingsResponseBody>
 
     suspend fun uploadMeterReading(meterReadingRequestBody: MeterReadingRequestBody, image: MultipartBody.Part): Response<MeterReadingResponseBody>
 
@@ -168,8 +172,13 @@ interface ApiRepository {
 
     suspend fun fetchPenalty(id: Int): Response<PenaltyResponseBody>
 
-    suspend fun activateLatePaymentPenalty(month: String, year: String): Response<PenaltyStatusChangeResponseBody>
+    suspend fun activateLatePaymentPenalty(month: String, year: String, penaltyRequestBody: PenaltyRequestBody): Response<PenaltyStatusChangeResponseBody>
     suspend fun deActivateLatePaymentPenalty(month: String, year: String): Response<PenaltyStatusChangeResponseBody>
+
+    suspend fun updatePenalty(penaltyUpdateRequestBody: PenaltyUpdateRequestBody, id: Int): Response<PenaltyResponseBody>
+
+    suspend fun updateExpense(additionalExpenseUpdateRequestBody: AdditionalExpenseUpdateRequestBody, id: Int): Response<AdditionalExpenseResponseBody>
+    suspend fun getExpense(id: Int): Response<AdditionalExpenseResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -328,17 +337,19 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
     )
 
     override suspend fun getMeterReadings(
-        month: String,
-        year: String,
-        meterReadingTaken: Boolean,
+        month: String?,
+        year: String?,
+        meterReadingTaken: Boolean?,
         tenantName: String?,
-        propertyName: String?
+        propertyName: String?,
+        role: String?,
     ): Response<MeterReadingsResponseBody> = apiService.getMeterReadings(
         month = month,
         year = year,
         meterReadingTaken = meterReadingTaken,
         tenantName = tenantName,
-        propertyName = propertyName
+        propertyName = propertyName,
+        role = role
     )
 
     override suspend fun uploadMeterReading(
@@ -408,10 +419,12 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
 
     override suspend fun activateLatePaymentPenalty(
         month: String,
-        year: String
+        year: String,
+        penaltyRequestBody: PenaltyRequestBody
     ): Response<PenaltyStatusChangeResponseBody> = apiService.activateLatePaymentPenalty(
         month = month,
-        year = year
+        year = year,
+        penaltyRequestBody = penaltyRequestBody
     )
 
     override suspend fun deActivateLatePaymentPenalty(
@@ -420,6 +433,26 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
     ): Response<PenaltyStatusChangeResponseBody> = apiService.deActivateLatePaymentPenalty(
         month = month,
         year = year
+    )
+
+    override suspend fun updatePenalty(
+        penaltyUpdateRequestBody: PenaltyUpdateRequestBody,
+        id: Int
+    ): Response<PenaltyResponseBody> = apiService.updatePenalty(
+        penaltyUpdateRequestBody = penaltyUpdateRequestBody,
+        id = id
+    )
+
+    override suspend fun updateExpense(
+        additionalExpenseUpdateRequestBody: AdditionalExpenseUpdateRequestBody,
+        id: Int
+    ): Response<AdditionalExpenseResponseBody> = apiService.updateExpense(
+        additionalExpenseUpdateRequestBody = additionalExpenseUpdateRequestBody,
+        id = id
+    )
+
+    override suspend fun getExpense(id: Int): Response<AdditionalExpenseResponseBody> = apiService.getExpense(
+        id = id
     )
 
 

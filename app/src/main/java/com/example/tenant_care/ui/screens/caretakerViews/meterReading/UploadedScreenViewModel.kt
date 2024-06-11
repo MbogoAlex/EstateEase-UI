@@ -94,7 +94,8 @@ class UploadedScreenViewModel(
                     year = uiState.value.year,
                     meterReadingTaken = uiState.value.meterReadingTaken,
                     tenantName = uiState.value.tenantName,
-                    propertyName = uiState.value.roomName
+                    propertyName = uiState.value.roomName,
+                    role = "caretaker"
                 )
                 if(response.isSuccessful) {
                     val rooms = mutableListOf<String>()

@@ -203,7 +203,7 @@ fun RentStatusCard(
     val formattedDueDate = rentPayment.dueDate
     val dailyPenalty = rentPayment.penaltyPerDay
     val formattedDailyPenalty = ReusableFunctions.formatMoneyValue(dailyPenalty)
-    if(daysLate > 0) {
+    if(daysLate > 0 && rentPayment.penaltyActive) {
         penaltyAccrued = rentPayment.penaltyPerDay * daysLate
     } else {
         penaltyAccrued = 0.0
@@ -249,7 +249,7 @@ fun RentStatusCard(
                 }
 
             }
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 //            RentStatusCardItem(
 //                key = "Water reading: 2 units",
 //                value = "Ksh, 300.00"
@@ -261,11 +261,11 @@ fun RentStatusCard(
 //            )
 
             Spacer(modifier = Modifier.height(10.dp))
-            RentStatusCardItem(
-                key = "Rent:",
-                value = formattedMonthlyRent
-            )
-            Spacer(modifier = Modifier.height(10.dp))
+//            RentStatusCardItem(
+//                key = "Rent:",
+//                value = formattedMonthlyRent
+//            )
+//            Spacer(modifier = Modifier.height(10.dp))
             RentStatusCardItem(key = "Due On", value = formattedDueDate)
             Spacer(modifier = Modifier.height(10.dp))
             Row(
@@ -306,23 +306,10 @@ fun RentStatusCard(
                         fontWeight = FontWeight.Bold
                     )
                 }
-            } else {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Total payable",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = formattedTotalPayable,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
             }
             Spacer(modifier = Modifier.height(20.dp))
             RentPaymentButton(
+                paymentStatus = rentPayment.rentPaymentStatus,
                 navigateToRentInvoiceScreen = navigateToRentInvoiceScreen,
                 tenantId = rentPayment.tenantId.toString(),
                 month = rentPayment.month,
@@ -354,6 +341,7 @@ fun RentStatusCardItem(
 
 @Composable
 fun RentPaymentButton(
+    paymentStatus: Boolean,
     navigateToRentInvoiceScreen: (tenantId: String, month: String, year: String) -> Unit,
     tenantId: String,
     month: String,
@@ -362,10 +350,11 @@ fun RentPaymentButton(
 ) {
     Button(
         shape = RoundedCornerShape(10.dp),
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth(),
         onClick = { navigateToRentInvoiceScreen(tenantId, month, year) }
     ) {
-        Text(text = "PROCEED TO PAYMENT")
+        Text(text = "CHECK INVOICE")
     }
 }
 

@@ -63,12 +63,14 @@ import com.example.tenant_care.util.sampleAmenity
 fun AmenityScreenComposable(
     navigateToEditAmenityScreen: () -> Unit,
     navigateToAmenityDetailsScreen: (amenityId: String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val viewModel: AmenityScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
 
-    Box {
+    Box(modifier = modifier) {
         AmenityScreen(
+            roleId = uiState.userDetails.roleId!!,
             amenities = uiState.amenities,
             searchText = if(uiState.searchText == null) "" else uiState.searchText!!,
             onStartSearch = {
@@ -86,6 +88,7 @@ fun AmenityScreenComposable(
 
 @Composable
 fun AmenityScreen(
+    roleId: Int,
     amenities: List<Amenity>,
     navigateToEditAmenityScreen: () -> Unit,
     navigateToAmenityDetailsScreen: (amenityId: String) -> Unit,
@@ -96,11 +99,13 @@ fun AmenityScreen(
 ) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = navigateToEditAmenityScreen) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add new amenity"
-                )
+            if(roleId == 1) {
+                FloatingActionButton(onClick = navigateToEditAmenityScreen) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add new amenity"
+                    )
+                }
             }
         }
     ) {
@@ -241,6 +246,7 @@ fun AmenityScreenPreview() {
     )
     Tenant_careTheme {
         AmenityScreen(
+            roleId = 1,
             amenities = amenities,
             searchText = "",
             onStartSearch = {},

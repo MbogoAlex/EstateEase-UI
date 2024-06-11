@@ -28,6 +28,10 @@ import com.example.tenant_care.ui.theme.Tenant_careTheme
 object RentPaymentsComposableDestination: AppNavigation {
     override val title: String = "Rent payments screen"
     override val route: String = "rent-payments-screen"
+    val month: String = "month"
+    val year: String = "year"
+    val roomName: String = "year"
+    val routeWithArgs: String = "$route/{$month}/{$roomName}"
 
 }
 
@@ -40,7 +44,7 @@ data class RentPaymentsNavigationItem(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RentPaymentsComposable(
-    navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
+    navigateToSingleTenantPaymentDetails: (month: String, year: String, tenantId: String, roomName: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: RentPaymentsScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -69,12 +73,16 @@ fun RentPaymentsComposable(
 
     Box() {
         RentPaymentsScreen(
+            month = uiState.month!!,
+            year = uiState.year!!,
             currentScreen = currentScreen,
             navItems = navigationItems,
             onChangeTab = {
                 viewModel.changeScreen(it)
             },
-            navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
+            navigateToSingleTenantPaymentDetails = {roomName, tenantId ->
+                navigateToSingleTenantPaymentDetails(uiState.month!!, uiState.year!!, tenantId, roomName)
+            },
         )
     }
 }
@@ -82,10 +90,12 @@ fun RentPaymentsComposable(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RentPaymentsScreen(
+    month: String,
+    year: String,
     navItems: List<RentPaymentsNavigationItem>,
     currentScreen: RentPaymentsScreen,
     onChangeTab: (newScreen: RentPaymentsScreen) -> Unit,
-    navigateToSingleTenantPaymentDetails: (tenantId: String) -> Unit,
+    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -173,10 +183,12 @@ fun RentPaymentScreenPreview() {
     val currentScreen = RentPaymentsScreen.ALL_TENANTS
     Tenant_careTheme {
         RentPaymentsScreen(
+            month = "JANUARY",
+            year = "2024",
             currentScreen = currentScreen,
             navItems = navigationItems,
             onChangeTab = {},
-            navigateToSingleTenantPaymentDetails = {}
+            navigateToSingleTenantPaymentDetails = {roomName, tenantId ->  }
         )
     }
 }

@@ -1,5 +1,7 @@
 package com.example.tenant_care.network
 
+import com.example.tenant_care.model.additionalExpense.AdditionalExpenseResponseBody
+import com.example.tenant_care.model.additionalExpense.AdditionalExpenseUpdateRequestBody
 import com.example.tenant_care.model.amenity.AmenitiesResponseBody
 import com.example.tenant_care.model.amenity.AmenityDeletionResponseBody
 import com.example.tenant_care.model.amenity.AmenityRequestBody
@@ -16,8 +18,10 @@ import com.example.tenant_care.model.pManager.RentPaymentOverView
 import com.example.tenant_care.model.pManager.RentPaymentRowUpdateRequestBody
 import com.example.tenant_care.model.pManager.RentPaymentRowUpdateResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentRowsUpdateResponseBody
+import com.example.tenant_care.model.penalty.PenaltyRequestBody
 import com.example.tenant_care.model.penalty.PenaltyResponseBody
 import com.example.tenant_care.model.penalty.PenaltyStatusChangeResponseBody
+import com.example.tenant_care.model.penalty.PenaltyUpdateRequestBody
 import com.example.tenant_care.model.property.ArchiveUnitResponseBody
 import com.example.tenant_care.model.property.PropertyRequestBody
 import com.example.tenant_care.model.property.PropertyResponseBody
@@ -198,11 +202,12 @@ interface ApiService {
     // get meter readings
     @GET("meterreading/all")
     suspend fun getMeterReadings(
-        @Query("month") month: String,
-        @Query("year") year: String,
-        @Query("meterReadingTaken") meterReadingTaken: Boolean,
+        @Query("month") month: String?,
+        @Query("year") year: String?,
+        @Query("meterReadingTaken") meterReadingTaken: Boolean?,
         @Query("tenantName") tenantName: String?,
-        @Query("propertyName") propertyName: String?
+        @Query("propertyName") propertyName: String?,
+        @Query("role") role: String?
     ): Response<MeterReadingsResponseBody>
 
     // upload meterreading
@@ -275,7 +280,8 @@ interface ApiService {
     @PUT("tenant/penalty/activate/month={month}/year={year}")
     suspend fun activateLatePaymentPenalty(
         @Path("month") month: String,
-        @Path("year") year: String
+        @Path("year") year: String,
+        @Body penaltyRequestBody: PenaltyRequestBody,
     ): Response<PenaltyStatusChangeResponseBody>
 
     @PUT("tenant/penalty/deactivate/month={month}/year={year}")
@@ -283,4 +289,19 @@ interface ApiService {
         @Path("month") month: String,
         @Path("year") year: String
     ): Response<PenaltyStatusChangeResponseBody>
+
+    @PUT("penalty/{id}")
+    suspend fun updatePenalty(
+        @Path("id") id: Int,
+        @Body penaltyUpdateRequestBody: PenaltyUpdateRequestBody
+    ): Response<PenaltyResponseBody>
+
+    @PUT("expense/{id}")
+    suspend fun updateExpense(
+        @Body additionalExpenseUpdateRequestBody: AdditionalExpenseUpdateRequestBody,
+        @Path("id") id: Int
+    ): Response<AdditionalExpenseResponseBody>
+
+    @GET("expense/{id}")
+    suspend fun getExpense(@Path("id") id: Int): Response<AdditionalExpenseResponseBody>
 }

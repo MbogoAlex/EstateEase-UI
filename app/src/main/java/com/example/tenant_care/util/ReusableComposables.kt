@@ -435,7 +435,7 @@ fun HouseUnitItem(
 @Composable
 fun PropertyDataCell(
     waterMeterData: WaterMeterDt,
-    navigateToEditMeterReadingScreen: (meterTableId: String, childScreen: String) -> Unit,
+    navigateToEditMeterReadingScreen: (propertyName: String, meterTableId: String, childScreen: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -456,10 +456,10 @@ fun PropertyDataCell(
                 Text(text = waterMeterData.tenantName!!)
             }
             Spacer(modifier = Modifier.height(10.dp))
-            if(waterMeterData.waterUnits != null) {
+            if(waterMeterData.waterUnitsReading != null) {
                 Row {
                     Text(text = "Water units: ")
-                    Text(text = waterMeterData.waterUnits.toString())
+                    Text(text = waterMeterData.waterUnitsReading.toString())
                     Spacer(modifier = Modifier.weight(1f))
                     Text(text = "${ReusableFunctions.formatMoneyValue(waterMeterData.pricePerUnit!!)}/unit")
                 }
@@ -468,7 +468,7 @@ fun PropertyDataCell(
                     modifier = Modifier
                         .fillMaxWidth(),
                     onClick = {
-                        navigateToEditMeterReadingScreen(waterMeterData.id.toString(),"update-screen")
+                        navigateToEditMeterReadingScreen(waterMeterData.propertyName!!, waterMeterData.id.toString(),"update-screen")
                     }
                 ) {
                     Text(text = "UPDATE")
@@ -480,7 +480,7 @@ fun PropertyDataCell(
                     modifier = Modifier
                         .fillMaxWidth(),
                     onClick = {
-                        navigateToEditMeterReadingScreen(waterMeterData.id.toString(),"upload-screen")
+                        navigateToEditMeterReadingScreen(waterMeterData.propertyName!!, waterMeterData.id.toString(),"upload-screen")
                     }
                 ) {
                     Text(text = "UPLOAD")
@@ -512,5 +512,29 @@ fun EditAlertDialog(
             }
         },
         onDismissRequest = onDismissRequest
+    )
+}
+
+@Composable
+fun LogoutDialog(
+    onLogout: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        title = {
+            Text(text = "Log out confirmation")
+        },
+        onDismissRequest = onDismiss,
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Cancel")
+            }
+        },
+        confirmButton = {
+            Button(onClick = onLogout) {
+                Text(text = "Logout")
+            }
+        }
     )
 }

@@ -33,7 +33,7 @@ data class WaterMeterDt(
     val id: Int?,
     val propertyName: String?,
     val tenantName: String?,
-    val waterUnits: Double?,
+    val waterUnitsReading: Double?,
     val pricePerUnit: Double?,
     val meterReadingDate: String?,
     val month: String?,
@@ -46,7 +46,7 @@ data class WaterMeterDt(
 data class PreviousWaterMeterData(
     val propertyName: String?,
     val tenantName: String?,
-    val waterUnits: Double?,
+    val waterUnitsReading: Double?,
     val pricePerUnit: Double?,
     val meterReadingDate: String?,
     val month: String?,

@@ -75,7 +75,10 @@ object EditMeterReadingScreenDestination: AppNavigation {
     override val route: String = "meter-reading-edit-screen"
     val meterTableId: String = "meterTableId"
     val childScreen: String = "childScreen"
-    val routeWithArgs: String = "$route/{$meterTableId}/{$childScreen}"
+    val propertyName: String = "propertyName"
+    val month: String = "month"
+    val year: String = "year"
+    val routeWithArgs: String = "$route/{$month}/{$year}/{$propertyName}/{$meterTableId}/{$childScreen}"
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -89,6 +92,8 @@ fun EditMeterReadingScreenComposable(
 
     val viewModel: EditMeterReadingScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
+
+    Log.i("MONTH_AND_YEAR_AND_ID", "${uiState.month}, ${uiState.year}")
 
     if(uiState.loadingStatus == LoadingStatus.SUCCESS) {
         Toast.makeText(context, "Meter reading edited", Toast.LENGTH_SHORT).show()
@@ -377,7 +382,7 @@ fun EditMeterReadingScreen(
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
-            if(previousImage != null && !previousImage.contains("null")) {
+            if(previousImage != null) {
                 AsyncImage(
                     model = ImageRequest.Builder(context = LocalContext.current)
                         .data(previousImage)
@@ -413,7 +418,7 @@ fun EditMeterReadingScreen(
 
         }
         Spacer(modifier = Modifier.weight(1f))
-        if(waterMeterDt.waterUnits != null) {
+        if(waterMeterDt.waterUnitsReading != null) {
             Button(
                 enabled = buttonEnabled && loadingStatus != LoadingStatus.LOADING,
                 modifier = Modifier

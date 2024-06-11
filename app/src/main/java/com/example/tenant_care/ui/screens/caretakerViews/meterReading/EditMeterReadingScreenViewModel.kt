@@ -46,6 +46,8 @@ data class EditMeterReadingScreenUiState(
     val previousImage: String? = null,
     val previousImageId: Int? = null,
     val capturedUnits: String = "",
+    val month: String = "",
+    val year: String = "",
     val uploadButtonEnabled: Boolean = false,
     val loadingStatus: LoadingStatus = LoadingStatus.INITIAL,
 )
@@ -59,6 +61,9 @@ class EditMeterReadingScreenViewModel(
 
     private val childScreen: String? = savedStateHandle[EditMeterReadingScreenDestination.childScreen]
     private val meterTableId: String? = savedStateHandle[EditMeterReadingScreenDestination.meterTableId]
+    private val propertyName: String? = savedStateHandle[EditMeterReadingScreenDestination.propertyName]
+    private val month: String? = savedStateHandle[EditMeterReadingScreenDestination.month]
+    private val year: String? = savedStateHandle[EditMeterReadingScreenDestination.year]
 
     fun loadStartupData() {
         viewModelScope.launch {
@@ -71,6 +76,14 @@ class EditMeterReadingScreenViewModel(
             }
         }
         loadMeterReading()
+        if(month != null && year != null) {
+            _uiState.update {
+                it.copy(
+                    month = month,
+                    year = year
+                )
+            }
+        }
     }
 
     fun loadMeterReading() {
@@ -82,12 +95,9 @@ class EditMeterReadingScreenViewModel(
                     _uiState.update {
                         it.copy(
                             waterMeterDt = response.body()?.data?.waterMeter!!,
-                            capturedMeterReading = if(response.body()?.data?.waterMeter?.waterUnits == null) 0.0 else response.body()?.data?.waterMeter?.waterUnits,
-                            previousMeterReading = response.body()?.data?.waterMeter?.previousWaterMeterData?.waterUnits,
+                            capturedMeterReading = if(response.body()?.data?.waterMeter?.waterUnitsReading == null) 0.0 else response.body()?.data?.waterMeter?.waterUnitsReading,
                             uploadedImage = response.body()?.data?.waterMeter?.imageName,
                             uploadedImageId = response.body()?.data?.waterMeter?.imageId,
-                            previousImage = response.body()?.data?.waterMeter?.previousWaterMeterData?.imageName,
-                            previousImageId = response.body()?.data?.waterMeter?.previousWaterMeterData?.imageId
                         )
                     }
                     Log.i("METER_DATA_FETCHED", response.body()?.data?.waterMeter!!.toString())
@@ -110,8 +120,8 @@ class EditMeterReadingScreenViewModel(
         val meterReadingRequest = MeterReadingRequestBody(
             meterDtTableId = meterTableId!!.toInt(),
             waterUnits = uiState.value.capturedMeterReading!!,
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString()
+            month = uiState.value.month,
+            year = uiState.value.year
         )
         var meterImage: MultipartBody.Part? = null
         val parcelFileDescriptor = context.contentResolver.openFileDescriptor(uiState.value.capturedImageUri!!, "r", null)
@@ -175,8 +185,8 @@ class EditMeterReadingScreenViewModel(
         val meterReadingRequest = MeterReadingRequestBody(
             meterDtTableId = meterTableId!!.toInt(),
             waterUnits = uiState.value.capturedMeterReading!!,
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString()
+            month = uiState.value.month,
+            year = uiState.value.year
         )
         val uploadedImage = if (uiState.value.capturedImageUri != null) uiState.value.capturedImageUri else uiState.value.uploadedImage
         var meterImage: MultipartBody.Part? = null
