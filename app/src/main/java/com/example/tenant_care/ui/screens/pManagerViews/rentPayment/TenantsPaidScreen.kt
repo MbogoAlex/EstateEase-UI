@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +43,7 @@ import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
 import com.example.tenant_care.model.pManager.TenantRentPaymentData
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.DownloadingStatus
 import com.example.tenant_care.util.FilterByNumOfRoomsBox
 import com.example.tenant_care.util.FilterByRoomNameBox
 import com.example.tenant_care.util.ReusableFunctions
@@ -55,16 +58,28 @@ fun TenantsPaidScreenComposable(
     navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String, month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val viewModel: TenantsPaidScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiStatus.collectAsState()
-
-    viewModel.setMonthAndYear(month, year)
 
     var showMenuPopup by remember {
         mutableStateOf(false)
     }
 
-    val popUpItems = listOf<String>("Active tenants", "Removed tenants", "Paid early", "Paid late")
+    var dataFetched by remember {
+        mutableStateOf(true)
+    }
+
+    if(dataFetched) {
+        viewModel.setMonthAndYear(month = month, year = year)
+        dataFetched = false
+    }
+
+    if(uiState.downloadingStatus == DownloadingStatus.SUCCESS) {
+        viewModel.resetDownloadingStatus()
+    }
+
+    val popUpItems = listOf<String>("Active tenants", "Removed tenants", "Paid early", "Paid late", "Report")
 
     Box(
         modifier = modifier
@@ -121,8 +136,11 @@ fun TenantsPaidScreenComposable(
                     viewModel.filterByTimeOfPayment(false)
                 } else if(item == "Paid late") {
                     viewModel.filterByTimeOfPayment(true)
+                } else if(item == "Report") {
+                    viewModel.fetchReport(context = context)
                 }
-            }
+            },
+            downloadingStatus = uiState.downloadingStatus
         )
     }
 }
@@ -153,6 +171,7 @@ fun TenantsPaidScreen(
     showMenuPopup: Boolean,
     onDismissRequest: () -> Unit,
     popUpItems: List<String>,
+    downloadingStatus: DownloadingStatus,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -317,6 +336,8 @@ fun TenantsPaidScreen(
                         popupMenuItems = popUpItems,
                         onPopupMenuItemClicked = onPopupMenuItemClicked
                     )
+                } else if(downloadingStatus == DownloadingStatus.LOADING) {
+                    CircularProgressIndicator()
                 } else {
                     Box(
                         contentAlignment = Alignment.Center
@@ -375,7 +396,10 @@ fun IndividualTenantPaidCell(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
-                navigateToSingleTenantPaymentDetails(rentPayment.propertyNumberOrName, rentPayment.tenantId!!.toString())
+                navigateToSingleTenantPaymentDetails(
+                    rentPayment.propertyNumberOrName,
+                    rentPayment.tenantId!!.toString()
+                )
             }
     ) {
         Column(
