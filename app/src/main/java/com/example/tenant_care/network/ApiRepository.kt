@@ -8,6 +8,12 @@ import com.example.tenant_care.model.amenity.AmenityRequestBody
 import com.example.tenant_care.model.amenity.AmenityResponseBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginRequestBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginResponseBody
+import com.example.tenant_care.model.caretaker.CaretakerPaymentRequestBody
+import com.example.tenant_care.model.caretaker.CaretakerPaymentResponseBody
+import com.example.tenant_care.model.caretaker.CaretakerRegistrationRequestBody
+import com.example.tenant_care.model.caretaker.CaretakerRegistrationResponseBody
+import com.example.tenant_care.model.caretaker.CaretakerResponseBody
+import com.example.tenant_care.model.caretaker.CaretakersResponseBody
 import com.example.tenant_care.model.caretaker.MeterReadingRequestBody
 import com.example.tenant_care.model.caretaker.MeterReadingResponseBody
 import com.example.tenant_care.model.caretaker.MeterReadingsResponseBody
@@ -29,6 +35,7 @@ import com.example.tenant_care.model.property.PropertyUnitResponseBody
 import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.tenant.LoginTenantRequestBody
 import com.example.tenant_care.model.tenant.LoginTenantResponseBody
+import com.example.tenant_care.model.tenant.PaymentStatusResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRequestBody
 import com.example.tenant_care.model.tenant.RentPaymentResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRowsResponse
@@ -37,6 +44,8 @@ import com.example.tenant_care.model.tenant.UnitAssignmentResponseBody
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.Path
 
 interface ApiRepository {
     suspend fun loginPManager(pManagerLoginDetails: PManagerRequestBody) : Response<PManagerResponseBody>
@@ -116,6 +125,10 @@ interface ApiRepository {
         rentPaymentRequestBody: RentPaymentRequestBody
     ): Response<RentPaymentResponseBody>
 
+    suspend fun getRentPaymentStatus(
+        id: Int
+    ): Response<PaymentStatusResponseBody>
+
     suspend fun getRentPaymentRowsAndGenerateReport(
         tenantId: Int,
         month: String?,
@@ -179,6 +192,29 @@ interface ApiRepository {
 
     suspend fun updateExpense(additionalExpenseUpdateRequestBody: AdditionalExpenseUpdateRequestBody, id: Int): Response<AdditionalExpenseResponseBody>
     suspend fun getExpense(id: Int): Response<AdditionalExpenseResponseBody>
+
+    suspend fun getActiveCaretakers(): Response<CaretakersResponseBody>
+
+    suspend fun getCaretaker(id: Int): Response<CaretakerResponseBody>
+
+    suspend fun registerCaretaker(caretaker: CaretakerRegistrationRequestBody): Response<CaretakerRegistrationResponseBody>
+
+    suspend fun payCaretaker(caretakerPaymentRequestBody: CaretakerPaymentRequestBody): Response<CaretakerPaymentResponseBody>
+
+    suspend fun getCaretakerPaymentStatus(id: String): Response<PaymentStatusResponseBody>
+
+    suspend fun removeCaretaker(id: Int): Response<CaretakerLoginResponseBody>
+
+    suspend fun generateGeneralReport(
+        month: String?,
+        year: String?,
+        roomName: String?,
+        rooms: String?,
+        tenantName: String?,
+        tenantId: Int?,
+        rentPaymentStatus: Boolean?,
+        paidLate: Boolean?,
+    ): Response<ResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -308,6 +344,10 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
     ): Response<RentPaymentResponseBody> = apiService.payRent(
         rentPaymentTblId = rentPaymentTblId,
         rentPaymentRequestBody = rentPaymentRequestBody
+    )
+
+    override suspend fun getRentPaymentStatus(id: Int): Response<PaymentStatusResponseBody> = apiService.getRentPaymentStatus(
+        id = id
     )
 
     override suspend fun getRentPaymentRowsAndGenerateReport(
@@ -453,6 +493,48 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
 
     override suspend fun getExpense(id: Int): Response<AdditionalExpenseResponseBody> = apiService.getExpense(
         id = id
+    )
+
+    override suspend fun getActiveCaretakers(): Response<CaretakersResponseBody> = apiService.getActiveCaretakers()
+
+    override suspend fun getCaretaker(id: Int): Response<CaretakerResponseBody> = apiService.getCaretaker(
+        id = id
+    )
+
+    override suspend fun registerCaretaker(caretaker: CaretakerRegistrationRequestBody): Response<CaretakerRegistrationResponseBody> = apiService.registerCaretaker(
+        caretaker = caretaker
+    )
+
+    override suspend fun payCaretaker(caretakerPaymentRequestBody: CaretakerPaymentRequestBody): Response<CaretakerPaymentResponseBody> = apiService.payCaretaker(
+        caretakerPaymentRequestBody = caretakerPaymentRequestBody
+    )
+
+    override suspend fun getCaretakerPaymentStatus(id: String): Response<PaymentStatusResponseBody> = apiService.getCaretakerPaymentStatus(
+        id = id
+    )
+
+    override suspend fun removeCaretaker(id: Int): Response<CaretakerLoginResponseBody> = apiService.removeCaretaker(
+        id = id
+    )
+
+    override suspend fun generateGeneralReport(
+        month: String?,
+        year: String?,
+        roomName: String?,
+        rooms: String?,
+        tenantName: String?,
+        tenantId: Int?,
+        rentPaymentStatus: Boolean?,
+        paidLate: Boolean?
+    ): Response<ResponseBody> = apiService.generateGeneralReport(
+        month = month,
+        year = year,
+        roomName = roomName,
+        rooms = rooms,
+        tenantName = tenantName,
+        tenantId = tenantId,
+        rentPaymentStatus = rentPaymentStatus,
+        paidLate = paidLate
     )
 
 

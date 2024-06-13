@@ -11,9 +11,11 @@ import com.example.tenant_care.datastore.DSRepository
 import com.example.tenant_care.model.caretaker.WaterMeterDt
 import com.example.tenant_care.model.tenant.RentPayment
 import com.example.tenant_care.model.tenant.RentPaymentRequestBody
+import com.example.tenant_care.util.PaymentStatus
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.ReusableFunctions.toUserDetails
 import com.example.tenant_care.util.waterMeterData
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,12 +30,6 @@ enum class FetchingInvoiceStatus {
     FAILURE
 }
 
-enum class PayRentStatus {
-    INITIAL,
-    LOADING,
-    SUCCESS,
-    FAILURE
-}
 
 val rentPaymentPlaceHolder = RentPayment(
     rentPaymentTblId = 1,
@@ -50,7 +46,7 @@ val rentPaymentPlaceHolder = RentPayment(
     transactionId = "123432111",
     year = "2024",
     propertyNumberOrName = "Col C2",
-    numberOfRooms = 2,
+    numberOfRooms = "Bedsitter",
     tenantId = 2,
     email = "tenant@gmail.com",
     fullName = "Mbogo AGM",
@@ -70,10 +66,10 @@ data class RentInvoiceScreenUiState(
     val paidAt: String = "",
     val waterUnitsConsumed: Double? = null,
     val totalWaterPrice: Double? = 0.0,
-    val waterUnitsCurrentMonth: String = "",
-    val waterUnitsPreviousMonth: String = "",
-    val waterMeterDt: WaterMeterDt = waterMeterData,
-    val payRentStatus: PayRentStatus = PayRentStatus.INITIAL,
+//    val waterUnitsCurrentMonth: String? = "",
+//    val waterUnitsPreviousMonth: String? = "",
+    val waterMeterDt: WaterMeterDt? = waterMeterData,
+    val paymentStatus: PaymentStatus = PaymentStatus.INITIAL,
     val fetchingInvoiceStatus: FetchingInvoiceStatus = FetchingInvoiceStatus.INITIAL
 )
 @RequiresApi(Build.VERSION_CODES.O)
@@ -113,27 +109,32 @@ class RentInvoiceScreenViewModel(
                     role = null
                 )
                 if (response.isSuccessful) {
-                    val meterData = response.body()?.data?.waterMeter!![0]
+                    val meterData: WaterMeterDt? = response.body()?.data?.waterMeter?.get(0)
+                    Log.i("METER_DATA", meterData.toString())
                     var waterPrice: Double? = 0.0
                     var unitsConsumed: Double? = 0.0
-                    unitsConsumed = if(meterData.waterUnitsReading != null && meterData.previousWaterMeterData?.waterUnitsReading != null) {
-                        abs(meterData.waterUnitsReading - meterData.previousWaterMeterData.waterUnitsReading)
-                    } else if(meterData.waterUnitsReading != null && meterData.previousWaterMeterData?.waterUnitsReading == null) {
-                        meterData.waterUnitsReading
-                    } else {
-                        null
+                    if(meterData != null) {
+                        unitsConsumed = if(meterData.waterUnitsReading != null && meterData.previousWaterMeterData?.waterUnitsReading != null) {
+                            abs(meterData.waterUnitsReading - meterData.previousWaterMeterData.waterUnitsReading)
+                        } else if(meterData.waterUnitsReading != null && meterData.previousWaterMeterData?.waterUnitsReading == null) {
+                            meterData.waterUnitsReading
+                        } else {
+                            null
+                        }
+                        if(unitsConsumed != 0.0 && unitsConsumed != null) {
+                            Log.i("PRICE_PER_UNIT:", "${meterData.pricePerUnit}")
+                            waterPrice = meterData.pricePerUnit?.times(unitsConsumed)
+                        } else if(unitsConsumed == 0.0) {
+                            waterPrice = 0.0
+                        }
                     }
-                    if(unitsConsumed != 0.0 && unitsConsumed != null) {
-                        waterPrice = waterMeterData.pricePerUnit?.times(unitsConsumed)
-                    } else if(unitsConsumed == 0.0) {
-                        waterPrice = 0.0
-                    }
+
                     _uiState.update {
                         it.copy(
-                            waterMeterDt = response.body()?.data?.waterMeter!![0],
+                            waterMeterDt = meterData,
                             waterUnitsConsumed = unitsConsumed,
-                            waterUnitsCurrentMonth = response.body()?.data?.waterMeter!![0].month!!,
-                            waterUnitsPreviousMonth = response.body()?.data?.waterMeter!![0].previousWaterMeterData?.month!!,
+//                            waterUnitsCurrentMonth = response.body()?.data?.waterMeter!![0].month!!,
+//                            waterUnitsPreviousMonth = response.body()?.data?.waterMeter!![0].previousWaterMeterData?.month!!,
                             totalWaterPrice = waterPrice
                         )
                     }
@@ -208,12 +209,14 @@ class RentInvoiceScreenViewModel(
     fun payRent(payableAmount: Double) {
         _uiState.update {
             it.copy(
-                payRentStatus = PayRentStatus.LOADING
+                paymentStatus = PaymentStatus.LOADING
             )
         }
         viewModelScope.launch {
             val rentPaymentRequestBody = RentPaymentRequestBody(
-                payableAmount = payableAmount
+                waterMeterDataTableId = uiState.value.waterMeterDt!!.id!!,
+                payableAmount = payableAmount,
+                msisdn = uiState.value.userDetails.phoneNumber
             )
             try {
                 val response = apiRepository.payRent(
@@ -224,22 +227,52 @@ class RentInvoiceScreenViewModel(
                     _uiState.update {
                         it.copy(
                             paidAt = ReusableFunctions.formatDateTimeValue(response.body()?.data?.rentPayment?.paidAt!!),
-                            payRentStatus = PayRentStatus.SUCCESS
                         )
                     }
                 } else {
                     _uiState.update {
                         it.copy(
-                            payRentStatus = PayRentStatus.FAILURE
+                            paymentStatus = PaymentStatus.FAILURE
                         )
                     }
+                    Log.e("RENT_PAYMENT_FAIL_ERROR_RESPONSE", response.toString())
                 }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
-                        payRentStatus = PayRentStatus.FAILURE
+                        paymentStatus = PaymentStatus.FAILURE
                     )
                 }
+                Log.e("RENT_PAYMENT_FAIL_ERROR_EXCEPTION", e.toString())
+            }
+        }
+    }
+
+    fun checkRentPaymentStatus() {
+        viewModelScope.launch {
+            try {
+                val response = apiRepository.getRentPaymentStatus(uiState.value.rentPayment.rentPaymentTblId)
+                if(response.isSuccessful) {
+                    _uiState.update {
+                        it.copy(
+                            paymentStatus = PaymentStatus.SUCCESS
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            paymentStatus = PaymentStatus.FAILURE
+                        )
+                    }
+                    Log.e("RENT_PAYMENT_STATUS_CHECK_ERROR_RESPONSE", response.toString())
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        paymentStatus = PaymentStatus.FAILURE
+                    )
+                }
+                Log.e("RENT_PAYMENT_STATUS_CHECK_ERROR_EXCEPTION", e.toString())
             }
         }
     }
@@ -247,7 +280,7 @@ class RentInvoiceScreenViewModel(
     fun resetRentPaymentStatus() {
         _uiState.update {
             it.copy(
-                payRentStatus = PayRentStatus.INITIAL
+                paymentStatus = PaymentStatus.INITIAL
             )
         }
     }

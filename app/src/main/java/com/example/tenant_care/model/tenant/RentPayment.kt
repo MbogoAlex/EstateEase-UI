@@ -4,6 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RentPaymentRequestBody(
+    val waterMeterDataTableId: Int,
+    val msisdn: String,
     val payableAmount: Double
 )
 @Serializable
@@ -33,5 +35,17 @@ data class RentPaymentData(
     val paidLate: Boolean,
     val tenant: TenantData,
     val unitName: String
+)
+
+@Serializable
+data class PaymentStatusResponseBody(
+    val statusCode: Int,
+    val message: String,
+    val data: PaymentStatusDT
+)
+
+@Serializable
+data class PaymentStatusDT(
+    val payment: Boolean
 )
 

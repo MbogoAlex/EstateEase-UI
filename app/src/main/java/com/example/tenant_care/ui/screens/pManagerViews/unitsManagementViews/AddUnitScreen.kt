@@ -145,12 +145,12 @@ fun PManagerAddUnitComposable(
 @Composable
 fun PManagerAddUnitScreen(
     unitID: String?,
-    numOfRooms: Int,
+    numOfRooms: String,
     unitNameOrNumber: String,
     unitDescription: String,
     monthlyRent: String,
     showSaveButton: Boolean,
-    updateNumOfRooms: (rooms: Int) -> Unit,
+    updateNumOfRooms: (rooms: String) -> Unit,
     updateUnitNameOrNumber: (name: String) -> Unit,
     updateUnitDescription: (description: String) -> Unit,
     updateUnitRent: (rent: String) -> Unit,
@@ -215,12 +215,12 @@ fun PManagerAddUnitScreen(
 @Composable
 fun PManagerAddUnitForm(
     unitId: String?,
-    numOfRooms: Int,
+    numOfRooms: String,
     unitNameOrNumber: String,
     unitDescription: String,
     monthlyRent: String,
     showSaveButton: Boolean,
-    updateNumOfRooms: (rooms: Int) -> Unit,
+    updateNumOfRooms: (rooms: String) -> Unit,
     updateUnitNameOrNumber: (unitName: String) -> Unit,
     updateUnitDescription: (unitDescription: String) -> Unit,
     updateUnitRent: (rent: String) -> Unit,
@@ -231,7 +231,7 @@ fun PManagerAddUnitForm(
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
-    var items = mutableListOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    var items = mutableListOf("Bedsitter", "One bedroom", "Two bedroom")
 
     Column {
         ElevatedCard(
@@ -244,10 +244,10 @@ fun PManagerAddUnitForm(
             ) {
                 Column {
                     TextButton(onClick = { expanded = true }) {
-                        if (numOfRooms == 0) {
-                            Text(text = "No. of rooms")
+                        if (numOfRooms.isEmpty()) {
+                            Text(text = "Type")
                         } else {
-                            Text(text = "$numOfRooms rooms")
+                            Text(text = numOfRooms)
                         }
 
                         Icon(
@@ -259,7 +259,7 @@ fun PManagerAddUnitForm(
                         for (item in items) {
                             DropdownMenuItem(
                                 text = {
-                                    Text(text = "$item rooms")
+                                    Text(text = item)
                                 },
                                 onClick = {
                                     updateNumOfRooms(item)
@@ -415,7 +415,7 @@ fun PManagerAddUnitFormPreview() {
     Tenant_careTheme {
         PManagerAddUnitForm(
             unitId = null,
-            numOfRooms = 4,
+            numOfRooms = "Bedsitter",
             unitNameOrNumber = "Col A2",
             unitDescription = "New unit",
             monthlyRent = "",
@@ -437,7 +437,7 @@ fun PManagerAddUnitScreenPreview() {
     Tenant_careTheme {
         PManagerAddUnitScreen(
             unitID = null,
-            numOfRooms = 4,
+            numOfRooms = "Bedsitter",
             unitNameOrNumber = "Col A2",
             unitDescription = "New unit",
             monthlyRent = "",

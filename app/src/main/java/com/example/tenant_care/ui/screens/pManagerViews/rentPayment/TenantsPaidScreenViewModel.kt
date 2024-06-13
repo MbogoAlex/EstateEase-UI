@@ -29,6 +29,8 @@ val paidRentPaymentsDataInit = RentPaymentDetailsResponseBodyData(
 )
 
 data class TenantsPaidScreenUiState(
+    val month: String = "",
+    val year: String = "",
     val rentPaymentsData: RentPaymentDetailsResponseBodyData = paidRentPaymentsDataInit,
     val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
     val fetchingStatus: FetchingTenantsPaidStatus = FetchingTenantsPaidStatus.INITIAL,
@@ -145,8 +147,8 @@ class TenantsPaidScreenViewModel(
             )
         }
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = tenantName,
             tenantId = null,
             rooms = rooms,
@@ -165,8 +167,8 @@ class TenantsPaidScreenViewModel(
             )
         }
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = _uiState.value.tenantName,
             tenantId = null,
             rooms = selectedNumOfRooms!!.toInt(),
@@ -190,8 +192,8 @@ class TenantsPaidScreenViewModel(
             )
         }
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = _uiState.value.tenantName,
             tenantId = null,
             rooms = rooms,
@@ -218,8 +220,8 @@ class TenantsPaidScreenViewModel(
         }
 
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = _uiState.value.tenantName,
             tenantId = null,
             rooms = rooms,
@@ -246,8 +248,8 @@ class TenantsPaidScreenViewModel(
         }
 
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = _uiState.value.tenantName,
             tenantId = null,
             rooms = rooms,
@@ -255,6 +257,26 @@ class TenantsPaidScreenViewModel(
             rentPaymentStatus = true,
             paidLate = paidLate,
             tenantActive = _uiState.value.tenantActive
+        )
+    }
+
+    fun setMonthAndYear(month: String, year: String) {
+        _uiState.update {
+            it.copy(
+                month = month,
+                year = year
+            )
+        }
+        fetchRentPaymentsData(
+            month = month,
+            year = year,
+            tenantName = null,
+            tenantId = null,
+            rooms = null,
+            roomName = null,
+            rentPaymentStatus = true,
+            paidLate = null,
+            tenantActive = null,
         )
     }
 
@@ -280,8 +302,8 @@ class TenantsPaidScreenViewModel(
             )
         }
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = _uiState.value.tenantName,
             tenantId = null,
             rooms = null,
@@ -294,16 +316,5 @@ class TenantsPaidScreenViewModel(
 
     init {
         loadUserDetails()
-        fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
-            tenantName = null,
-            tenantId = null,
-            rooms = null,
-            roomName = null,
-            rentPaymentStatus = true,
-            paidLate = null,
-            tenantActive = null,
-        )
     }
 }

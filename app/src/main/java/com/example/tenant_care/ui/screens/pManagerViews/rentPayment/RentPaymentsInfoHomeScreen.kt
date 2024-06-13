@@ -62,6 +62,8 @@ import com.example.tenant_care.ui.theme.Tenant_careTheme
 import com.example.tenant_care.util.EditAlertDialog
 import com.example.tenant_care.util.ExecutionStatus
 import com.example.tenant_care.util.ExpenseUpdateStatus
+import com.example.tenant_care.util.FilterByMonthBox
+import com.example.tenant_care.util.FilterByYearBox
 import com.example.tenant_care.util.PenaltyUpdateStatus
 import com.example.tenant_care.util.ReusableFunctions
 import java.time.LocalDateTime
@@ -85,6 +87,10 @@ fun RentPaymentsInfoHomeScreenComposable(
     }
 
     var showEditPricePerWaterUnit by remember {
+        mutableStateOf(false)
+    }
+
+    var showChangeDurationDialog by remember {
         mutableStateOf(false)
     }
 
@@ -173,8 +179,34 @@ fun RentPaymentsInfoHomeScreenComposable(
         )
     }
 
+
+
+    if(showChangeDurationDialog) {
+        ChangeDurationDialog(
+            onConfirm = {
+                showChangeDurationDialog = !showChangeDurationDialog
+                viewModel.fetchRentOverview()
+            },
+            onDismissRequest = {
+                showChangeDurationDialog = !showChangeDurationDialog
+            },
+            years = uiState.years,
+            selectedYear = uiState.year,
+            selectedMonth = uiState.month,
+            onChangeSelectedYear = {
+                viewModel.updateYear(it)
+            },
+            onChangeSelectedMonth = {
+                viewModel.updateMonth(it)
+            },
+            months = uiState.months
+        )
+    }
+
     Box {
         RentPaymentsInfoHomeScreen(
+            penaltyButtonEnabled = uiState.penaltyButtonEnabled,
+            waterUnitsButtonEnabled = uiState.waterUnitButtonEnabled,
             month = uiState.month,
             year = uiState.year,
             penaltyActive = uiState.penaltyStatus,
@@ -200,6 +232,12 @@ fun RentPaymentsInfoHomeScreenComposable(
                 showEditPricePerWaterUnit = !showEditPricePerWaterUnit
             },
             navigateToRentPaymentsScreen = navigateToRentPaymentsScreen,
+            onChangeDuration = {
+                showChangeDurationDialog = !showChangeDurationDialog
+            },
+            onReset = {
+                viewModel.unfilter()
+            },
             navigateToAddUnitScreen = {}
         )
     }
@@ -207,6 +245,8 @@ fun RentPaymentsInfoHomeScreenComposable(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RentPaymentsInfoHomeScreen(
+    penaltyButtonEnabled: Boolean,
+    waterUnitsButtonEnabled: Boolean,
     month: String,
     year: String,
     penaltyActive: Boolean,
@@ -225,6 +265,8 @@ fun RentPaymentsInfoHomeScreen(
     penaltyUpdateStatus: PenaltyUpdateStatus,
     expenseUpdateStatus: ExpenseUpdateStatus,
     onPenaltyStatusChanged: (status: Boolean) -> Unit,
+    onChangeDuration: () -> Unit,
+    onReset: () -> Unit,
     navigateToRentPaymentsScreen: (month: String, year: String) -> Unit,
     navigateToAddUnitScreen: () -> Unit,
     modifier: Modifier = Modifier
@@ -237,6 +279,8 @@ fun RentPaymentsInfoHomeScreen(
             .fillMaxSize()
     ) {
         RentPaymentCard(
+            penaltyButtonEnabled = penaltyButtonEnabled,
+            waterUnitsButtonEnabled = waterUnitsButtonEnabled,
             month = month,
             year = year,
             totalUnits = totalUnits,
@@ -245,9 +289,14 @@ fun RentPaymentsInfoHomeScreen(
             clearedUnits = clearedUnits,
             deficit = deficit,
             unclearedUnits = unclearedUnits,
-            navigateToRentPaymentsScreen = navigateToRentPaymentsScreen)
+            onChangeDuration = onChangeDuration,
+            onReset = onReset,
+            navigateToRentPaymentsScreen = navigateToRentPaymentsScreen
+        )
         Spacer(modifier = Modifier.height(20.dp))
         AdditionalPayments(
+            penaltyButtonEnabled = penaltyButtonEnabled,
+            waterUnitsButtonEnabled = waterUnitsButtonEnabled,
             penaltyActive = penaltyActive,
             penaltyAmount = penaltyAmount,
             pricePerWaterUnit = pricePerWaterUnit,
@@ -265,6 +314,8 @@ fun RentPaymentsInfoHomeScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RentPaymentCard(
+    penaltyButtonEnabled: Boolean,
+    waterUnitsButtonEnabled: Boolean,
     month: String,
     year: String,
     totalUnits: Int,
@@ -273,6 +324,8 @@ fun RentPaymentCard(
     clearedUnits: Int,
     deficit: Double,
     unclearedUnits: Int,
+    onChangeDuration: () -> Unit,
+    onReset: () -> Unit,
     navigateToRentPaymentsScreen: (month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -289,13 +342,20 @@ fun RentPaymentCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${LocalDateTime.now().month}, ${LocalDateTime.now().year}",
+                    text = "$month, $year",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-                TextButton(onClick = { /*TODO*/ }) {
-                    Text(text = "Change month")
+                TextButton(onClick = onChangeDuration) {
+                    Text(text = "Change")
                 }
+                if(!penaltyButtonEnabled && !waterUnitsButtonEnabled) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(onClick = onReset) {
+                        Text(text = "Reset")
+                    }
+                }
+
             }
             Row {
                 Text(text = "Occupied units: $totalUnits")
@@ -395,6 +455,8 @@ fun RentPaymentCard(
 
 @Composable
 fun AdditionalPayments(
+    penaltyButtonEnabled: Boolean,
+    waterUnitsButtonEnabled: Boolean,
     penaltyActive: Boolean,
     penaltyAmount: Double,
     pricePerWaterUnit: Double,
@@ -421,7 +483,11 @@ fun AdditionalPayments(
                 if(executionStatus == ExecutionStatus.LOADING) {
                     CircularProgressIndicator()
                 } else {
-                    Switch(checked = penaltyActive, onCheckedChange = onPenaltyStatusChanged)
+                    Switch(
+                        enabled = penaltyButtonEnabled,
+                        checked = penaltyActive,
+                        onCheckedChange = onPenaltyStatusChanged
+                    )
                 }
             }
         }
@@ -446,7 +512,7 @@ fun AdditionalPayments(
                         Text(text = ReusableFunctions.formatMoneyValue(penaltyAmount))
                         Spacer(modifier = Modifier.width(3.dp))
                         IconButton(
-                            enabled = penaltyActive,
+                            enabled = penaltyActive && penaltyButtonEnabled,
                             onClick = onEditPenaltyAmount
                         ) {
                             Icon(
@@ -478,7 +544,10 @@ fun AdditionalPayments(
                     ) {
                         Text(text = ReusableFunctions.formatMoneyValue(pricePerWaterUnit))
                         Spacer(modifier = Modifier.width(3.dp))
-                        IconButton(onClick = onEditPricePerWaterUnit) {
+                        IconButton(
+                            enabled = waterUnitsButtonEnabled,
+                            onClick = onEditPricePerWaterUnit
+                        ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.edit),
                                 contentDescription = "Edit price per water unit"
@@ -541,6 +610,48 @@ fun EditAmountAlertDialog(
     )
 }
 
+@Composable
+fun ChangeDurationDialog(
+    onConfirm: () -> Unit,
+    onDismissRequest: () -> Unit,
+    years: List<String>,
+    selectedYear: String,
+    selectedMonth: String,
+    onChangeSelectedYear: (year: String) -> Unit,
+    onChangeSelectedMonth: (month: String) -> Unit,
+    months: List<String>,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        text = {
+            Row {
+                FilterByYearBox(
+                    years = years,
+                    selectedYear = selectedYear,
+                    onChangeSelectedYear = onChangeSelectedYear
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                FilterByMonthBox(
+                    months = months,
+                    selectedMonth = selectedMonth,
+                    onChangeSelectedMonth = onChangeSelectedMonth
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = "Cancel")
+            }
+        },
+        onDismissRequest = onDismissRequest,
+        confirmButton = { 
+            Button(onClick = onConfirm) {
+                Text(text = "Filter")
+            }
+        }
+    )
+}
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
@@ -566,6 +677,10 @@ fun RentPaymentsInfoHomeScreenPreview() {
             navigateToRentPaymentsScreen = { month, year ->  },
             onEditPenaltyAmount = {},
             onEditPricePerWaterUnit = {},
+            onChangeDuration = {},
+            onReset = {},
+            penaltyButtonEnabled = true,
+            waterUnitsButtonEnabled = true,
             navigateToAddUnitScreen = { /*TODO*/ }
         )
     }

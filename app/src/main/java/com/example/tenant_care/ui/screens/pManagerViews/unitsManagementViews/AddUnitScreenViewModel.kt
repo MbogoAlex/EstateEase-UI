@@ -29,7 +29,7 @@ enum class UploadingStatus {
 }
 
 data class PManagerAddUnitScreenUiState(
-    val numOfRooms: Int = 0,
+    val numOfRooms: String = "",
     val unitNameOrNumber: String = "",
     val unitDescription: String = "",
     val monthlyRent: String = "",
@@ -78,7 +78,7 @@ class PManagerAddUnitScreenViewModel(
                     _uiState.update {
                         it.copy(
                             propertyUnit = response.body()?.data?.property!!,
-                            numOfRooms = response.body()?.data?.property?.numberOfRooms!!,
+                            numOfRooms = response.body()?.data?.property?.rooms!!,
                             unitNameOrNumber = response.body()?.data?.property?.propertyNumberOrName!!,
                             unitDescription = response.body()?.data?.property?.propertyDescription!!,
                             monthlyRent = response.body()?.data?.property?.monthlyRent!!.toString()
@@ -91,7 +91,7 @@ class PManagerAddUnitScreenViewModel(
         }
     }
 
-    fun updateNumOfRooms(numOfRooms: Int) {
+    fun updateNumOfRooms(numOfRooms: String) {
         _uiState.update {
             it.copy(
                 numOfRooms = numOfRooms,
@@ -130,7 +130,7 @@ class PManagerAddUnitScreenViewModel(
             )
         }
         val property = PropertyRequestBody(
-            numberOfRooms = _uiState.value.numOfRooms,
+            rooms = _uiState.value.numOfRooms,
             propertyNumberOrName = _uiState.value.unitNameOrNumber,
             propertyDescription = _uiState.value.unitDescription,
             monthlyRent = _uiState.value.monthlyRent.toDouble(),
@@ -174,7 +174,7 @@ class PManagerAddUnitScreenViewModel(
             )
         }
         val property = PropertyRequestBody(
-            numberOfRooms = _uiState.value.numOfRooms,
+            rooms = _uiState.value.numOfRooms,
             propertyNumberOrName = _uiState.value.unitNameOrNumber,
             propertyDescription = _uiState.value.unitDescription,
             monthlyRent = _uiState.value.monthlyRent.toDouble(),
@@ -226,7 +226,7 @@ class PManagerAddUnitScreenViewModel(
     fun checkIfAllFieldsAreFilled() {
         _uiState.update {
             it.copy(
-                showSaveButton = uiState.value.numOfRooms != 0 && uiState.value.unitNameOrNumber.isNotEmpty() && uiState.value.unitDescription.isNotEmpty()
+                showSaveButton = uiState.value.numOfRooms.isNotEmpty() && uiState.value.unitNameOrNumber.isNotEmpty() && uiState.value.unitDescription.isNotEmpty()
                         && uiState.value.monthlyRent.isNotEmpty()
             )
         }

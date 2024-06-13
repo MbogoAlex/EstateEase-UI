@@ -48,7 +48,7 @@ fun UnoccupiedUnitsScreenComposable(
             numberOfRoomsSelected = uiState.rooms,
             properties = uiState.properties,
             onSelectNumOfRooms = {
-                viewModel.updateRooms(it.toString())
+                viewModel.updateRooms(it)
             },
             selectedUnitName = uiState.roomName,
             onChangeSelectedUnitName = {
@@ -66,7 +66,7 @@ fun UnoccupiedUnitsScreen(
     rooms: List<String>,
     numberOfRoomsSelected: String?,
     properties: List<PropertyUnit>,
-    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    onSelectNumOfRooms: (rooms: String) -> Unit,
     selectedUnitName: String?,
     onChangeSelectedUnitName: (name: String) -> Unit,
     unfilterUnits: () -> Unit,

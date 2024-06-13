@@ -87,7 +87,7 @@ class UnoccupiedUnitsScreenViewModel(
             try {
                 val response = apiRepository.fetchFilteredProperties(
                     tenantName = null,
-                    rooms = _uiState.value.rooms,
+                    rooms = _uiState.value.rooms.takeIf { it.isNotEmpty() },
                     roomName = _uiState.value.roomName,
                     occupied = false
                 )

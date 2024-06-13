@@ -119,7 +119,7 @@ fun OccupiedUnitsScreen(
     rooms: List<String>,
     numberOfRoomsSelected: String?,
     properties: List<PropertyUnit>,
-    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    onSelectNumOfRooms: (rooms: String) -> Unit,
     searchText: String?,
     onSearchTextChanged: (newValue: String) -> Unit,
     selectedUnitName: String?,
@@ -285,10 +285,10 @@ fun OccupiedUnitDetails(
                 Spacer(modifier = Modifier.height(10.dp))
                 Row {
                     Text(
-                        text = "No. Rooms: ",
+                        text = ": ",
                         fontWeight = FontWeight.Bold
                     )
-                    Text(text = propertyUnit.numberOfRooms.toString())
+                    Text(text = propertyUnit.rooms)
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Row {
@@ -337,7 +337,7 @@ fun OccupiedUnitDetails(
 fun OccupiedUnitItemPreview() {
     val property = PropertyUnit (
         propertyUnitId = 0,
-        numberOfRooms = 2,
+        rooms = "Bedsitter",
         propertyNumberOrName = "Col C2",
         propertyDescription = "2-bedroom unit",
         monthlyRent = 7200.00,

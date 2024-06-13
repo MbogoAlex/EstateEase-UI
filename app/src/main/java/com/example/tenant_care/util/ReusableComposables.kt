@@ -54,10 +54,10 @@ import com.example.tenant_care.model.property.PropertyUnit
 @Composable
 fun FilterByNumOfRoomsBox(
     selectedNumOfRooms: String?,
-    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    onSelectNumOfRooms: (rooms: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var rooms = listOf<Int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    var rooms = listOf<String>("Bedsitter", "One bedroom", "Two bedroom")
     var expanded by remember {
         mutableStateOf(false)
     }
@@ -81,7 +81,7 @@ fun FilterByNumOfRoomsBox(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "No. Rooms".takeIf { selectedNumOfRooms.isNullOrEmpty() } ?: "$selectedNumOfRooms room".takeIf { selectedNumOfRooms?.toInt() == 1 } ?: "$selectedNumOfRooms rooms",
+                    text = "Type".takeIf { selectedNumOfRooms.isNullOrEmpty() } ?: "${selectedNumOfRooms?.substring(0, 7)}...".takeIf { selectedNumOfRooms?.length!! > 9 } ?: "$selectedNumOfRooms",
                     modifier = Modifier
                         .padding(10.dp)
                 )
@@ -103,7 +103,7 @@ fun FilterByNumOfRoomsBox(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = "$i room".takeIf { i == 1 } ?: "$i rooms"
+                                    text = i
                                 )
                             },
                             onClick = {
@@ -399,7 +399,7 @@ fun HouseUnitItem(
             Spacer(modifier = Modifier.height(10.dp))
             Row {
                 Text(text = "Rooms:")
-                Text(text = propertyUnit.numberOfRooms.toString())
+                Text(text = propertyUnit.rooms)
             }
             Spacer(modifier = Modifier.height(10.dp))
             if(tenant != null) {
@@ -492,6 +492,31 @@ fun PropertyDataCell(
 
 @Composable
 fun EditAlertDialog(
+    title: String,
+    onConfirm: () -> Unit,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        title = {
+            Text(text = title)
+        },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text(text = "Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = "Cancel")
+            }
+        },
+        onDismissRequest = onDismissRequest
+    )
+}
+
+@Composable
+fun PaymentDialog(
     title: String,
     onConfirm: () -> Unit,
     onDismissRequest: () -> Unit,

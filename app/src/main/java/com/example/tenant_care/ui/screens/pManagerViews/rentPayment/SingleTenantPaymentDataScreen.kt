@@ -53,8 +53,6 @@ import com.example.tenant_care.util.ReusableFunctions
 import java.time.LocalDateTime
 
 
-
-
 object SingleTenantPaymentDetailsComposableDestination: AppNavigation {
     override val title: String = "Single Tenant Payment Details"
     override val route: String = "single-tenant-payment-detail"
@@ -62,9 +60,10 @@ object SingleTenantPaymentDetailsComposableDestination: AppNavigation {
     val month: String = "month"
     val year: String = "year"
     val roomName: String = "roomName"
-    val routeWithArgs: String = "$route/{$month}/{$year}/{$tenantId}/{$roomName}"
+    val routeWithArgs: String = "$route/{$roomName}/{$tenantId}/{$month}/{$year}"
 
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SingleTenantPaymentDetailsComposable(
@@ -110,6 +109,8 @@ fun SingleTenantPaymentDetailsComposable(
         Log.i("FORMATTED_DATE_IS", uiState.rentPaidOn)
         Box(modifier = modifier) {
             SingleTenantPaymentDetailsScreen(
+                month = uiState.month,
+                year = uiState.year,
                 currentWaterReadingMonth = uiState.waterUnitsCurrentMonth,
                 previousWaterReadingMonth = uiState.waterUnitsPreviousMonth,
                 totalWaterPrice = uiState.totalWaterPrice!!,
@@ -161,6 +162,8 @@ fun SingleTenantPaymentDetailsComposable(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SingleTenantPaymentDetailsScreen(
+    month: String?,
+    year: String?,
     currentWaterReadingMonth: String,
     previousWaterReadingMonth: String,
     totalWaterPrice: Double,
@@ -196,7 +199,7 @@ fun SingleTenantPaymentDetailsScreen(
             }
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = LocalDateTime.now().month.toString(),
+                text = "$month, $year",
                 fontWeight = FontWeight.Bold
             )
         }
@@ -305,7 +308,7 @@ fun TenantPaid(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = rentPaymentData.numberOfRooms.toString()
+                    text = rentPaymentData.numberOfRooms
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -449,7 +452,7 @@ fun TenantNotPaid(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = rentPaymentData.numberOfRooms.toString()
+                    text = rentPaymentData.numberOfRooms
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -678,7 +681,7 @@ fun TenantPaidLate(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = rentPaymentData.numberOfRooms.toString()
+                    text = rentPaymentData.numberOfRooms
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))

@@ -154,12 +154,12 @@ fun SearchTenantField(
 fun FilterRoomsBox(
     modifier: Modifier = Modifier
 ) {
-    var rooms = listOf<Int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    var rooms = listOf<String>("Bedsitter", "One bedroom", "Two bedroom")
     var expanded by remember {
         mutableStateOf(false)
     }
     var selectedNumOfRooms by remember {
-        mutableIntStateOf(0)
+        mutableStateOf("")
     }
     Card(
         modifier = Modifier
@@ -169,7 +169,8 @@ fun FilterRoomsBox(
     ) {
         Column {
             Text(
-                text = "No. Rooms".takeIf { selectedNumOfRooms == 0 } ?: "$selectedNumOfRooms room".takeIf { selectedNumOfRooms == 1 } ?: "$selectedNumOfRooms rooms",
+                text = "Type".takeIf { selectedNumOfRooms.isNullOrEmpty() } ?: selectedNumOfRooms.substring(0, 7)
+                    .takeIf { selectedNumOfRooms.length > 9  } ?: "$selectedNumOfRooms",
                 modifier = Modifier
                     .padding(10.dp)
             )
@@ -181,7 +182,7 @@ fun FilterRoomsBox(
                     DropdownMenuItem(
                         text = {
                                Text(
-                                   text = "$i room".takeIf { i == 1 } ?: "$i rooms"
+                                   text = i
                                )
                         },
                         onClick = {

@@ -80,9 +80,7 @@ fun RentPaymentsComposable(
             onChangeTab = {
                 viewModel.changeScreen(it)
             },
-            navigateToSingleTenantPaymentDetails = {roomName, tenantId ->
-                navigateToSingleTenantPaymentDetails(uiState.month!!, uiState.year!!, tenantId, roomName)
-            },
+            navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
         )
     }
 }
@@ -95,7 +93,7 @@ fun RentPaymentsScreen(
     navItems: List<RentPaymentsNavigationItem>,
     currentScreen: RentPaymentsScreen,
     onChangeTab: (newScreen: RentPaymentsScreen) -> Unit,
-    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String) -> Unit,
+    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String, month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -105,6 +103,8 @@ fun RentPaymentsScreen(
         when(currentScreen) {
             RentPaymentsScreen.ALL_TENANTS -> {
                 AllTenantsPaymentsScreenComposable(
+                    month = month,
+                    year = year,
                     navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
                     modifier = Modifier
                         .weight(1f)
@@ -112,6 +112,8 @@ fun RentPaymentsScreen(
             }
             RentPaymentsScreen.PAID -> {
                 TenantsPaidScreenComposable(
+                    month = month,
+                    year = year,
                     navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
                     modifier = Modifier
                         .weight(1f)
@@ -119,6 +121,8 @@ fun RentPaymentsScreen(
             }
             RentPaymentsScreen.NOT_PAID -> {
                 TenantsNotPaidScreenComposable(
+                    month = month,
+                    year = year,
                     navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
                     modifier = Modifier
                         .weight(1f)
@@ -188,7 +192,7 @@ fun RentPaymentScreenPreview() {
             currentScreen = currentScreen,
             navItems = navigationItems,
             onChangeTab = {},
-            navigateToSingleTenantPaymentDetails = {roomName, tenantId ->  }
+            navigateToSingleTenantPaymentDetails = {roomName, tenantId, month, year ->   }
         )
     }
 }

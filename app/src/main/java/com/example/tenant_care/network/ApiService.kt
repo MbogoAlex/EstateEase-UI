@@ -8,6 +8,12 @@ import com.example.tenant_care.model.amenity.AmenityRequestBody
 import com.example.tenant_care.model.amenity.AmenityResponseBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginRequestBody
 import com.example.tenant_care.model.caretaker.CaretakerLoginResponseBody
+import com.example.tenant_care.model.caretaker.CaretakerPaymentRequestBody
+import com.example.tenant_care.model.caretaker.CaretakerPaymentResponseBody
+import com.example.tenant_care.model.caretaker.CaretakerRegistrationRequestBody
+import com.example.tenant_care.model.caretaker.CaretakerRegistrationResponseBody
+import com.example.tenant_care.model.caretaker.CaretakerResponseBody
+import com.example.tenant_care.model.caretaker.CaretakersResponseBody
 import com.example.tenant_care.model.caretaker.MeterReadingRequestBody
 import com.example.tenant_care.model.caretaker.MeterReadingResponseBody
 import com.example.tenant_care.model.caretaker.MeterReadingsResponseBody
@@ -29,6 +35,7 @@ import com.example.tenant_care.model.property.PropertyUnitResponseBody
 import com.example.tenant_care.model.property.SinglePropertyUnitResponseBody
 import com.example.tenant_care.model.tenant.LoginTenantRequestBody
 import com.example.tenant_care.model.tenant.LoginTenantResponseBody
+import com.example.tenant_care.model.tenant.PaymentStatusResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRequestBody
 import com.example.tenant_care.model.tenant.RentPaymentResponseBody
 import com.example.tenant_care.model.tenant.RentPaymentRowsResponse
@@ -180,6 +187,8 @@ interface ApiService {
         @Body rentPaymentRequestBody: RentPaymentRequestBody
     ): Response<RentPaymentResponseBody>
 
+    @GET("tenant/payment/{id}")
+    suspend fun getRentPaymentStatus(@Path("id") id: Int): Response<PaymentStatusResponseBody>
     @GET("tenant/rentpaymentsreport")
     suspend fun getRentPaymentRowsAndGenerateReport(
         @Query("tenantId") tenantId: Int,
@@ -304,4 +313,34 @@ interface ApiService {
 
     @GET("expense/{id}")
     suspend fun getExpense(@Path("id") id: Int): Response<AdditionalExpenseResponseBody>
+
+    @GET("caretaker/active")
+    suspend fun getActiveCaretakers(): Response<CaretakersResponseBody>
+
+    @GET("caretaker/{id}")
+    suspend fun getCaretaker(@Path("id") id: Int): Response<CaretakerResponseBody>
+
+    @POST("caretaker/register")
+    suspend fun registerCaretaker(@Body caretaker: CaretakerRegistrationRequestBody): Response<CaretakerRegistrationResponseBody>
+
+    @POST("caretaker/payment")
+    suspend fun payCaretaker(@Body caretakerPaymentRequestBody: CaretakerPaymentRequestBody): Response<CaretakerPaymentResponseBody>
+
+    @GET("caretaker/payment/{id}")
+    suspend fun getCaretakerPaymentStatus(@Path("id") id: String): Response<PaymentStatusResponseBody>
+
+    @PUT("caretaker/deregister/{caretakerId}")
+    suspend fun removeCaretaker(@Path("caretakerId") id: Int): Response<CaretakerLoginResponseBody>
+
+    @GET("rentpayment/generalreport")
+    suspend fun generateGeneralReport(
+        @Query("month") month: String?,
+        @Query("year") year: String?,
+        @Query("roomName") roomName: String?,
+        @Query("rooms") rooms: String?,
+        @Query("tenantName") tenantName: String?,
+        @Query("tenantId") tenantId: Int?,
+        @Query("rentPaymentStatus") rentPaymentStatus: Boolean?,
+        @Query("paidLate") paidLate: Boolean?,
+    ): Response<ResponseBody>
 }

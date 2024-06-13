@@ -87,6 +87,7 @@ class SingleTenantPaymentDataScreenViewModel(
                 }
             }
         }
+        Log.i("NAV_DETAILS: ", "TENANTID: $tenantId, ROOMNAME: $roomName MONTH: $month, YEAR: $year")
         getMeterReadings()
     }
 

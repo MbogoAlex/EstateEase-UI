@@ -70,7 +70,7 @@ fun OccupiedUnitsScreen(
     rooms: List<String>,
     numberOfRoomsSelected: String?,
     properties: List<PropertyUnit>,
-    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    onSelectNumOfRooms: (rooms: String) -> Unit,
     searchText: String?,
     onSearchTextChanged: (newValue: String) -> Unit,
     selectedUnitName: String?,

@@ -50,11 +50,15 @@ import com.example.tenant_care.util.UndoFilteringBox
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TenantsPaidScreenComposable(
-    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String) -> Unit,
+    month: String,
+    year: String,
+    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String, month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: TenantsPaidScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiStatus.collectAsState()
+
+    viewModel.setMonthAndYear(month, year)
 
     var showMenuPopup by remember {
         mutableStateOf(false)
@@ -66,6 +70,8 @@ fun TenantsPaidScreenComposable(
         modifier = modifier
     ) {
         TenantsPaidScreen(
+            month = month,
+            year = year,
             activeTenantsSelected = uiState.activeTenantsSelected,
             inActiveTenantsSelected = uiState.inactiveTenantsSelected,
             latePaymentsSelected = uiState.latePaymentsSelected,
@@ -95,7 +101,9 @@ fun TenantsPaidScreenComposable(
             numberOfUnits = uiState.rentPaymentsData.rentpayment.size,
             rentPayments = uiState.rentPaymentsData.rentpayment,
             paidAt = uiState.rentPaidAt,
-            navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
+            navigateToSingleTenantPaymentDetails = {roomName, tenantId ->
+                navigateToSingleTenantPaymentDetails(roomName, tenantId, month, year)
+            },
             onDismissRequest = {
                 showMenuPopup = !showMenuPopup
             },
@@ -122,6 +130,8 @@ fun TenantsPaidScreenComposable(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TenantsPaidScreen(
+    month: String,
+    year: String,
     activeTenantsSelected: Boolean,
     inActiveTenantsSelected: Boolean,
     latePaymentsSelected: Boolean,
@@ -129,7 +139,7 @@ fun TenantsPaidScreen(
     tenantName: String?,
     onSearchTextChanged: (searchText: String) -> Unit,
     numberOfRoomsSelected: String?,
-    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    onSelectNumOfRooms: (rooms: String) -> Unit,
     rooms: List<String>,
     selectedUnitName: String?,
     onChangeSelectedUnitName: (unitName: String) -> Unit,
@@ -326,6 +336,10 @@ fun TenantsPaidScreen(
 
             }
         }
+        Text(
+            text = "$month, $year",
+            fontWeight = FontWeight.Bold
+        )
         Spacer(modifier = Modifier.height(10.dp))
         LazyColumn() {
             items(rentPayments.size) {
@@ -382,7 +396,7 @@ fun IndividualTenantPaidCell(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(text = "No.Rooms: ")
                 Text(
-                    text = rentPayment.numberOfRooms.toString(),
+                    text = rentPayment.numberOfRooms,
                     fontWeight = FontWeight.Bold
                 )
             }

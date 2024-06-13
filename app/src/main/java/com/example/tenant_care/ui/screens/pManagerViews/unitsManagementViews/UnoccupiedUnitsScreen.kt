@@ -11,16 +11,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
@@ -88,7 +92,7 @@ fun UnoccupiedUnitsComposable(
 @Composable
 fun UnoccupiedUnitsScreen(
     selectedNumOfRooms: String?,
-    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    onSelectNumOfRooms: (rooms: String) -> Unit,
     rooms: List<String>,
     selectedUnit: String?,
     onChangeSelectedUnitName: (name: String) -> Unit,
@@ -200,10 +204,10 @@ fun UnoccupiedUnitItem(
 @Composable
 fun FilterUnOccupiedUnitsByNumOfRoomsBox(
     selectedNumOfRooms: String?,
-    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    onSelectNumOfRooms: (rooms: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var rooms = listOf<Int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    var rooms = listOf<String>("Bedsitter", "One bedroom", "Two bedroom")
     var expanded by remember {
         mutableStateOf(false)
     }
@@ -227,7 +231,7 @@ fun FilterUnOccupiedUnitsByNumOfRoomsBox(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "No. Rooms".takeIf { selectedNumOfRooms == null } ?: "$selectedNumOfRooms room".takeIf { selectedNumOfRooms?.toInt() == 1 } ?: "$selectedNumOfRooms rooms",
+                    text = "Type".takeIf { selectedNumOfRooms.isNullOrEmpty() } ?: "${selectedNumOfRooms?.substring(0, 7)}...".takeIf { selectedNumOfRooms?.length!! > 9 } ?: "$selectedNumOfRooms",
                     modifier = Modifier
                         .padding(10.dp)
                 )
@@ -240,18 +244,25 @@ fun FilterUnOccupiedUnitsByNumOfRoomsBox(
                 expanded = expanded,
                 onDismissRequest = { expanded = !expanded }
             ) {
-                rooms.forEachIndexed { index, i ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = "$i room".takeIf { i == 1 } ?: "$i rooms"
-                            )
-                        },
-                        onClick = {
-                            onSelectNumOfRooms(i)
-                            expanded = false
-                        }
-                    )
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 250.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    rooms.forEachIndexed { index, i ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = i
+                                )
+                            },
+                            onClick = {
+                                onSelectNumOfRooms(i)
+                                expanded = false
+                            }
+                        )
+                        Divider()
+                    }
                 }
             }
         }

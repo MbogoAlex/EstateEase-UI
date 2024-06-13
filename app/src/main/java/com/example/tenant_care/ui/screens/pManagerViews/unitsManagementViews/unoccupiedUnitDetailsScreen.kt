@@ -129,7 +129,7 @@ fun UnoccupiedUnitDetailsComposable(
                     viewModel.updateTenantPassword(it)
                 },
                 assignmentButtonEnabled = uiState.assignmentButtonEnabled,
-                numOfRooms = uiState.propertyUnit.numberOfRooms.toString(),
+                numOfRooms = uiState.propertyUnit.rooms,
                 cancelUnitAssignment = {
                     viewModel.toggleScreen()
                 },
@@ -216,10 +216,10 @@ fun UnOccupiedUnitDetailsScreen(
                 Spacer(modifier = Modifier.height(10.dp))
                 Row {
                     Text(
-                        text = "No. Rooms: ",
+                        text = "Type: ",
                         fontWeight = FontWeight.Bold
                     )
-                    Text(text = propertyUnit.numberOfRooms.toString())
+                    Text(text = propertyUnit.rooms)
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Row {

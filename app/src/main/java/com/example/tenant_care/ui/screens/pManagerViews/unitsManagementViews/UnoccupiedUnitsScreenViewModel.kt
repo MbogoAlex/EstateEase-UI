@@ -88,7 +88,7 @@ class UnoccupiedUnitsScreenViewModel(
 
 
 
-    fun filterByNumberOfRooms(rooms: Int) {
+    fun filterByNumberOfRooms(rooms: String) {
         _uiState.update {
             it.copy(
                 numOfRoomsSelected = rooms.toString()

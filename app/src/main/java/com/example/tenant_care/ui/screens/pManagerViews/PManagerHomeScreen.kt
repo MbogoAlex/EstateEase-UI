@@ -63,6 +63,7 @@ import com.example.tenant_care.R
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.ui.screens.caretakerViews.sideBarMenuItems
 import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityScreenComposable
+import com.example.tenant_care.ui.screens.pManagerViews.caretakerManagement.CaretakerManagementHomeScreenComposable
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsInfoHomeScreenComposable
 import com.example.tenant_care.ui.screens.pManagerViews.unitsManagementViews.UnitsManagementComposable
 import com.example.tenant_care.ui.theme.Tenant_careTheme
@@ -90,6 +91,7 @@ fun PManagerHomeComposable(
     navigateToAmenityDetailsScreen: (amenityId: String) -> Unit,
     navigateToEditAmenityScreen: () -> Unit,
     navigateToPmanagerHomeScreenWithArgs: (childScreen: String) -> Unit,
+    navigateToCaretakerDetailsScreenWithArgs: (caretakerId: String) -> Unit,
     navigateToLoginScreenWithArgs: (roleId: String, phoneNumber: String, password: String) -> Unit,
 ) {
     val activity = (LocalContext.current as? Activity)
@@ -115,6 +117,12 @@ fun PManagerHomeComposable(
             title = "Notifications",
             icon = R.drawable.message,
             screen = PManagerViewSideBarMenuScreen.NOTIFICATIONS,
+            color = Color.Gray
+        ),
+        PManagerViewSideBarMenuItem(
+            title = "Caretaker management",
+            icon = R.drawable.person,
+            screen = PManagerViewSideBarMenuScreen.CARETAKER_MANAGEMENT,
             color = Color.Gray
         ),
         PManagerViewSideBarMenuItem(
@@ -144,6 +152,9 @@ fun PManagerHomeComposable(
         viewModel.resetChildScreen()
     } else if(uiState.childScreen == "units-management-screen") {
         currentScreen = PManagerViewSideBarMenuScreen.UNITS_MANAGEMENT
+        viewModel.resetChildScreen()
+    } else if(uiState.childScreen == "caretakers-screen") {
+        currentScreen = PManagerViewSideBarMenuScreen.CARETAKER_MANAGEMENT
         viewModel.resetChildScreen()
     }
 
@@ -180,7 +191,8 @@ fun PManagerHomeComposable(
             navigateToPreviousScreen = navigateToPreviousScreen,
             navigateToAmenityDetailsScreen = navigateToAmenityDetailsScreen,
             navigateToEditAmenityScreen = navigateToEditAmenityScreen,
-            navigateToPmanagerHomeScreenWithArgs = navigateToPmanagerHomeScreenWithArgs
+            navigateToPmanagerHomeScreenWithArgs = navigateToPmanagerHomeScreenWithArgs,
+            navigateToCaretakerDetailsScreenWithArgs = navigateToCaretakerDetailsScreenWithArgs
         )
     }
 }
@@ -200,6 +212,7 @@ fun PManagerHomeScreen(
     navigateToAmenityDetailsScreen: (amenityId: String) -> Unit,
     navigateToEditAmenityScreen: () -> Unit,
     navigateToPmanagerHomeScreenWithArgs: (childScreen: String) -> Unit,
+    navigateToCaretakerDetailsScreenWithArgs: (caretakerId: String) -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -307,6 +320,12 @@ fun PManagerHomeScreen(
                         Text(text = "Hello")
                     }
                 }
+                PManagerViewSideBarMenuScreen.CARETAKER_MANAGEMENT -> {
+                    CaretakerManagementHomeScreenComposable(
+                        navigateToHomeScreenWithArgs = navigateToPmanagerHomeScreenWithArgs,
+                        navigateToCaretakerDetailsScreenWithArgs = navigateToCaretakerDetailsScreenWithArgs
+                    )
+                }
                 PManagerViewSideBarMenuScreen.AMENITIES -> {
                     AmenityScreenComposable(
                         navigateToAmenityDetailsScreen = navigateToAmenityDetailsScreen,
@@ -368,7 +387,8 @@ fun PManagerHomeScreenPreview() {
             navigateToAmenityDetailsScreen = {},
             navigateToEditAmenityScreen = {},
             navigateToPmanagerHomeScreenWithArgs = {},
-            onLogout = {}
+            onLogout = {},
+            navigateToCaretakerDetailsScreenWithArgs = {}
         )
     }
 }

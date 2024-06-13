@@ -302,7 +302,7 @@ fun RentStatusCard(
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = formattedTotalPayable,
+                        text = ReusableFunctions.formatMoneyValue(rentPayment.paidAmount!!),
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -395,7 +395,7 @@ fun TenantRentViewScreenPreview() {
             transactionId = "123432111",
             year = "2024",
             propertyNumberOrName = "Col C2",
-            numberOfRooms = 2,
+            numberOfRooms = "Bedsitter",
             tenantId = 2,
             email = "tenant@gmail.com",
             fullName = "Mbogo AGM",
@@ -423,7 +423,7 @@ fun TenantRentViewScreenPreview() {
             transactionId = "123432111",
             year = "2024",
             propertyNumberOrName = "Col C2",
-            numberOfRooms = 2,
+            numberOfRooms = "Bedsitter",
             tenantId = 2,
             email = "tenant@gmail.com",
             fullName = "Mbogo AGM",
@@ -451,7 +451,7 @@ fun TenantRentViewScreenPreview() {
             transactionId = "123432111",
             year = "2024",
             propertyNumberOrName = "Col C2",
-            numberOfRooms = 2,
+            numberOfRooms = "Bedsitter",
             tenantId = 2,
             email = "tenant@gmail.com",
             fullName = "Mbogo AGM",

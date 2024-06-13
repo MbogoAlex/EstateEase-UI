@@ -1,6 +1,7 @@
 package com.example.tenant_care.ui.screens.pManagerViews.rentPayment
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -38,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -51,18 +54,23 @@ import com.example.tenant_care.EstateEaseViewModelFactory
 import com.example.tenant_care.R
 import com.example.tenant_care.model.pManager.TenantRentPaymentData
 import com.example.tenant_care.ui.theme.Tenant_careTheme
+import com.example.tenant_care.util.DownloadingStatus
 import com.example.tenant_care.util.FilterByNumOfRoomsBox
 import com.example.tenant_care.util.FilterByRoomNameBox
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.SearchFieldForTenants
 import com.example.tenant_care.util.UndoFilteringBox
+import java.time.Year
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AllTenantsPaymentsScreenComposable(
-    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String) -> Unit,
+    month: String,
+    year: String,
+    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String, month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val viewModel: AllTenantsPaymentsScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
 
@@ -70,12 +78,32 @@ fun AllTenantsPaymentsScreenComposable(
         mutableStateOf(false)
     }
 
-    val popUpItems = listOf<String>("Active tenants", "Removed tenants")
+    var dataFetched by remember {
+        mutableStateOf(true)
+    }
+
+    if(dataFetched) {
+        viewModel.setMonthAndYear(month = month, year = year)
+        dataFetched = false
+    }
+
+    if(uiState.downloadingStatus == DownloadingStatus.SUCCESS) {
+        viewModel.resetDownloadingStatus()
+    }
+
+//    var generatingReport by remember {
+//        mutableStateOf(false)
+//    }
+
+    val popUpItems = listOf<String>("Active tenants", "Removed tenants", "Report")
+
 
     Box(
         modifier = modifier
     ) {
         AllTenantsPaymentsScreen(
+            month = month,
+            year = year,
             activeTenantsSelected = uiState.activeTenantsSelected,
             inActiveTenantsSelected = uiState.inactiveTenantsSelected,
             tenantName = uiState.tenantName,
@@ -102,7 +130,9 @@ fun AllTenantsPaymentsScreenComposable(
                 viewModel.unfilterUnits()
             },
             numberOfUnits = uiState.rentPaymentsData.rentpayment.size,
-            navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
+            navigateToSingleTenantPaymentDetails = {roomName, tenantId ->
+                navigateToSingleTenantPaymentDetails(roomName, tenantId, month, year)
+            },
             onMenuButtonClicked = {
                 showMenuPopup = !showMenuPopup
             },
@@ -116,8 +146,11 @@ fun AllTenantsPaymentsScreenComposable(
                     viewModel.filterByActiveTenants(true)
                 } else if(item == "Removed tenants") {
                     viewModel.filterByActiveTenants(false)
+                } else if(item == "Report") {
+                    viewModel.fetchReport(context)
                 }
-            }
+            },
+            downloadingStatus = uiState.downloadingStatus
         )
 
     }
@@ -128,7 +161,6 @@ fun PopupMenu(
     popupMenuItems: List<String>,
     onDismissRequest: () -> Unit,
     onPopupMenuItemClicked: (item: String) -> Unit,
-
     modifier: Modifier = Modifier
 ) {
     Card {
@@ -176,12 +208,14 @@ fun PopupMenu(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AllTenantsPaymentsScreen(
+    month: String,
+    year: String,
     activeTenantsSelected: Boolean,
     inActiveTenantsSelected: Boolean,
     tenantName: String?,
     onSearchTextChanged: (searchText: String) -> Unit,
     numberOfRoomsSelected: String?,
-    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    onSelectNumOfRooms: (rooms: String) -> Unit,
     rooms: List<String>,
     selectedUnitName: String?,
     onChangeSelectedUnitName: (unitName: String) -> Unit,
@@ -194,6 +228,7 @@ fun AllTenantsPaymentsScreen(
     showMenuPopup: Boolean,
     popUpItems: List<String>,
     onPopupMenuItemClicked: (item: String) -> Unit,
+    downloadingStatus: DownloadingStatus,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -274,6 +309,8 @@ fun AllTenantsPaymentsScreen(
                         popupMenuItems = popUpItems,
                         onPopupMenuItemClicked = onPopupMenuItemClicked
                     )
+                } else if(downloadingStatus == DownloadingStatus.LOADING) {
+                    CircularProgressIndicator()
                 } else {
                     Box(
                         contentAlignment = Alignment.Center
@@ -293,6 +330,10 @@ fun AllTenantsPaymentsScreen(
 
             }
         }
+        Text(
+            text = "$month, $year",
+            fontWeight = FontWeight.Bold
+        )
         Spacer(modifier = Modifier.height(10.dp))
         LazyColumn() {
             items(rentPayments.size) {
@@ -325,7 +366,10 @@ fun IndividualTenantCell(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
-                navigateToSingleTenantPaymentDetails(rentPayment.propertyNumberOrName, rentPayment.tenantId!!.toString())
+                navigateToSingleTenantPaymentDetails(
+                    rentPayment.propertyNumberOrName,
+                    rentPayment.tenantId!!.toString()
+                )
             }
     ) {
         Column(
@@ -346,7 +390,7 @@ fun IndividualTenantCell(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(text = "No.Rooms: ")
                 Text(
-                    text = rentPayment.numberOfRooms.toString(),
+                    text = rentPayment.numberOfRooms,
                     fontWeight = FontWeight.Bold
                 )
             }

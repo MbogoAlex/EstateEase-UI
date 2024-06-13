@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 val propertyUnitData = PropertyUnit(
     propertyUnitId = 0,
-    numberOfRooms = 1,
+    rooms = "Bedsitter",
     propertyNumberOrName = "",
     propertyDescription = "",
     monthlyRent = 0.0,

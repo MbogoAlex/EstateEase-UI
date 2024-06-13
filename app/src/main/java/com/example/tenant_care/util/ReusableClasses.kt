@@ -37,6 +37,13 @@ enum class ExpenseUpdateStatus {
     FAILURE
 }
 
+enum class PaymentStatus {
+    INITIAL,
+    LOADING,
+    SUCCESS,
+    FAILURE
+}
+
 enum class TenantViewSidebarMenuScreen {
     HOME_SCREEN,
     LOGIN_SCREEN
@@ -90,6 +97,7 @@ enum class PManagerViewSideBarMenuScreen {
     RENT_PAYMENTS_INFO,
     UNITS_MANAGEMENT,
     NOTIFICATIONS,
+    CARETAKER_MANAGEMENT,
     AMENITIES,
     LOGOUT
 }
@@ -99,4 +107,17 @@ data class PManagerViewSideBarMenuItem(
     val icon: Int,
     val screen: PManagerViewSideBarMenuScreen,
     val color: Color
+)
+
+enum class CaretakerManagementBottomBarScreen {
+    CARETAKERS,
+    ADD_CARETAKER
+}
+
+data class CaretakerManagementBottomBarMenuItem(
+    val title: String,
+    val icon: Int,
+    val screen: CaretakerManagementBottomBarScreen,
+    val color: Color
+
 )

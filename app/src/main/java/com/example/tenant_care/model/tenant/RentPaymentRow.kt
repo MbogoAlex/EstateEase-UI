@@ -28,7 +28,7 @@ data class RentPayment(
     val transactionId: String?,
     val year: String,
     val propertyNumberOrName: String,
-    val numberOfRooms: Int,
+    val numberOfRooms: String,
     val tenantId: Int,
     val email: String,
     val fullName: String,

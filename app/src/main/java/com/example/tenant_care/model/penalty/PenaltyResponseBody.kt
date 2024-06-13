@@ -54,10 +54,10 @@ data class RentPaymentDT(
     val daysLate: Int,
     val penaltyPerDay: Double,
     val paidAmount: Double?,
-    val paidAt: Double?,
+    val paidAt: String?,
     val paidLate: Boolean?,
     val tenant: TenantData,
     val unitName: String,
-    val numberOfRooms: Int,
-    val waterMeterDataDTO: WaterMeterDt
+    val rooms: String?,
+    val waterMeterDataDTO: WaterMeterDt?
 )

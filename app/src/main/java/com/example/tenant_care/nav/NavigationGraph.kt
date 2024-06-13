@@ -27,6 +27,8 @@ import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityDetailsScr
 import com.example.tenant_care.ui.screens.generalViews.amenity.AmenityDetailsScreenDestination
 import com.example.tenant_care.ui.screens.generalViews.amenity.EditAmenityComposable
 import com.example.tenant_care.ui.screens.generalViews.amenity.EditAmenityScreenDestination
+import com.example.tenant_care.ui.screens.pManagerViews.caretakerManagement.CaretakerDetailsScreenComposable
+import com.example.tenant_care.ui.screens.pManagerViews.caretakerManagement.CaretakerDetailsScreenDestination
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsComposable
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.RentPaymentsComposableDestination
 import com.example.tenant_care.ui.screens.pManagerViews.rentPayment.SingleTenantPaymentDetailsComposable
@@ -148,6 +150,10 @@ fun NavigationGraph(
                 navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->
                     navController.navigate("${LoginScreenDestination.route}/${roleId}/${phoneNumber}/${password}")
                 },
+                navigateToCaretakerDetailsScreenWithArgs = {
+                    navController.navigate("${CaretakerDetailsScreenDestination.route}/${it}")
+
+                }
             )
         }
         composable(UnitsManagementComposableDestination.route) {
@@ -513,6 +519,9 @@ fun NavigationGraph(
                 navigateToLoginScreenWithArgs = {roleId, phoneNumber, password ->
                     navController.navigate("${LoginScreenDestination.route}/${roleId}/${phoneNumber}/${password}")
                 },
+                navigateToCaretakerDetailsScreenWithArgs = {
+                    navController.navigate("${CaretakerDetailsScreenDestination.route}/${it}")
+                }
             )
         }
         composable(
@@ -531,6 +540,24 @@ fun NavigationGraph(
                     navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
                 }
             )
+        }
+        composable(
+            CaretakerDetailsScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(CaretakerDetailsScreenDestination.caretakerId) {
+                    CaretakerDetailsScreenDestination.route
+                }
+            )
+        ) {
+            CaretakerDetailsScreenComposable(
+                navigateToPreviousScreen = {
+                    navController.navigateUp()
+                },
+                navigateToHomeScreenWithArgs = {
+                    navController.navigate("${PManagerHomeScreenDestination.route}/${it}")
+                }
+            )
+
         }
     }
 }

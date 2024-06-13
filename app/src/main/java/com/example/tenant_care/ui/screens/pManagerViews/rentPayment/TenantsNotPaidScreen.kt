@@ -49,7 +49,9 @@ import com.example.tenant_care.util.UndoFilteringBox
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TenantsNotPaidScreenComposable(
-    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String) -> Unit,
+    month: String,
+    year: String,
+    navigateToSingleTenantPaymentDetails: (roomName: String, tenantId: String, month: String, year: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: TenantsNotPaidScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
@@ -59,12 +61,23 @@ fun TenantsNotPaidScreenComposable(
         mutableStateOf(false)
     }
 
-    val popUpItems = listOf<String>("Active tenants", "Removed tenants")
+    val popUpItems = listOf<String>("Active tenants", "Removed tenants", "Report")
+
+    var dataFetched by remember {
+        mutableStateOf(true)
+    }
+
+    if(dataFetched) {
+        viewModel.setMonthAndYear(month = month, year = year)
+        dataFetched = false
+    }
 
     Box(
         modifier = modifier
     ) {
         TenantsNotPaidScreen(
+            month = month,
+            year = year,
             activeTenantsSelected = uiState.activeTenantsSelected,
             inActiveTenantsSelected = uiState.inactiveTenantsSelected,
             tenantName = uiState.tenantName,
@@ -91,7 +104,9 @@ fun TenantsNotPaidScreenComposable(
             },
             rentPayments = uiState.rentPaymentsData.rentpayment,
             numberOfUnits = uiState.rentPaymentsData.rentpayment.size,
-            navigateToSingleTenantPaymentDetails = navigateToSingleTenantPaymentDetails,
+            navigateToSingleTenantPaymentDetails = {roomName, tenantId ->
+                navigateToSingleTenantPaymentDetails(roomName, tenantId, month, year)
+            },
             onDismissRequest = {
                 showMenuPopup = !showMenuPopup
             },
@@ -115,12 +130,14 @@ fun TenantsNotPaidScreenComposable(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TenantsNotPaidScreen(
+    month: String,
+    year: String,
     activeTenantsSelected: Boolean,
     inActiveTenantsSelected: Boolean,
     tenantName: String?,
     onSearchTextChanged: (searchText: String) -> Unit,
     numberOfRoomsSelected: String?,
-    onSelectNumOfRooms: (rooms: Int) -> Unit,
+    onSelectNumOfRooms: (rooms: String) -> Unit,
     rooms: List<String>,
     selectedUnitName: String?,
     onChangeSelectedUnitName: (unitName: String) -> Unit,
@@ -232,6 +249,10 @@ fun TenantsNotPaidScreen(
 
             }
         }
+        Text(
+            text = "$month, $year",
+            fontWeight = FontWeight.Bold
+        )
         Spacer(modifier = Modifier.height(10.dp))
         LazyColumn() {
             items(rentPayments.size) {
@@ -288,7 +309,7 @@ fun IndividualNotPaidTenantCell(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(text = "No.Rooms: ")
                 Text(
-                    text = rentPayment.numberOfRooms.toString(),
+                    text = rentPayment.numberOfRooms,
                     fontWeight = FontWeight.Bold
                 )
             }

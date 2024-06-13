@@ -2,6 +2,9 @@ package com.example.tenant_care.util
 
 import com.example.tenant_care.model.amenity.Amenity
 import com.example.tenant_care.model.amenity.AmenityImage
+import com.example.tenant_care.model.caretaker.CaretakerDT
+import com.example.tenant_care.model.caretaker.CaretakerPayment
+import com.example.tenant_care.model.caretaker.PManagerDt
 import com.example.tenant_care.model.caretaker.PreviousWaterMeterData
 import com.example.tenant_care.model.caretaker.WaterMeterDt
 import com.example.tenant_care.model.property.PropertyTenant
@@ -12,7 +15,7 @@ import kotlinx.serialization.Serializable
 val properties = listOf<PropertyUnit>(
     PropertyUnit(
         propertyUnitId = 1,
-        numberOfRooms = 2,
+        rooms = "Bedsitter",
         propertyNumberOrName = "Col A1",
         propertyDescription = "2 bedrooms property",
         monthlyRent = 2000.00,
@@ -24,7 +27,7 @@ val properties = listOf<PropertyUnit>(
     ),
     PropertyUnit(
         propertyUnitId = 1,
-        numberOfRooms = 2,
+        rooms = "Bedsitter",
         propertyNumberOrName = "Col A1",
         propertyDescription = "2 bedrooms property",
         monthlyRent = 2000.00,
@@ -36,7 +39,7 @@ val properties = listOf<PropertyUnit>(
     ),
     PropertyUnit(
         propertyUnitId = 1,
-        numberOfRooms = 2,
+        rooms = "Bedsitter",
         propertyNumberOrName = "Col A1",
         propertyDescription = "2 bedrooms property",
         monthlyRent = 2000.00,
@@ -48,7 +51,7 @@ val properties = listOf<PropertyUnit>(
     ),
     PropertyUnit(
         propertyUnitId = 1,
-        numberOfRooms = 2,
+        rooms = "Bedsitter",
         propertyNumberOrName = "Col A1",
         propertyDescription = "2 bedrooms property",
         monthlyRent = 2000.00,
@@ -331,5 +334,90 @@ val sampleAmenity = Amenity(
     addedBy = "Alex Mbogo",
     images = sampleAmenityImages,
     pmanagerId = 1,
+)
+
+
+val pManagerExample = PManagerDt(
+    fullName = "John Doe",
+    nationalIdOrPassportNumber = "23453234",
+    phoneNumber = "567876545",
+    email = "doe@gmail.com",
+    pmanagerId = 2
+)
+
+val caretakerExample = CaretakerDT(
+    caretakerId = 1,
+    fullName = "Alex Mbogo",
+    nationalIdOrPassportNumber = "123456543",
+    phoneNumber = "098765699",
+    email = "alex@gmail.com",
+    caretakerAddedAt = "2024-04-15T19:36:38.168224",
+    active = true,
+    salary = 10.0,
+    payments = emptyList(),
+    pmanager = pManagerExample
+)
+
+val caretakersExample = listOf(
+    CaretakerDT(
+        caretakerId = 1,
+        fullName = "Alex Mbogo",
+        nationalIdOrPassportNumber = "123456543",
+        phoneNumber = "098765699",
+        email = "alex@gmail.com",
+        caretakerAddedAt = "2024-04-15T19:36:38.168224",
+        active = true,
+        salary = 10.0,
+        payments = emptyList(),
+        pmanager = pManagerExample
+    ),
+    CaretakerDT(
+        caretakerId = 1,
+        fullName = "Alex Mbogo",
+        nationalIdOrPassportNumber = "123456543",
+        phoneNumber = "098765699",
+        email = "alex@gmail.com",
+        caretakerAddedAt = "2024-04-15T19:36:38.168224",
+        active = true,
+        salary = 10.0,
+        payments = emptyList(),
+        pmanager = pManagerExample
+    ),
+    CaretakerDT(
+        caretakerId = 1,
+        fullName = "Alex Mbogo",
+        nationalIdOrPassportNumber = "123456543",
+        phoneNumber = "098765699",
+        email = "alex@gmail.com",
+        caretakerAddedAt = "2024-04-15T19:36:38.168224",
+        active = true,
+        salary = 10.0,
+        payments = emptyList(),
+        pmanager = pManagerExample
+    ),
+    CaretakerDT(
+        caretakerId = 1,
+        fullName = "Alex Mbogo",
+        nationalIdOrPassportNumber = "123456543",
+        phoneNumber = "098765699",
+        email = "alex@gmail.com",
+        caretakerAddedAt = "2024-04-15T19:36:38.168224",
+        active = true,
+        salary = 10.0,
+        payments = emptyList(),
+        pmanager = pManagerExample
+    ),
+    CaretakerDT(
+        caretakerId = 1,
+        fullName = "Alex Mbogo",
+        nationalIdOrPassportNumber = "123456543",
+        phoneNumber = "098765699",
+        email = "alex@gmail.com",
+        caretakerAddedAt = "2024-04-15T19:36:38.168224",
+        active = true,
+        salary = 10.0,
+        payments = emptyList(),
+        pmanager = pManagerExample
+    )
 )
 

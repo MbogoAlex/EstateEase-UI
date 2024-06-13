@@ -29,6 +29,8 @@ val unPaidRentPaymentsDataInit = RentPaymentDetailsResponseBodyData(
 )
 
 data class TenantsNotPaidScreenUiState(
+    val month: String = "",
+    val year: String = "",
     val rentPaymentsData: RentPaymentDetailsResponseBodyData = unPaidRentPaymentsDataInit,
     val userDetails: ReusableFunctions.UserDetails = ReusableFunctions.UserDetails(),
     val fetchingStatus: FetchingTenantsNotPaidStatus = FetchingTenantsNotPaidStatus.INITIAL,
@@ -140,8 +142,8 @@ class TenantsNotPaidScreenViewModel(
             )
         }
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = tenantName,
             tenantId = null,
             rooms = rooms,
@@ -160,8 +162,8 @@ class TenantsNotPaidScreenViewModel(
             )
         }
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = _uiState.value.tenantName,
             tenantId = null,
             rooms = selectedNumOfRooms!!.toInt(),
@@ -185,8 +187,8 @@ class TenantsNotPaidScreenViewModel(
             )
         }
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = _uiState.value.tenantName,
             tenantId = null,
             rooms = rooms,
@@ -209,8 +211,8 @@ class TenantsNotPaidScreenViewModel(
             )
         }
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = _uiState.value.tenantName,
             tenantId = null,
             rooms = null,
@@ -241,8 +243,8 @@ class TenantsNotPaidScreenViewModel(
             )
         }
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = uiStatus.value.month,
+            year = uiStatus.value.year,
             tenantName = _uiState.value.tenantName,
             tenantId = null,
             rooms = rooms,
@@ -261,11 +263,16 @@ class TenantsNotPaidScreenViewModel(
         }
     }
 
-    init {
-        loadUserDetails()
+    fun setMonthAndYear(month: String, year: String) {
+        _uiState.update {
+            it.copy(
+                month = month,
+                year = year
+            )
+        }
         fetchRentPaymentsData(
-            month = LocalDateTime.now().month.toString(),
-            year = LocalDateTime.now().year.toString(),
+            month = month,
+            year = year,
             tenantName = null,
             tenantId = null,
             rooms = null,
@@ -274,5 +281,9 @@ class TenantsNotPaidScreenViewModel(
             paidLate = null,
             tenantActive = null
         )
+    }
+
+    init {
+        loadUserDetails()
     }
 }

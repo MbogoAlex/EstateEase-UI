@@ -42,6 +42,12 @@ data class RentPaymentsInfoHomeScreenUiState(
     val newPenaltyAmount: String = "",
     val month: String = "",
     val year: String = "",
+    val years: List<String> = emptyList(),
+    val currentMonth: String = "",
+    val currentYear: String = "",
+    val penaltyButtonEnabled: Boolean = true,
+    val waterUnitButtonEnabled: Boolean = true,
+    val months: List<String> = emptyList(),
     val executionStatus: ExecutionStatus = ExecutionStatus.INITIAL,
     val penaltyUpdateStatus: PenaltyUpdateStatus = PenaltyUpdateStatus.INITIAL,
     val expenseUpdateStatus: ExpenseUpdateStatus = ExpenseUpdateStatus.INITIAL
@@ -58,11 +64,39 @@ class RentPaymentsInfoHomeScreenViewModel(
     // load user details
 
     fun loadUserDetails() {
+
+        val months = listOf<String>(
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        )
+        var currentYear = LocalDateTime.now().year
+        val years = mutableListOf<String>()
+        var i = 10
+        do {
+            years.add(currentYear.toString())
+            currentYear--
+            i--
+        } while (i > 0)
+
         viewModelScope.launch {
             dsRepository.userDSDetails.collect() { userDsDetails ->
                 _uiState.update {
                     it.copy(
                         userDSDetails = userDsDetails,
+                        years = years,
+                        months = months,
+                        currentMonth = LocalDateTime.now().month.toString(),
+                        currentYear = LocalDateTime.now().year.toString()
                     )
                 }
             }
@@ -107,7 +141,7 @@ class RentPaymentsInfoHomeScreenViewModel(
     fun fetchPenalty() {
         viewModelScope.launch {
             try {
-               val response = apiRepository.fetchPenalty(2)
+               val response = apiRepository.fetchPenalty(1)
                if(response.isSuccessful) {
                    _uiState.update {
                        it.copy(
@@ -191,6 +225,7 @@ class RentPaymentsInfoHomeScreenViewModel(
                             executionStatus = ExecutionStatus.FAILURE
                         )
                     }
+                    Log.e("DEACTIVATE_PENALTY_ERROR_RESPONSE", response.toString())
                 }
             } catch (e: Exception) {
                 _uiState.update {
@@ -198,6 +233,7 @@ class RentPaymentsInfoHomeScreenViewModel(
                         executionStatus = ExecutionStatus.FAILURE
                     )
                 }
+                Log.e("DEACTIVATE_PENALTY_ERROR_EXCEPTION", e.toString())
             }
         }
     }
@@ -341,6 +377,40 @@ class RentPaymentsInfoHomeScreenViewModel(
                 expenseUpdateStatus = ExpenseUpdateStatus.INITIAL
             )
         }
+    }
+
+    fun updateMonth(month: String) {
+        _uiState.update {
+            it.copy(
+                month = month,
+                penaltyButtonEnabled = month.lowercase() == LocalDateTime.now().month.toString().lowercase() && uiState.value.year == LocalDateTime.now().year.toString(),
+                waterUnitButtonEnabled = month.lowercase() == LocalDateTime.now().month.toString().lowercase() && uiState.value.year == LocalDateTime.now().year.toString()
+            )
+        }
+//        fetchRentOverview()
+    }
+
+    fun updateYear(year: String) {
+        _uiState.update {
+            it.copy(
+                year = year,
+                penaltyButtonEnabled = year.lowercase() == LocalDateTime.now().year.toString().lowercase() && uiState.value.month == LocalDateTime.now().month.toString(),
+                waterUnitButtonEnabled = year.lowercase() == LocalDateTime.now().year.toString().lowercase() && uiState.value.month == LocalDateTime.now().month.toString()
+            )
+        }
+//        fetchRentOverview()
+    }
+
+    fun unfilter() {
+        _uiState.update {
+            it.copy(
+                month = LocalDateTime.now().month.toString(),
+                year = LocalDateTime.now().year.toString(),
+                penaltyButtonEnabled = true,
+                waterUnitButtonEnabled = true
+            )
+        }
+        fetchRentOverview()
     }
 
     init {

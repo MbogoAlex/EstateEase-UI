@@ -1,5 +1,6 @@
 package com.example.tenant_care.ui.screens.caretakerViews.units
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.network.ApiRepository
@@ -98,7 +99,7 @@ class OccupiedUnitsScreenViewModel(
             try {
                 val response = apiRepository.fetchFilteredProperties(
                     tenantName = uiState.value.tenantName,
-                    rooms = uiState.value.rooms,
+                    rooms = uiState.value.rooms.takeIf { it.isNotEmpty() },
                     roomName = uiState.value.roomName,
                     occupied = true
                 )
@@ -120,6 +121,7 @@ class OccupiedUnitsScreenViewModel(
                             loadingStatus = LoadingStatus.FAILURE
                         )
                     }
+                    Log.e("FETCH_UNITS_ERROR_RESPONSE", response.toString())
                 }
             } catch (e: Exception) {
                 _uiState.update {
@@ -127,6 +129,7 @@ class OccupiedUnitsScreenViewModel(
                         loadingStatus = LoadingStatus.FAILURE
                     )
                 }
+                Log.e("FETCH_UNITS_ERROR_EXCEPTION", e.toString())
             }
         }
     }

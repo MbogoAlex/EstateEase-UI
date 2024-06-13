@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PropertyRequestBody(
-    val numberOfRooms: Int,
+    val rooms: String,
     val propertyNumberOrName: String,
     val propertyDescription: String,
     val monthlyRent: Double,
@@ -23,8 +23,8 @@ data class PropertyRequestBodyData(
 @Serializable
 data class NewProperty(
     val propertyUnitId: Int,
-    val numberOfRooms: Int,
-    val propertyNumberOrName: Int,
+    val rooms: String,
+    val propertyNumberOrName: String,
     val propertyDescription: String,
     val monthlyRent: Double,
     val propertyAddedAt: String,

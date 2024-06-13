@@ -27,7 +27,7 @@ enum class ArchivingStatus {
 
 val occupiedPropertyUnitData = PropertyUnit(
     propertyUnitId = 0,
-    numberOfRooms = 1,
+    rooms = "Bedsitter",
     propertyNumberOrName = "",
     propertyDescription = "",
     monthlyRent = 0.0,

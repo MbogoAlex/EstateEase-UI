@@ -31,7 +31,7 @@ data class TenantDetails(
 @Serializable
 data class TenantPropertyUnit (
     val propertyUnitId: Int,
-    val numberOfRooms: Int,
+    val rooms: String,
     val propertyNumberOrName: String,
     val propertyDescription: String,
     val monthlyRent: Double
