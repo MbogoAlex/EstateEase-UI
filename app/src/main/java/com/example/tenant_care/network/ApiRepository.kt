@@ -17,6 +17,8 @@ import com.example.tenant_care.model.caretaker.CaretakersResponseBody
 import com.example.tenant_care.model.caretaker.MeterReadingRequestBody
 import com.example.tenant_care.model.caretaker.MeterReadingResponseBody
 import com.example.tenant_care.model.caretaker.MeterReadingsResponseBody
+import com.example.tenant_care.model.message.MessageRequestBody
+import com.example.tenant_care.model.message.MessageResponseBody
 import com.example.tenant_care.model.pManager.PManagerRequestBody
 import com.example.tenant_care.model.pManager.PManagerResponseBody
 import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBody
@@ -215,6 +217,10 @@ interface ApiRepository {
         rentPaymentStatus: Boolean?,
         paidLate: Boolean?,
     ): Response<ResponseBody>
+
+    suspend fun sendSms(
+        messageRequestBody: MessageRequestBody
+    ): Response<MessageResponseBody>
 }
 
 class NetworkRepository(private val apiService: ApiService): ApiRepository {
@@ -535,6 +541,10 @@ class NetworkRepository(private val apiService: ApiService): ApiRepository {
         tenantId = tenantId,
         rentPaymentStatus = rentPaymentStatus,
         paidLate = paidLate
+    )
+
+    override suspend fun sendSms(messageRequestBody: MessageRequestBody): Response<MessageResponseBody> = apiService.sendSms(
+        messageRequestBody = messageRequestBody
     )
 
 

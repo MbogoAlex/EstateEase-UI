@@ -385,6 +385,8 @@ fun RentPaymentCard(
 
                 Text(
                     text = ReusableFunctions.formatMoneyValue(expectedRent),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     style = TextStyle(
                         color = Color.Green
                     )
@@ -407,6 +409,8 @@ fun RentPaymentCard(
             ) {
                 Text(
                     text = ReusableFunctions.formatMoneyValue(paidAmount),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     style = TextStyle(
                         color = Color.Blue
                     )
@@ -429,6 +433,8 @@ fun RentPaymentCard(
             ) {
                 Text(
                     text = ReusableFunctions.formatMoneyValue(deficit),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     style = TextStyle(
                         color = Color.Red
                     )

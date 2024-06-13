@@ -44,6 +44,12 @@ enum class PaymentStatus {
     FAILURE
 }
 
+enum class SendingMessageStatus {
+    INITIAL,
+    LOADING,
+    SUCCESS,
+    FAILURE
+}
 enum class TenantViewSidebarMenuScreen {
     HOME_SCREEN,
     LOGIN_SCREEN

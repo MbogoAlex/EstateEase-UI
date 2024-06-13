@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -26,6 +27,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -50,6 +53,7 @@ import com.example.tenant_care.R
 import com.example.tenant_care.model.pManager.TenantRentPaymentData
 import com.example.tenant_care.nav.AppNavigation
 import com.example.tenant_care.util.ReusableFunctions
+import com.example.tenant_care.util.SendingMessageStatus
 import java.time.LocalDateTime
 
 
@@ -74,6 +78,36 @@ fun SingleTenantPaymentDetailsComposable(
     val viewModel: SingleTenantPaymentDataScreenViewModel = viewModel(factory = EstateEaseViewModelFactory.Factory)
     val uiState by viewModel.uiState.collectAsState()
 
+    var showSmsDialog by remember {
+        mutableStateOf(false)
+    }
+
+    if(showSmsDialog) {
+        EditSmsAlertDialog(
+            title = "Rent Remainder",
+            sms = uiState.sms,
+            label = "Message",
+            onValueChange = {
+                viewModel.updateMessage(it)
+            },
+            onConfirm = {
+                showSmsDialog = !showSmsDialog
+                viewModel.sendSms()
+            },
+            onDismissRequest = {
+                showSmsDialog = !showSmsDialog
+                viewModel.clearMessage()
+            }
+        )
+    }
+
+    if(uiState.sendingMessageStatus == SendingMessageStatus.SUCCESS) {
+        Toast.makeText(context, "Message sent", Toast.LENGTH_SHORT).show()
+        viewModel.resetSendingStatus()
+    } else if(uiState.sendingMessageStatus == SendingMessageStatus.FAILURE) {
+        Toast.makeText(context, "Failed to send message. Try again later", Toast.LENGTH_SHORT).show()
+        viewModel.resetSendingStatus()
+    }
 
     if(uiState.showPenaltyChangeDialog) {
         Log.i("SHOW_DIALOG_STATE", uiState.showPenaltyChangeDialog.toString())
@@ -148,10 +182,15 @@ fun SingleTenantPaymentDetailsComposable(
                     }
 
                 },
+                onRemindTenant = {
+                    showSmsDialog = !showSmsDialog
+                },
                 onChangePenaltyAmount = {
                     viewModel.togglePenaltyChangeDialog()
                     Log.i("SHOW_DIALOG_STATE", uiState.showPenaltyChangeDialog.toString())
                 },
+                sms = uiState.sms,
+                sendingMessageStatus = uiState.sendingMessageStatus,
                 penaltyPerDay = uiState.penaltyPerDay
             )
         }
@@ -164,6 +203,7 @@ fun SingleTenantPaymentDetailsComposable(
 fun SingleTenantPaymentDetailsScreen(
     month: String?,
     year: String?,
+    sms: String,
     currentWaterReadingMonth: String,
     previousWaterReadingMonth: String,
     totalWaterPrice: Double,
@@ -176,6 +216,8 @@ fun SingleTenantPaymentDetailsScreen(
     paidOn: String,
     penaltyPerDay: Double,
     penaltyActive: Boolean,
+    sendingMessageStatus: SendingMessageStatus,
+    onRemindTenant: () -> Unit,
     navigateToPreviousScreen: () -> Unit,
     onPenaltyActiveStatusChanged: (penaltyActive: Boolean) -> Unit,
     onChangePenaltyAmount: () -> Unit,
@@ -226,6 +268,7 @@ fun SingleTenantPaymentDetailsScreen(
             )
         } else if(!rentPaid) {
             TenantNotPaid(
+                sms = sms,
                 currentWaterReadingMonth = currentWaterReadingMonth,
                 previousWaterReadingMonth = previousWaterReadingMonth,
                 waterUnits = waterUnits,
@@ -235,6 +278,8 @@ fun SingleTenantPaymentDetailsScreen(
                 tenantSince = tenantSince,
                 penaltyActive = penaltyActive,
                 penaltyPerDay = penaltyPerDay,
+                sendingMessageStatus = sendingMessageStatus,
+                onRemindTenant = onRemindTenant,
                 onPenaltyActiveStatusChanged = onPenaltyActiveStatusChanged,
                 onChangePenaltyAmount = onChangePenaltyAmount
             )
@@ -373,6 +418,9 @@ fun TenantNotPaid(
     tenantSince: String,
     penaltyActive: Boolean,
     penaltyPerDay: Double,
+    sendingMessageStatus: SendingMessageStatus,
+    sms: String,
+    onRemindTenant: () -> Unit,
     onPenaltyActiveStatusChanged: (penaltyActive: Boolean) -> Unit,
     onChangePenaltyAmount: () -> Unit,
     modifier: Modifier = Modifier
@@ -598,11 +646,16 @@ fun TenantNotPaid(
             }
             Spacer(modifier = Modifier.height(20.dp))
             OutlinedButton(
+                enabled = sendingMessageStatus != SendingMessageStatus.LOADING,
                 modifier = Modifier
                     .fillMaxWidth(),
-                onClick = { /*TODO*/ }
+                onClick = onRemindTenant
             ) {
-                Text(text = "Remind tenant")
+                if(sendingMessageStatus == SendingMessageStatus.LOADING) {
+                    CircularProgressIndicator()
+                } else {
+                    Text(text = "Remind tenant")
+                }
             }
         }
     }
@@ -845,6 +898,59 @@ fun ChangePenaltyAmountDialog(
                 Text(text = "Cancel")
             }
         }
+    )
+}
+
+@Composable
+fun EditSmsAlertDialog(
+    title: String,
+    sms: String,
+    label: String,
+    onValueChange: (newValue: String) -> Unit,
+    onConfirm: () -> Unit,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        title = {
+            Text(text = title)
+        },
+        text = {
+            Column {
+                TextField(
+                    value = sms,
+                    label = {
+                        Text(text = label)
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Text
+                    ),
+                    onValueChange = onValueChange,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+
+            }
+        },
+        confirmButton = {
+            Button(
+                enabled = sms.isNotEmpty(),
+                onClick = onConfirm
+            ) {
+                Text(text = "Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = "Cancel")
+            }
+        },
+        onDismissRequest = onDismissRequest
     )
 }
 

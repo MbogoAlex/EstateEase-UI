@@ -9,10 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.tenant_care.network.ApiRepository
 import com.example.tenant_care.datastore.DSRepository
 import com.example.tenant_care.model.caretaker.WaterMeterDt
+import com.example.tenant_care.model.message.MessageRequestBody
 import com.example.tenant_care.model.pManager.RentPaymentDetailsResponseBodyData
 import com.example.tenant_care.model.pManager.RentPaymentRowUpdateRequestBody
 import com.example.tenant_care.util.ReusableFunctions
 import com.example.tenant_care.util.ReusableFunctions.toUserDetails
+import com.example.tenant_care.util.SendingMessageStatus
 import com.example.tenant_care.util.waterMeterData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,10 +60,12 @@ data class SingleTenantPaymentScreenUiState(
     val penaltyPerDay: Double = 0.0,
     val newPenaltyPerDay: Double? = null,
     val rentPaymentRowId: Int = 0,
+    val sms: String = "",
     val rentPenaltySwitchResponse: String = "",
     val showPenaltyChangeDialog: Boolean = false,
     val singleTenantPenaltyToggleStatus: SingleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.INITIAL,
-    val fetchingStatus: FetchingSingleTenantPaymentStatus = FetchingSingleTenantPaymentStatus.INITIAL
+    val fetchingStatus: FetchingSingleTenantPaymentStatus = FetchingSingleTenantPaymentStatus.INITIAL,
+    val sendingMessageStatus: SendingMessageStatus = SendingMessageStatus.INITIAL
 )
 @RequiresApi(Build.VERSION_CODES.O)
 class SingleTenantPaymentDataScreenViewModel(
@@ -326,6 +330,68 @@ class SingleTenantPaymentDataScreenViewModel(
         _uiState.update {
             it.copy(
                 singleTenantPenaltyToggleStatus = SingleTenantPenaltyToggleStatus.INITIAL
+            )
+        }
+    }
+
+    fun updateMessage(message: String) {
+        _uiState.update {
+            it.copy(
+                sms = message
+            )
+        }
+    }
+
+    fun clearMessage() {
+        _uiState.update {
+            it.copy(
+                sms = ""
+            )
+        }
+    }
+
+    fun sendSms() {
+        _uiState.update {
+            it.copy(
+                sendingMessageStatus = SendingMessageStatus.LOADING
+            )
+        }
+        val messageRequestBody = MessageRequestBody(
+            message = uiState.value.sms
+        )
+        viewModelScope.launch {
+            try {
+                val response = apiRepository.sendSms(messageRequestBody)
+                if(response.isSuccessful) {
+                    _uiState.update {
+                        it.copy(
+                            sendingMessageStatus = SendingMessageStatus.SUCCESS
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            sendingMessageStatus = SendingMessageStatus.FAILURE
+                        )
+                    }
+                    Log.e("SENDING_SMS_ERROR", response.toString())
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        sendingMessageStatus = SendingMessageStatus.FAILURE
+                    )
+                }
+                Log.e("SENDING_SMS_EXCEPTION", e.toString())
+            }
+        }
+    }
+
+    fun resetSendingStatus() {
+        _uiState.update {
+            it.copy(
+                sendingMessageStatus = SendingMessageStatus.INITIAL,
+                sms = ""
             )
         }
     }
